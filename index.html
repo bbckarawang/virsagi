@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Aplikasi Saya</title>
+  <title>Virsagi</title>
   
   <!-- Koneksi ke Manifest -->
   <link rel="manifest" href="manifest.json">
@@ -29,13 +29,15 @@
   </style>
 </head>
 <body>
-  <!-- GANTI URL DI BAWAH DENGAN URL WEB APP APPS SCRIPT KAMU -->
+  <!-- URL Apps Script kamu -->
   <iframe src="https://script.google.com/a/macros/pertiwi.ac.id/s/AKfycbyk6LGG36KtEAD8mnkDKf7qJaDt2m0I0UwL44eIegpXtBTj5rABdIYuE7rxaIE9k7bj/exec"></iframe>
 
   <script>
-    // Mendaftarkan Service Worker untuk kebutuhan PWA
+    // Mendaftarkan Service Worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js');
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log('SW Registered'))
+        .catch((err) => console.log('SW Error:', err));
     }
   </script>
 </body>
