@@ -7,7 +7,7 @@
   "theme_color": "#4285F4",
   "icons": [
     {
-      "src": "icon_virsagi.png",
+      "src": "logo_virsagi.png",
       "sizes": "192x192 512x512",
       "type": "image/png",
       "purpose": "any maskable"
