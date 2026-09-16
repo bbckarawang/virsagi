@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Aplikasi Saya</title>
+  
+  <!-- Koneksi ke Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4285F4">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #ffffff;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- GANTI URL DI BAWAH DENGAN URL WEB APP APPS SCRIPT KAMU -->
+  <iframe src="https://script.google.com/a/macros/pertiwi.ac.id/s/AKfycbyk6LGG36KtEAD8mnkDKf7qJaDt2m0I0UwL44eIegpXtBTj5rABdIYuE7rxaIE9k7bj/exec"></iframe>
+
+  <script>
+    // Mendaftarkan Service Worker untuk kebutuhan PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
