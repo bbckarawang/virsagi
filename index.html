@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Virsagi</title>
   
-  <!-- Koneksi ke Manifest -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#4285F4">
   <meta name="mobile-web-app-capable" content="yes">
@@ -19,15 +18,81 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #ffffff;
+      background-color: #f5f6fa;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    /* Area Utama Iframe (Menyisakan ruang 60px di bawah untuk Menu Navigasi) */
-    .content-area {
+    /* 1. Halaman Menu Utama / Dashboard */
+    #main-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: calc(100% - 60px);
-      position: relative;
+      height: 100%;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 500;
+      padding: 20px;
+    }
+
+    .app-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .menu-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .menu-card {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .menu-card:active {
+      transform: scale(0.98);
+      background-color: #f0f4fe;
+    }
+
+    .menu-card svg {
+      width: 28px;
+      height: 28px;
+      fill: #4285F4;
+      margin-right: 15px;
+    }
+
+    .menu-card span {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    /* 2. Area Iframe Full Screen */
+    #app-container {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      background: #ffffff;
     }
 
     iframe {
@@ -36,67 +101,22 @@
       border: none;
     }
 
-    /* Bottom Navigation Bar */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      background-color: #ffffff;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: #757575;
-      text-decoration: none;
-      font-size: 11px;
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: none;
-      cursor: pointer;
-      transition: color 0.2s ease;
-    }
-
-    .nav-item svg {
-      width: 22px;
-      height: 22px;
-      fill: currentColor;
-      margin-bottom: 3px;
-    }
-
-    /* Efek Menu yang Aktif */
-    .nav-item.active {
-      color: #4285F4;
-      font-weight: bold;
-    }
-
-    /* Loading Screen Container */
+    /* 3. Loading Screen Love */
     #loader {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: calc(100% - 60px);
+      height: 100%;
       background-color: #ffffff;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      z-index: 9999;
+      z-index: 2000;
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
-    /* Animasi Heartbeat Love */
     .heart {
       width: 40px;
       height: 40px;
@@ -139,39 +159,44 @@
 </head>
 <body>
 
-  <div class="content-area">
-    <!-- Element Loading Screen Love -->
-    <div id="loader">
-      <div class="heart"></div>
-      <div class="loading-text" id="loader-text">Memuat Virsagi Utama...</div>
-    </div>
+  <!-- 1. Tampilan Menu Utama saat Pertama Kali Dibuka -->
+  <div id="main-menu">
+    <div class="app-title">Pilih Menu Virsagi</div>
+    <div class="menu-container">
+      
+      <!-- Menu Home (Rumah) -->
+      <div class="menu-card" onclick="openApp('https://script.google.com/a/macros/pertiwi.ac.id/s/AKfycbyk6LGG36KtEAD8mnkDKf7qJaDt2m0I0UwL44eIegpXtBTj5rABdIYuE7rxaIE9k7bj/exec', 'Memuat Home...')">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Home</span>
+      </div>
 
-    <!-- Iframe Apps Script Utama (Default Menu 1) -->
-    <iframe id="appFrame" src="https://script.google.com/a/macros/pertiwi.ac.id/s/AKfycbyk6LGG36KtEAD8mnkDKf7qJaDt2m0I0UwL44eIegpXtBTj5rABdIYuE7rxaIE9k7bj/exec"></iframe>
+      <!-- Menu Schedule (Kalender) -->
+      <div class="menu-card" onclick="openApp('https://script.google.com/macros/s/AKfycbyh3EOXIMqa5S9xYDq8O4r3aNmc8Z2bCsK2DtiY_KMPU-ov5xYtYOp998Aoipmdm9M/exec', 'Memuat Schedule...')">
+        <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+        <span>Schedule</span>
+      </div>
+
+      <!-- Menu Game (Game Console) -->
+      <div class="menu-card" onclick="openApp('https://script.google.com/macros/s/AKfycbwRFoqleJLMSCcS4YaSX4jU2qnG-zGY7zQ5S1IXTgT-WmFgyxeIk_ZZEn9P0jEPyj4/exec', 'Memuat Game...')">
+        <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+        <span>Game</span>
+      </div>
+
+    </div>
   </div>
 
-  <!-- Bottom Navigation Menu -->
-  <nav class="bottom-nav">
-    <!-- Menu 1 -->
-    <button class="nav-item active" onclick="switchTab(this, 'https://script.google.com/a/macros/pertiwi.ac.id/s/AKfycbyk6LGG36KtEAD8mnkDKf7qJaDt2m0I0UwL44eIegpXtBTj5rABdIYuE7rxaIE9k7bj/exec', 'Memuat Virsagi Utama...')">
-      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      <span>Virsagi 1</span>
-    </button>
-
-    <!-- Menu 2 (Ganti URL dengan URL Apps Script ke-2) -->
-    <button class="nav-item" onclick="switchTab(this, 'https://script.google.com/macros/s/AKfycbyh3EOXIMqa5S9xYDq8O4r3aNmc8Z2bCsK2DtiY_KMPU-ov5xYtYOp998Aoipmdm9M/exec', 'Memuat Virsagi 2...')">
-      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-      <span>Virsagi 2</span>
-    </button>
-
-    <!-- Menu 3 (Ganti URL dengan URL Apps Script ke-3) -->
-    <button class="nav-item" onclick="switchTab(this, 'https://script.google.com/macros/s/AKfycbwRFoqleJLMSCcS4YaSX4jU2qnG-zGY7zQ5S1IXTgT-WmFgyxeIk_ZZEn9P0jEPyj4/exec', 'Memuat Virsagi 3...')">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-      <span>Virsagi 3</span>
-    </button>
-  </nav>
+  <!-- 2. Area Tampilan Aplikasi Full Screen -->
+  <div id="app-container">
+    <div id="loader" class="hidden">
+      <div class="heart"></div>
+      <div class="loading-text" id="loader-text">Memuat...</div>
+    </div>
+    <iframe id="appFrame" src=""></iframe>
+  </div>
 
   <script>
+    const mainMenu = document.getElementById('main-menu');
+    const appContainer = document.getElementById('app-container');
     const iframe = document.getElementById('appFrame');
     const loader = document.getElementById('loader');
     const loaderText = document.getElementById('loader-text');
@@ -181,25 +206,35 @@
       loader.classList.add('hidden');
     };
 
-    // Fungsi Pindah Menu
-    function switchTab(element, url, title) {
-      // Jika URL belum diganti/masih placeholder
-      if (url.startsWith('MASUKKAN_URL')) {
-        alert('URL untuk menu ini belum diisi.');
-        return;
-      }
-
-      // Update Tampilan Tab Aktif
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      element.classList.add('active');
-
-      // Tampilkan kembali loading love
-      loaderText.innerText = title;
+    // Fungsi Membuka Aplikasi (Full Screen)
+    function openApp(url, titleText) {
+      // Tampilkan Loading
+      loaderText.innerText = titleText;
       loader.classList.remove('hidden');
 
-      // Ganti URL Iframe
+      // Tampilkan kontainer full screen & sembunyikan menu
+      appContainer.style.display = 'block';
+      mainMenu.style.display = 'none';
+
+      // Set URL ke iframe
       iframe.src = url;
+
+      // Tambahkan status ke histori browser agar tombol Back HP berfungsi
+      history.pushState({ page: 'app' }, '', '');
     }
+
+    // Fungsi Kembali ke Menu Utama
+    function showMainMenu() {
+      appContainer.style.display = 'none';
+      mainMenu.style.display = 'flex';
+      iframe.src = ''; // Bersihkan iframe
+    }
+
+    // Mendeteksi Tombol Back di HP Android
+    window.onpopstate = function(event) {
+      // Jika tombol back ditekan, kembalikan ke menu utama
+      showMainMenu();
+    };
 
     // Register Service Worker
     if ('serviceWorker' in navigator) {
