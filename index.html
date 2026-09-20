@@ -68,11 +68,12 @@
       letter-spacing: 1px;
     }
 
-    /* Grid Layout 2x2 */
+    /* Grid Layout 2x2 dengan Center Floating Button */
     .menu-container {
+      position: relative;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 16px;
       width: 100%;
       max-width: 340px;
     }
@@ -83,10 +84,10 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px 10px;
+      padding: 24px 10px;
       background: rgba(30, 41, 59, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
+      border-radius: 20px;
       backdrop-filter: blur(8px);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
       cursor: pointer;
@@ -104,14 +105,56 @@
       width: 32px;
       height: 32px;
       fill: #eab308;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.5));
     }
 
     .menu-card span {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: #f8fafc;
+    }
+
+    /* Tombol Reminder Lingkaran di Tengah Grid */
+    .reminder-center-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 2px solid #eab308;
+      box-shadow: 0 0 18px rgba(234, 179, 8, 0.5), inset 0 0 10px rgba(234, 179, 8, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.25s ease;
+    }
+
+    .reminder-center-btn:active {
+      transform: translate(-50%, -50%) scale(0.9);
+      box-shadow: 0 0 25px rgba(234, 179, 8, 0.8);
+    }
+
+    .reminder-center-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: #eab308;
+      filter: drop-shadow(0 0 5px rgba(234, 179, 8, 0.8));
+    }
+
+    .reminder-center-btn span {
+      font-size: 9px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 3px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     /* 2. Area Iframe Full Screen */
@@ -194,12 +237,11 @@
 
   <!-- 1. Tampilan Dashboard Kosmik -->
   <div id="main-menu">
-    <!-- Gambar Logo Pasangan / Virsagi di Repository -->
     <img src="logo_virsagi.png" alt="Logo Virsagi" class="brand-logo" onerror="this.src='logo_virsagi.jpg';">
     <div class="app-title">VIRSAGI</div>
     <div class="app-subtitle">DIFFERENT PATHS, SAME ADVENTURE</div>
 
-    <!-- Grid 2x2 -->
+    <!-- Grid 2x2 + Center Floating Reminder Button -->
     <div class="menu-container">
       
       <!-- Menu 1: Home -->
@@ -224,6 +266,12 @@
       <div class="menu-card" onclick="openApp('https://script.google.com/macros/s/AKfycbxto3C5Rm1WmmIP2wIFd-txWjfnxXE4tUg2V8u5z0tVKrVItSDyxHZxzf8WsMgtkite/exec', 'Memuat Dictionary...')">
         <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4zm0 16v-2h12v2H6z"/></svg>
         <span>Dictionary</span>
+      </div>
+
+      <!-- Center Floating Button: Reminder -->
+      <div class="reminder-center-btn" onclick="openApp('https://script.google.com/macros/s/AKfycbwTntKSu0TWglbxxe5E5JVPShFxe3Z0l9VuWWtgO8glYrssyrLc0NtvK9Bumx3azO4/exec', 'Memuat Reminder...')">
+        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        <span>Reminder</span>
       </div>
 
     </div>
