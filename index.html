@@ -43,8 +43,8 @@
 
     /* Logo Virsagi Berdua */
     .brand-logo {
-      width: 120px;
-      height: 120px;
+      width: 110px;
+      height: 110px;
       border-radius: 50%;
       object-fit: cover;
       margin-bottom: 12px;
@@ -68,44 +68,48 @@
       letter-spacing: 1px;
     }
 
+    /* Grid Layout 2x2 */
     .menu-container {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 12px;
       width: 100%;
-      max-width: 320px;
+      max-width: 340px;
     }
 
-    /* Kartu Menu Transparan & Glowing */
+    /* Kartu Menu Transparan & Glowing (Desain Kartu Grid) */
     .menu-card {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      padding: 14px 18px;
+      justify-content: center;
+      padding: 20px 10px;
       background: rgba(30, 41, 59, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
+      border-radius: 16px;
       backdrop-filter: blur(8px);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
       cursor: pointer;
       transition: all 0.2s ease;
+      text-align: center;
     }
 
     .menu-card:active {
-      transform: scale(0.97);
+      transform: scale(0.95);
       background: rgba(51, 65, 85, 0.9);
       border-color: rgba(234, 179, 8, 0.6);
     }
 
     .menu-card svg {
-      width: 24px;
-      height: 24px;
+      width: 32px;
+      height: 32px;
       fill: #eab308;
-      margin-right: 15px;
-      filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4));
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.5));
     }
 
     .menu-card span {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       color: #f8fafc;
     }
@@ -195,6 +199,7 @@
     <div class="app-title">VIRSAGI</div>
     <div class="app-subtitle">DIFFERENT PATHS, SAME ADVENTURE</div>
 
+    <!-- Grid 2x2 -->
     <div class="menu-container">
       
       <!-- Menu 1: Home -->
@@ -215,7 +220,7 @@
         <span>Game</span>
       </div>
 
-      <!-- Menu 4: Dictionary (Logo Buku Kamus) -->
+      <!-- Menu 4: Dictionary -->
       <div class="menu-card" onclick="openApp('https://script.google.com/macros/s/AKfycbxto3C5Rm1WmmIP2wIFd-txWjfnxXE4tUg2V8u5z0tVKrVItSDyxHZxzf8WsMgtkite/exec', 'Memuat Dictionary...')">
         <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4zm0 16v-2h12v2H6z"/></svg>
         <span>Dictionary</span>
