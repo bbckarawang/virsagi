@@ -6,7 +6,7 @@
   <title>Virsagi</title>
   
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4285F4">
+  <meta name="theme-color" content="#0d1117">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
 
@@ -18,69 +18,96 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #f5f6fa;
+      /* Tema Kosmik Dark Theme */
+      background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #ffffff;
     }
 
-    /* 1. Halaman Menu Utama / Dashboard */
+    /* 1. Halaman Menu Utama / Dashboard Kosmik */
     #main-menu {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: #ffffff;
+      background: radial-gradient(circle at center, #1a233a 0%, #0d1117 100%);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       z-index: 500;
       padding: 20px;
+      overflow-y: auto;
+    }
+
+    /* Logo Virsagi Berdua */
+    .brand-logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 12px;
+      box-shadow: 0 0 20px rgba(234, 179, 8, 0.3), 0 0 10px rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(234, 179, 8, 0.5);
     }
 
     .app-title {
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 30px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 4px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .app-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 25px;
+      letter-spacing: 1px;
     }
 
     .menu-container {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 12px;
       width: 100%;
       max-width: 320px;
     }
 
+    /* Kartu Menu Transparan & Glowing */
     .menu-card {
       display: flex;
       align-items: center;
-      padding: 16px 20px;
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      padding: 14px 18px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .menu-card:active {
-      transform: scale(0.98);
-      background-color: #f0f4fe;
+      transform: scale(0.97);
+      background: rgba(51, 65, 85, 0.9);
+      border-color: rgba(234, 179, 8, 0.6);
     }
 
     .menu-card svg {
-      width: 28px;
-      height: 28px;
-      fill: #4285F4;
+      width: 24px;
+      height: 24px;
+      fill: #eab308;
       margin-right: 15px;
+      filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.4));
     }
 
     .menu-card span {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
-      color: #333;
+      color: #f8fafc;
     }
 
     /* 2. Area Iframe Full Screen */
@@ -92,7 +119,7 @@
       top: 0;
       left: 0;
       z-index: 1000;
-      background: #ffffff;
+      background: #0d1117;
     }
 
     iframe {
@@ -101,14 +128,14 @@
       border: none;
     }
 
-    /* 3. Loading Screen Love */
+    /* 3. Loading Screen Love Dark Mode */
     #loader {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: #ffffff;
+      background-color: #0d1117;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -124,6 +151,7 @@
       position: relative;
       transform: rotate(-45deg);
       animation: heartbeat 1.2s infinite ease-in-out;
+      box-shadow: 0 0 20px rgba(255, 75, 92, 0.6);
     }
 
     .heart::before,
@@ -148,7 +176,8 @@
     .loading-text {
       margin-top: 35px;
       font-size: 13px;
-      color: #777777;
+      color: #94a3b8;
+      letter-spacing: 1px;
     }
 
     #loader.hidden {
@@ -159,33 +188,43 @@
 </head>
 <body>
 
-  <!-- 1. Tampilan Menu Utama saat Pertama Kali Dibuka -->
+  <!-- 1. Tampilan Dashboard Kosmik -->
   <div id="main-menu">
-    <div class="app-title">Pilih Menu Virsagi</div>
+    <!-- Gambar Logo Pasangan / Virsagi di Repository -->
+    <img src="logo_virsagi.png" alt="Logo Virsagi" class="brand-logo" onerror="this.src='logo_virsagi.jpg';">
+    <div class="app-title">VIRSAGI</div>
+    <div class="app-subtitle">DIFFERENT PATHS, SAME ADVENTURE</div>
+
     <div class="menu-container">
       
-      <!-- Menu Home (Rumah) -->
+      <!-- Menu 1: Home -->
       <div class="menu-card" onclick="openApp('https://script.google.com/a/macros/pertiwi.ac.id/s/AKfycbyk6LGG36KtEAD8mnkDKf7qJaDt2m0I0UwL44eIegpXtBTj5rABdIYuE7rxaIE9k7bj/exec', 'Memuat Home...')">
         <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         <span>Home</span>
       </div>
 
-      <!-- Menu Schedule (Kalender) -->
+      <!-- Menu 2: Schedule -->
       <div class="menu-card" onclick="openApp('https://script.google.com/macros/s/AKfycbyh3EOXIMqa5S9xYDq8O4r3aNmc8Z2bCsK2DtiY_KMPU-ov5xYtYOp998Aoipmdm9M/exec', 'Memuat Schedule...')">
         <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
         <span>Schedule</span>
       </div>
 
-      <!-- Menu Game (Game Console) -->
+      <!-- Menu 3: Game -->
       <div class="menu-card" onclick="openApp('https://script.google.com/macros/s/AKfycbwRFoqleJLMSCcS4YaSX4jU2qnG-zGY7zQ5S1IXTgT-WmFgyxeIk_ZZEn9P0jEPyj4/exec', 'Memuat Game...')">
         <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
         <span>Game</span>
       </div>
 
+      <!-- Menu 4: Dictionary (Logo Buku Kamus) -->
+      <div class="menu-card" onclick="openApp('https://script.google.com/macros/s/AKfycbxto3C5Rm1WmmIP2wIFd-txWjfnxXE4tUg2V8u5z0tVKrVItSDyxHZxzf8WsMgtkite/exec', 'Memuat Dictionary...')">
+        <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4zm0 16v-2h12v2H6z"/></svg>
+        <span>Dictionary</span>
+      </div>
+
     </div>
   </div>
 
-  <!-- 2. Area Tampilan Aplikasi Full Screen -->
+  <!-- 2. Area Full Screen Apps Script -->
   <div id="app-container">
     <div id="loader" class="hidden">
       <div class="heart"></div>
@@ -201,42 +240,31 @@
     const loader = document.getElementById('loader');
     const loaderText = document.getElementById('loader-text');
 
-    // Hilangkan loading saat iframe selesai dimuat
     iframe.onload = function() {
       loader.classList.add('hidden');
     };
 
-    // Fungsi Membuka Aplikasi (Full Screen)
     function openApp(url, titleText) {
-      // Tampilkan Loading
       loaderText.innerText = titleText;
       loader.classList.remove('hidden');
 
-      // Tampilkan kontainer full screen & sembunyikan menu
       appContainer.style.display = 'block';
       mainMenu.style.display = 'none';
 
-      // Set URL ke iframe
       iframe.src = url;
-
-      // Tambahkan status ke histori browser agar tombol Back HP berfungsi
       history.pushState({ page: 'app' }, '', '');
     }
 
-    // Fungsi Kembali ke Menu Utama
     function showMainMenu() {
       appContainer.style.display = 'none';
       mainMenu.style.display = 'flex';
-      iframe.src = ''; // Bersihkan iframe
+      iframe.src = '';
     }
 
-    // Mendeteksi Tombol Back di HP Android
     window.onpopstate = function(event) {
-      // Jika tombol back ditekan, kembalikan ke menu utama
       showMainMenu();
     };
 
-    // Register Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js')
         .then(() => console.log('SW Registered'))
