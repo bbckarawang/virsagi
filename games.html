@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>VirSagi Game ✨ Virgo & Sagittarius Cosmic Match</title>
   <!-- PeerJS untuk koneksi P2P tanpa database/Firebase -->
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-deep: #070919;
-      --bg-card: rgba(18, 23, 52, 0.72);
-      --border-glass: rgba(255, 215, 130, 0.22);
+      --bg-card: rgba(18, 23, 52, 0.78);
+      --border-glass: rgba(255, 215, 130, 0.25);
       --gold: #ffd166;
       --gold-glow: rgba(255, 209, 102, 0.45);
       --virgo-color: #6ee7b7;
@@ -43,7 +43,6 @@
       position: relative;
     }
 
-    /* Starfield Canvas */
     #starCanvas {
       position: fixed;
       top: 0;
@@ -54,7 +53,7 @@
       pointer-events: none;
     }
 
-    /* Custom Toast Notification (Pengganti alert bawaan) */
+    /* Toast Notification */
     #toast-container {
       position: fixed;
       top: 18px;
@@ -70,14 +69,14 @@
     }
 
     .toast {
-      background: rgba(20, 25, 58, 0.92);
+      background: rgba(20, 25, 58, 0.94);
       backdrop-filter: blur(14px);
       border: 1px solid var(--gold);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px var(--gold-glow);
       color: #fff;
       padding: 12px 16px;
       border-radius: 16px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       display: flex;
       align-items: center;
@@ -99,7 +98,7 @@
       to { opacity: 0; transform: translateY(-15px) scale(0.95); }
     }
 
-    /* Floating Emoji Burst */
+    /* Floating Emoji */
     .floating-emoji {
       position: fixed;
       bottom: 80px;
@@ -115,7 +114,6 @@
       100% { transform: translateY(-360px) scale(0.9) rotate(-12deg); opacity: 0; }
     }
 
-    /* Main Container */
     .app-wrapper {
       position: relative;
       z-index: 10;
@@ -127,7 +125,6 @@
       flex-direction: column;
     }
 
-    /* Header */
     header {
       display: flex;
       justify-content: space-between;
@@ -176,7 +173,7 @@
       transform: scale(0.92);
     }
 
-    /* Connection Status Pill */
+    /* Status Pill */
     .status-bar {
       background: var(--bg-card);
       border: 1px solid var(--border-glass);
@@ -206,15 +203,14 @@
 
     .status-dot.waiting {
       background: var(--gold);
-      animation: pulse 1.4s infinite;
+      animation: pulse 1.2s infinite;
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(1.3); }
+      50% { opacity: 0.35; transform: scale(1.35); }
     }
 
-    /* Glass Card */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border-glass);
@@ -234,40 +230,96 @@
       display: none !important;
     }
 
-    /* Zodiac Selector */
-    .zodiac-badges {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin: 16px 0;
+    /* Permanent Room Role Cards */
+    .perm-room-badge {
+      display: inline-block;
+      background: rgba(255, 209, 102, 0.14);
+      border: 1px solid rgba(255, 209, 102, 0.4);
+      color: var(--gold);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
     }
 
-    .zodiac-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1.5px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 14px 10px;
-      text-align: center;
+    .role-connect-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .role-action-card {
+      border-radius: 18px;
+      padding: 18px 16px;
       cursor: pointer;
       transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      border: 1.5px solid transparent;
     }
 
-    .zodiac-card.active.virgo {
+    .role-action-card:active {
+      transform: scale(0.98);
+    }
+
+    .role-virgo-btn {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(6, 78, 59, 0.35) 100%);
+      border-color: rgba(110, 231, 183, 0.45);
+    }
+
+    .role-virgo-btn:hover {
       border-color: var(--virgo-color);
-      background: rgba(110, 231, 183, 0.12);
-      box-shadow: 0 0 20px rgba(110, 231, 183, 0.2);
+      box-shadow: 0 0 24px rgba(110, 231, 183, 0.22);
     }
 
-    .zodiac-card.active.sagi {
+    .role-sagi-btn {
+      background: linear-gradient(135deg, rgba(244, 114, 182, 0.18) 0%, rgba(131, 24, 67, 0.35) 100%);
+      border-color: rgba(244, 114, 182, 0.45);
+    }
+
+    .role-sagi-btn:hover {
       border-color: var(--sagi-color);
-      background: rgba(244, 114, 182, 0.12);
-      box-shadow: 0 0 20px rgba(244, 114, 182, 0.2);
+      box-shadow: 0 0 24px rgba(244, 114, 182, 0.22);
     }
 
-    .zodiac-icon {
-      font-size: 2rem;
-      display: block;
-      margin-bottom: 4px;
+    .role-avatar {
+      font-size: 2.3rem;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .connecting-panel {
+      margin-top: 18px;
+      background: rgba(255, 209, 102, 0.08);
+      border: 1px dashed var(--gold);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .spinner-ring {
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(255, 209, 102, 0.2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     /* Buttons & Inputs */
@@ -321,15 +373,9 @@
       width: auto;
     }
 
-    .input-group {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
     input[type="text"] {
       width: 100%;
-      background: rgba(10, 14, 35, 0.8);
+      background: rgba(10, 14, 35, 0.85);
       border: 1px solid var(--border-glass);
       border-radius: 12px;
       padding: 12px 14px;
@@ -341,44 +387,6 @@
 
     input[type="text"]:focus {
       border-color: var(--gold);
-    }
-
-    .divider {
-      text-align: center;
-      margin: 16px 0;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      position: relative;
-    }
-
-    .divider::before, .divider::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      width: 35%;
-      height: 1px;
-      background: rgba(255, 255, 255, 0.12);
-    }
-    .divider::before { left: 0; }
-    .divider::after { right: 0; }
-
-    /* Room Code Box */
-    .invite-box {
-      background: rgba(255, 209, 102, 0.08);
-      border: 1px dashed var(--gold);
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 12px;
-      text-align: center;
-    }
-
-    .room-code-text {
-      font-family: monospace;
-      font-size: 1.25rem;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: var(--gold);
-      margin: 6px 0;
     }
 
     /* Game Menu Grid */
@@ -512,14 +520,6 @@
       height: 8px;
       border-radius: 8px;
       cursor: pointer;
-    }
-
-    .scale-numbers {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 6px;
     }
 
     /* Reveal Comparison Box */
@@ -798,60 +798,57 @@
     <div class="status-bar">
       <div>
         <span class="status-dot" id="statusDot"></span>
-        <span id="statusText">Belum terhubung ke semesta</span>
+        <span id="statusText">Pilih peranmu untuk masuk</span>
       </div>
-      <div id="roleBadge" style="font-weight: 700; color: var(--gold);">♍ Virgo</div>
+      <div id="roleBadge" style="font-weight: 700; color: var(--gold);">✨ VirSagi</div>
     </div>
 
-    <!-- SCREEN 1: LOBBY & KONEKSI P2P -->
+    <!-- SCREEN 1: PERMANENT ROOM DIRECT CONNECT -->
     <section id="screenLobby" class="card">
       <div style="text-align: center;">
-        <h2 style="font-size: 1.2rem; color: var(--gold); margin-bottom: 6px;">Koneksi Bintang Tanpa Server</h2>
-        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
-          Pilih zodiakmu, buat ruang rasi bintang, dan kirimkan tautan undangan ke pasanganmu.
+        <span class="perm-room-badge">🌌 PERMANENT ROOM: VIRSAGI-UNIVERSE</span>
+        <h2 style="font-size: 1.2rem; color: var(--gold); margin-bottom: 6px;">Portal Bintang Berdua</h2>
+        <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.4;">
+          Tanpa kode acak! <strong>Virgo Boy</strong> membuka ruang sebagai Host, dan <strong>Sagittarius Girl</strong> langsung klik gabung.
         </p>
       </div>
 
-      <!-- Pilih Peran Virgo / Sagittarius -->
-      <div class="zodiac-badges">
-        <div class="zodiac-card virgo active" id="pickVirgo" onclick="selectZodiac('Virgo')">
-          <span class="zodiac-icon">♍</span>
-          <strong style="color: var(--virgo-color);">Virgo Boy</strong>
-          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Analitis & Perhatian</div>
-        </div>
-        <div class="zodiac-card sagi" id="pickSagi" onclick="selectZodiac('Sagittarius')">
-          <span class="zodiac-icon">♐</span>
-          <strong style="color: var(--sagi-color);">Sagittarius Girl</strong>
-          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Petualang & Ceria</div>
-        </div>
-      </div>
-
-      <!-- Buat Ruang (Host) -->
-      <button class="btn btn-primary" id="btnCreateRoom" onclick="createRoom()">
-        ✨ Buat Ruang Bintang (Host)
-      </button>
-
-      <!-- Kotak Kode & Link Undangan (Muncul setelah buat ruang) -->
-      <div id="inviteSection" class="invite-box hidden">
-        <div style="font-size: 0.78rem; color: var(--text-muted);">Kode Ruang Bintang:</div>
-        <div class="room-code-text" id="displayRoomCode">----</div>
-        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 8px;">
-          <button class="btn btn-secondary btn-sm" onclick="copyInviteLink()">🔗 Salin Link Undangan</button>
-          <button class="btn btn-outline btn-sm" onclick="copyRoomCode()">📋 Salin Kode</button>
-        </div>
-        <div style="font-size: 0.75rem; color: var(--gold); margin-top: 8px;">
-          Menunggu pasangan bergabung... 🌠
-        </div>
-      </div>
-
-      <div class="divider">ATAU GABUNG RUANG</div>
-
-      <!-- Gabung Ruang (Guest) -->
-      <div class="input-group">
-        <input type="text" id="inputJoinCode" placeholder="Masukkan kode ruang..." maxlength="15" />
-        <button class="btn btn-secondary" style="width: auto; padding: 0 18px;" onclick="joinRoom()">
-          Gabung 🚀
+      <!-- Tombol Pilih Peran & Koneksi Langsung -->
+      <div id="roleSelectButtons" class="role-connect-grid">
+        <button class="role-action-card role-virgo-btn" onclick="startAsVirgoHost()">
+          <div class="role-avatar">♍</div>
+          <div>
+            <strong style="color: var(--virgo-color); font-size: 1.05rem; display: block;">Aku Virgo Boy (Host)</strong>
+            <span style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.3; display: block; margin-top: 2px;">
+              Buka ruang bintang permanen & tunggu Sagittarius masuk
+            </span>
+          </div>
         </button>
+
+        <button class="role-action-card role-sagi-btn" onclick="joinAsSagittariusGuest()">
+          <div class="role-avatar">♐</div>
+          <div>
+            <strong style="color: var(--sagi-color); font-size: 1.05rem; display: block;">Aku Sagittarius Girl (Gabung)</strong>
+            <span style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.3; display: block; margin-top: 2px;">
+              Langsung terhubung otomatis ke ruang Virgo Boy
+            </span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Panel Status Menghubungkan (Muncul setelah klik salah satu peran) -->
+      <div id="connectingPanel" class="connecting-panel hidden">
+        <div class="spinner-ring"></div>
+        <div id="connectingTitle" style="font-weight: 700; color: var(--gold); font-size: 0.95rem; margin-bottom: 4px;">
+          Menyiapkan Sinyal Bintang...
+        </div>
+        <div id="connectingSub" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px;">
+          Mohon tunggu sebentar...
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: center;">
+          <button class="btn btn-secondary btn-sm" onclick="retryConnection()">🔄 Coba Sambung Ulang</button>
+          <button class="btn btn-outline btn-sm" onclick="resetLobby()">⬅️ Ganti Peran</button>
+        </div>
       </div>
     </section>
 
@@ -915,7 +912,6 @@
         <span class="score-pill" id="hudScore">✨ 0 Poin</span>
       </div>
 
-      <!-- Konten Dinamis Game -->
       <div id="gamePlayArea"></div>
     </section>
 
@@ -979,7 +975,7 @@
 
   <script>
     /* =========================================================================
-       1. BANK 30+ PERTANYAAN KECOCOKAN RANDOM (VIRGO & SAGITTARIUS EDITION)
+       1. BANK 30 PERTANYAAN KECOCOKAN RANDOM (VIRGO & SAGITTARIUS EDITION)
        ========================================================================= */
     const QUESTION_BANK = {
       tot: [
@@ -1145,7 +1141,7 @@
     };
 
     /* =========================================================================
-       2. WEB AUDIO API (EFEK SUARA SINTESIS TANPA FILE EKSTERNAL)
+       2. WEB AUDIO API (EFEK SUARA SINTESIS)
        ========================================================================= */
     let soundEnabled = true;
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1169,7 +1165,6 @@
         osc.start(now);
         osc.stop(now + 0.08);
       } else if (type === 'match') {
-        // Arpeggio kosmik saat cocok
         const notes = [523.25, 659.25, 783.99, 1046.50];
         notes.forEach((freq, idx) => {
           const o = audioCtx.createOscillator();
@@ -1234,7 +1229,7 @@
       setTimeout(() => {
         el.classList.add('fade-out');
         setTimeout(() => el.remove(), 300);
-      }, 3000);
+      }, 3200);
     }
 
     function spawnFloatingEmoji(emoji) {
@@ -1251,7 +1246,7 @@
     }
 
     /* =========================================================================
-       4. LATAR BELAKANG LANGIT BERBINTANG (HTML5 CANVAS)
+       4. LATAR BELAKANG LANGIT BERBINTANG
        ========================================================================= */
     const starCanvas = document.getElementById('starCanvas');
     const sCtx = starCanvas.getContext('2d');
@@ -1275,7 +1270,6 @@
     function animateStars() {
       sCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
 
-      // Bintang berkelip
       stars.forEach(st => {
         st.alpha += st.speed;
         if (st.alpha > 1 || st.alpha < 0.15) st.speed *= -1;
@@ -1285,12 +1279,10 @@
         sCtx.fill();
       });
 
-      // Bintang jatuh sesekali
       if (Math.random() < 0.012 && shootingStars.length < 2) {
         shootingStars.push({
           x: Math.random() * starCanvas.width,
           y: Math.random() * (starCanvas.height * 0.4),
-          len: Math.random() * 70 + 40,
           vx: -(Math.random() * 5 + 4),
           vy: Math.random() * 3 + 2,
           life: 1
@@ -1315,18 +1307,34 @@
     animateStars();
 
     /* =========================================================================
-       5. KONEKSI P2P (PEERJS) & MANAJEMEN STATE
+       5. KONEKSI P2P PERMANENT ROOM (STUN SERVERS + AUTO-RETRY)
        ========================================================================= */
+    // ID Permanen Khusus Virgo Boy (Host) & Sagittarius Girl (Guest)
+    const PERMANENT_HOST_ID = 'VIRSAGI-LOVE-HOST-PERMANENT-2026';
+
+    // Konfigurasi ICE / STUN Server agar tembus jaringan seluler (4G/5G) & Wi-Fi berbeda
+    const PEER_CONFIG = {
+      debug: 1,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { urls: 'stun:stun4.l.google.com:19302' }
+        ]
+      }
+    };
+
     let peer = null;
     let conn = null;
     let isHost = false;
     let myZodiac = 'Virgo';
     let partnerZodiac = 'Sagittarius';
-    let roomCode = '';
+    let retryTimer = null;
     let unreadChat = 0;
     let chatOpen = false;
 
-    // Game State
     let gameState = {
       mode: null,
       round: 0,
@@ -1336,33 +1344,14 @@
       questions: [],
       myAnswer: null,
       partnerAnswer: null,
-      // Khusus Wavelength
       clueGiver: 'Virgo',
       targetNumber: 5,
       clueWord: '',
-      // Khusus KnowMe
-      knowMePhase: 'answer', // 'answer' atau 'guess'
+      knowMePhase: 'answer',
       mySelfAnswers: [],
       partnerSelfAnswers: [],
-      // Timer Draw
       timerInterval: null
     };
-
-    function selectZodiac(zodiac) {
-      playSound('click');
-      myZodiac = zodiac;
-      partnerZodiac = zodiac === 'Virgo' ? 'Sagittarius' : 'Virgo';
-      document.getElementById('pickVirgo').classList.toggle('active', zodiac === 'Virgo');
-      document.getElementById('pickSagi').classList.toggle('active', zodiac === 'Sagittarius');
-      document.getElementById('roleBadge').textContent = zodiac === 'Virgo' ? '♍ Virgo' : '♐ Sagittarius';
-    }
-
-    function generateShortId() {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let res = 'VS-';
-      for (let i = 0; i < 4; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
-      return res;
-    }
 
     function updateConnectionUI(state, text) {
       const dot = document.getElementById('statusDot');
@@ -1371,61 +1360,144 @@
       label.textContent = text;
     }
 
-    function createRoom() {
+    function showConnectingUI(title, sub) {
+      document.getElementById('roleSelectButtons').classList.add('hidden');
+      document.getElementById('connectingPanel').classList.remove('hidden');
+      document.getElementById('connectingTitle').textContent = title;
+      document.getElementById('connectingSub').textContent = sub;
+    }
+
+    function resetLobby() {
       playSound('click');
+      clearInterval(retryTimer);
+      if (peer) {
+        peer.destroy();
+        peer = null;
+      }
+      conn = null;
+      document.getElementById('roleSelectButtons').classList.remove('hidden');
+      document.getElementById('connectingPanel').classList.add('hidden');
+      document.getElementById('roleBadge').textContent = '✨ VirSagi';
+      updateConnectionUI('', 'Pilih peranmu untuk masuk');
+    }
+
+    function retryConnection() {
+      playSound('click');
+      if (isHost) {
+        startAsVirgoHost();
+      } else {
+        joinAsSagittariusGuest();
+      }
+    }
+
+    /* --- VIRGO BOY: BUKA RUANG PERMANEN (HOST) --- */
+    function startAsVirgoHost() {
+      playSound('click');
+      clearInterval(retryTimer);
+      if (peer) peer.destroy();
+
       isHost = true;
-      roomCode = generateShortId();
-      updateConnectionUI('waiting', 'Membuka portal rasi bintang...');
+      myZodiac = 'Virgo';
+      partnerZodiac = 'Sagittarius';
+      document.getElementById('roleBadge').textContent = '♍ Virgo Boy';
+      updateConnectionUI('waiting', 'Membuka ruang permanen...');
+      showConnectingUI(
+        '♍ Ruang Virgo Boy Sedang Dibuka...',
+        'Mendaftarkan sinyal ke satelit bintang. Tunggu sebentar...'
+      );
 
-      peer = new Peer(roomCode);
+      peer = new Peer(PERMANENT_HOST_ID, PEER_CONFIG);
 
-      peer.on('open', (id) => {
-        document.getElementById('displayRoomCode').textContent = id;
-        document.getElementById('inviteSection').classList.remove('hidden');
-        document.getElementById('btnCreateRoom').classList.add('hidden');
-        updateConnectionUI('waiting', 'Menunggu pasangan masuk...');
-        showToast('Ruang bintang berhasil dibuat! Kirim link ke dia ✨', '🌠');
+      peer.on('open', () => {
+        updateConnectionUI('waiting', 'Menunggu Sagittarius Girl...');
+        showConnectingUI(
+          '♍ Ruang Permanen Siap! ✨',
+          'Minta pacarmu membuka halaman ini dan langsung klik tombol "Aku Sagittarius Girl (Gabung)".'
+        );
+        showToast('Ruang Virgo Boy aktif! Menunggu dia klik gabung 🌠', '♍');
       });
 
       peer.on('connection', (connection) => {
+        if (conn && conn.open) {
+          connection.close();
+          return;
+        }
         conn = connection;
         setupConnectionHandlers();
       });
 
       peer.on('error', (err) => {
-        showToast('Gangguan sinyal kosmik: ' + err.type, '⚠️');
+        if (err.type === 'unavailable-id') {
+          showConnectingUI(
+            '⚠️ Sesi Lama Masih Aktif',
+            'Ruang sebelumnya belum tertutup sepenuhnya. Mencoba mengambil alih dalam 3 detik...'
+          );
+          setTimeout(() => {
+            if (isHost && (!conn || !conn.open)) startAsVirgoHost();
+          }, 3000);
+        } else {
+          showToast('Sinyal terganggu (' + err.type + '), klik Coba Sambung Ulang', '⚠️');
+        }
       });
     }
 
-    function joinRoom(autoCode = null) {
+    /* --- SAGITTARIUS GIRL: LANGSUNG GABUNG (GUEST) --- */
+    function joinAsSagittariusGuest() {
       playSound('click');
-      const code = (autoCode || document.getElementById('inputJoinCode').value).trim().toUpperCase();
-      if (!code) {
-        showToast('Masukkan kode ruang dulu ya!', '💫');
-        return;
-      }
+      clearInterval(retryTimer);
+      if (peer) peer.destroy();
+
       isHost = false;
-      roomCode = code;
-      updateConnectionUI('waiting', 'Menghubungkan ke ruang ' + code + '...');
+      myZodiac = 'Sagittarius';
+      partnerZodiac = 'Virgo';
+      document.getElementById('roleBadge').textContent = '♐ Sagittarius Girl';
+      updateConnectionUI('waiting', 'Mencari ruang Virgo Boy...');
+      showConnectingUI(
+        '♐ Menghubungkan ke Virgo Boy...',
+        'Mencari sinyal ruang permanen. Jika Virgo Boy belum klik buka ruang, sistem akan otomatis menunggu & menyambungkan...'
+      );
 
-      peer = new Peer();
+      peer = new Peer(PEER_CONFIG);
+
       peer.on('open', () => {
-        conn = peer.connect(code, { reliable: true });
-        setupConnectionHandlers();
+        attemptConnectToHost();
+        // Auto-retry setiap 3 detik sampai terhubung
+        retryTimer = setInterval(() => {
+          if (!conn || !conn.open) {
+            attemptConnectToHost();
+          } else {
+            clearInterval(retryTimer);
+          }
+        }, 3000);
       });
 
-      peer.on('error', () => {
-        showToast('Ruang tidak ditemukan. Cek lagi kodenya!', '❌');
-        updateConnectionUI('', 'Gagal terhubung');
+      peer.on('error', (err) => {
+        if (err.type === 'peer-unavailable') {
+          document.getElementById('connectingTitle').textContent = '⏳ Menunggu Virgo Boy Membuka Ruang...';
+          document.getElementById('connectingSub').textContent = 'Pastikan pacarmu sudah klik "Aku Virgo Boy (Host)". Sistem otomatis mencoba masuk setiap 3 detik.';
+        } else {
+          showToast('Mencoba menghubungkan ulang... (' + err.type + ')', '🔄');
+        }
       });
+    }
+
+    function attemptConnectToHost() {
+      if (conn) {
+        try { conn.close(); } catch (e) {}
+      }
+      conn = peer.connect(PERMANENT_HOST_ID, {
+        reliable: true,
+        serialization: 'json'
+      });
+      setupConnectionHandlers();
     }
 
     function setupConnectionHandlers() {
       conn.on('open', () => {
+        clearInterval(retryTimer);
         playSound('match');
-        updateConnectionUI('online', `Terhubung dengan ${partnerZodiac} 💫`);
-        showToast(`Yeay! ${partnerZodiac} sudah bergabung!`, '🎉');
-        // Kirim info zodiak kita
+        updateConnectionUI('online', `Terhubung: Virgo ♍ ❤️ ♐ Sagittarius`);
+        showToast(`Berhasil terhubung dengan ${partnerZodiac}! 🎉`, '💖');
         sendData({ type: 'HANDSHAKE', zodiac: myZodiac });
         switchScreen('screenMenu');
         document.getElementById('btnHome').classList.remove('hidden');
@@ -1436,8 +1508,14 @@
       });
 
       conn.on('close', () => {
-        updateConnectionUI('', 'Koneksi terputus');
-        showToast('Pasangan terputus dari ruang bintang 😢', '📡');
+        updateConnectionUI('waiting', 'Koneksi terputus, menyambungkan ulang...');
+        showToast('Sinyal terputus! Mencoba menyambung kembali... 🔄', '📡');
+        if (!isHost) {
+          retryTimer = setInterval(() => {
+            if (!conn || !conn.open) attemptConnectToHost();
+            else clearInterval(retryTimer);
+          }, 3000);
+        }
       });
     }
 
@@ -1446,35 +1524,6 @@
         conn.send(payload);
       }
     }
-
-    function copyInviteLink() {
-      playSound('click');
-      const url = new URL(window.location.href);
-      url.searchParams.set('room', roomCode);
-      url.searchParams.set('role', myZodiac === 'Virgo' ? 'Sagittarius' : 'Virgo');
-      navigator.clipboard.writeText(url.toString());
-      showToast('Link undangan disalin! Tinggal paste ke chat dia 💌', '🔗');
-    }
-
-    function copyRoomCode() {
-      playSound('click');
-      navigator.clipboard.writeText(roomCode);
-      showToast('Kode ruang ' + roomCode + ' berhasil disalin!', '📋');
-    }
-
-    // Auto-detect parameter URL saat pasangan membuka link undangan
-    window.addEventListener('DOMContentLoaded', () => {
-      const params = new URLSearchParams(window.location.search);
-      const urlRoom = params.get('room');
-      const urlRole = params.get('role');
-      if (urlRole && (urlRole === 'Virgo' || urlRole === 'Sagittarius')) {
-        selectZodiac(urlRole);
-      }
-      if (urlRoom) {
-        document.getElementById('inputJoinCode').value = urlRoom;
-        showToast(`Undangan ke ruang ${urlRoom} terdeteksi! Klik Gabung 🚀`, '💌');
-      }
-    });
 
     /* =========================================================================
        6. CHAT LUCU & EMOJI REACTION
@@ -1558,12 +1607,7 @@
     function handleIncomingData(data) {
       switch (data.type) {
         case 'HANDSHAKE':
-          partnerZodiac = data.zodiac;
-          if (partnerZodiac === myZodiac) {
-            // Otomatis sesuaikan agar tidak kembar
-            selectZodiac(partnerZodiac === 'Virgo' ? 'Sagittarius' : 'Virgo');
-          }
-          updateConnectionUI('online', `Terhubung dengan ${partnerZodiac} 💫`);
+          updateConnectionUI('online', `Terhubung: Virgo ♍ ❤️ ♐ Sagittarius`);
           break;
 
         case 'CHAT':
@@ -1596,12 +1640,12 @@
           break;
 
         case 'VALIDATE_MATCH':
-          // Pasangan menekan tombol "Sah / Cocok!" pada Mind Sync
           playSound('match');
           gameState.score += 100;
           updateHUD();
           showToast('Disepakati SAH! +100 Poin Kecocokan! 💖', '🎉');
-          document.getElementById('btnNextRound').disabled = false;
+          const nextBtn = document.getElementById('btnNextRound');
+          if (nextBtn) nextBtn.disabled = false;
           const validateBtn = document.getElementById('btnValidateSync');
           if (validateBtn) validateBtn.remove();
           break;
@@ -1679,7 +1723,6 @@
       const area = document.getElementById('gamePlayArea');
       const q = gameState.questions[gameState.round];
 
-      // --- MODE 1: THIS OR THAT ---
       if (gameState.mode === 'tot') {
         area.innerHTML = `
           <div class="question-box">Pilih yang paling menggambarkan dirimu!</div>
@@ -1689,10 +1732,7 @@
           </div>
           <div id="waitStatus" style="text-align:center; margin-top:14px; font-size:0.82rem; color:var(--text-muted);"></div>
         `;
-      }
-
-      // --- MODE 2: MIND SYNC ---
-      else if (gameState.mode === 'mindsync') {
+      } else if (gameState.mode === 'mindsync') {
         area.innerHTML = `
           <div class="question-box">"${q}"</div>
           <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
@@ -1704,10 +1744,7 @@
           </button>
           <div id="waitStatus" style="text-align:center; margin-top:14px; font-size:0.82rem; color:var(--text-muted);"></div>
         `;
-      }
-
-      // --- MODE 3: WAVELENGTH ---
-      else if (gameState.mode === 'wavelength') {
+      } else if (gameState.mode === 'wavelength') {
         const amIGiver = gameState.clueGiver === myZodiac;
         if (amIGiver) {
           area.innerHTML = `
@@ -1736,10 +1773,7 @@
             </div>
           `;
         }
-      }
-
-      // --- MODE 4: SEBERAPA KENAL AKU ---
-      else if (gameState.mode === 'knowme') {
+      } else if (gameState.mode === 'knowme') {
         const isAnswerPhase = gameState.knowMePhase === 'answer';
         area.innerHTML = `
           <div style="text-align:center; font-size:0.78rem; color:var(--gold); font-weight:700;">
@@ -1752,10 +1786,7 @@
           </button>
           <div id="waitStatus" style="text-align:center; margin-top:14px; font-size:0.82rem; color:var(--text-muted);"></div>
         `;
-      }
-
-      // --- MODE 5: DRAW & MATCH ---
-      else if (gameState.mode === 'draw') {
+      } else if (gameState.mode === 'draw') {
         area.innerHTML = `
           <div style="text-align:center; font-weight:700; color:var(--gold); margin-bottom:6px;">
             Tema: "${q}"
@@ -1781,7 +1812,6 @@
       }
     }
 
-    /* --- HANDLER SUB-GAME --- */
     function submitToT(choice) {
       if (gameState.myAnswer) return;
       playSound('click');
@@ -1925,7 +1955,6 @@
       canvas.addEventListener('touchmove', move, { passive: false });
       canvas.addEventListener('touchend', end);
 
-      // Hitung mundur 30 detik
       let timeLeft = 30;
       gameState.timerInterval = setInterval(() => {
         timeLeft--;
@@ -1957,7 +1986,6 @@
        ========================================================================= */
     function checkRoundCompletion() {
       if (gameState.mode === 'wavelength') {
-        // Jika saya pemberi petunjuk dan pasangan sudah menebak
         if (gameState.clueGiver === myZodiac && gameState.partnerAnswer !== null) {
           revealWavelengthResult(gameState.partnerAnswer, gameState.targetNumber);
         }
@@ -1969,7 +1997,6 @@
       const area = document.getElementById('gamePlayArea');
       const q = gameState.questions[gameState.round];
 
-      // --- HASIL THIS OR THAT ---
       if (gameState.mode === 'tot') {
         const isMatch = gameState.myAnswer === gameState.partnerAnswer;
         if (isMatch) {
@@ -1994,10 +2021,7 @@
           </div>
           ${renderNextButton()}
         `;
-      }
-
-      // --- HASIL MIND SYNC ---
-      else if (gameState.mode === 'mindsync') {
+      } else if (gameState.mode === 'mindsync') {
         const exactMatch = gameState.myAnswer.toLowerCase() === gameState.partnerAnswer.toLowerCase();
         if (exactMatch) {
           gameState.score += 100;
@@ -2023,12 +2047,8 @@
           ` : ''}
           ${renderNextButton()}
         `;
-      }
-
-      // --- HASIL SEBERAPA KENAL AKU ---
-      else if (gameState.mode === 'knowme') {
+      } else if (gameState.mode === 'knowme') {
         if (gameState.knowMePhase === 'answer') {
-          // Simpan jawaban babak 1, langsung lanjut ke ronde berikutnya atau masuk babak tebak
           gameState.mySelfAnswers.push(gameState.myAnswer);
           gameState.partnerSelfAnswers.push(gameState.partnerAnswer);
           showToast('Jawaban tersimpan rahasia! Lanjut... 🤫', '💌');
@@ -2036,7 +2056,6 @@
             if (isHost) triggerNextRound();
           }, 900);
         } else {
-          // Babak Tebak: bandingkan tebakanku dengan jawaban asli pasangan, & tebakan pasangan dengan jawabanku
           const actualPartnerAns = gameState.partnerSelfAnswers[gameState.round];
           const actualMyAns = gameState.mySelfAnswers[gameState.round];
           const iGuessedRight = gameState.myAnswer.toLowerCase() === actualPartnerAns.toLowerCase();
@@ -2071,10 +2090,7 @@
             ${renderNextButton()}
           `;
         }
-      }
-
-      // --- HASIL DRAW & MATCH ---
-      else if (gameState.mode === 'draw') {
+      } else if (gameState.mode === 'draw') {
         playSound('match');
         area.innerHTML = `
           <div style="text-align:center; font-size:1.1rem; font-weight:800; color:var(--gold);">
@@ -2135,7 +2151,7 @@
 
     function renderNextButton() {
       if (!isHost) {
-        return `<div style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-top:8px;">Menunggu Host melanjutkan ronde... ✨</div>`;
+        return `<div style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-top:8px;">Menunggu Virgo Boy (Host) melanjutkan ronde... ✨</div>`;
       }
       const isLast = gameState.round + 1 >= gameState.maxRounds;
       return `
@@ -2158,7 +2174,6 @@
       gameState.clueGiver = gameState.clueGiver === 'Virgo' ? 'Sagittarius' : 'Virgo';
 
       if (gameState.round >= gameState.maxRounds) {
-        // Khusus KnowMe: setelah selesai babak jawab, pindah ke babak tebak
         if (gameState.mode === 'knowme' && gameState.knowMePhase === 'answer') {
           gameState.knowMePhase = 'guess';
           gameState.round = 0;
