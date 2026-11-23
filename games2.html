@@ -1,0 +1,2541 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>VirSagi Game Batch 2 ✨ Cosmic Strategy & Co-op</title>
+  <!-- PeerJS untuk koneksi P2P tanpa database/Firebase -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #070919;
+      --bg-card: rgba(18, 23, 52, 0.82);
+      --border-glass: rgba(255, 215, 130, 0.25);
+      --gold: #ffd166;
+      --gold-glow: rgba(255, 209, 102, 0.45);
+      --virgo-color: #6ee7b7;
+      --sagi-color: #f472b6;
+      --purple-accent: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #fb7185;
+      --success: #34d399;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #161b40 0%, #070919 75%);
+      color: var(--text-main);
+      min-height: 100dvh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    #starCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Toast Notification */
+    #toast-container {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 90%;
+      max-width: 380px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(20, 25, 58, 0.95);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--gold);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px var(--gold-glow);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: toastIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .toast.fade-out {
+      animation: toastOut 0.3s ease forwards;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(-15px) scale(0.95); }
+    }
+
+    /* Floating Emoji */
+    .floating-emoji {
+      position: fixed;
+      bottom: 80px;
+      font-size: 2.2rem;
+      pointer-events: none;
+      z-index: 900;
+      animation: floatUp 2.4s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.6) rotate(-10deg); opacity: 0; }
+      20% { opacity: 1; transform: translateY(-30px) scale(1.15) rotate(8deg); }
+      100% { transform: translateY(-360px) scale(0.9) rotate(-12deg); opacity: 0; }
+    }
+
+    .app-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 480px;
+      min-height: 100dvh;
+      padding: 16px 16px 90px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 4px 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand h1 {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.25rem;
+      background: linear-gradient(135deg, #fff6d6 0%, var(--gold) 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.5px;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      color: var(--gold);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+
+    .icon-btn.danger-btn {
+      border-color: rgba(251, 113, 133, 0.45);
+      color: var(--danger);
+      background: rgba(251, 113, 133, 0.12);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Status Pill */
+    .status-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      background: #64748b;
+    }
+
+    .status-dot.online {
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    .status-dot.waiting {
+      background: var(--gold);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(1.35); }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 22px;
+      padding: 20px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      animation: fadeSlide 0.35s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Permanent Room Role Cards */
+    .perm-room-badge {
+      display: inline-block;
+      background: rgba(255, 209, 102, 0.14);
+      border: 1px solid rgba(255, 209, 102, 0.4);
+      color: var(--gold);
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .role-connect-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .role-action-card {
+      border-radius: 18px;
+      padding: 18px 16px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      border: 1.5px solid transparent;
+    }
+
+    .role-action-card:active {
+      transform: scale(0.98);
+    }
+
+    .role-virgo-btn {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(6, 78, 59, 0.35) 100%);
+      border-color: rgba(110, 231, 183, 0.45);
+    }
+
+    .role-virgo-btn:hover {
+      border-color: var(--virgo-color);
+      box-shadow: 0 0 24px rgba(110, 231, 183, 0.22);
+    }
+
+    .role-sagi-btn {
+      background: linear-gradient(135deg, rgba(244, 114, 182, 0.18) 0%, rgba(131, 24, 67, 0.35) 100%);
+      border-color: rgba(244, 114, 182, 0.45);
+    }
+
+    .role-sagi-btn:hover {
+      border-color: var(--sagi-color);
+      box-shadow: 0 0 24px rgba(244, 114, 182, 0.22);
+    }
+
+    .role-avatar {
+      font-size: 2.3rem;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .connecting-panel {
+      margin-top: 18px;
+      background: rgba(255, 209, 102, 0.08);
+      border: 1px dashed var(--gold);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .spinner-ring {
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(255, 209, 102, 0.2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      width: 100%;
+      padding: 13px 16px;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffd166 0%, #f59e0b 100%);
+      color: #111827;
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(139, 92, 246, 0.22);
+      border: 1px solid rgba(139, 92, 246, 0.5);
+      color: #ede9fe;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-glass);
+      color: var(--text-main);
+    }
+
+    .btn-danger-outline {
+      background: rgba(251, 113, 133, 0.12);
+      border: 1px solid rgba(251, 113, 133, 0.45);
+      color: var(--danger);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+      color: #06281e;
+    }
+
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      border-radius: 10px;
+      width: auto;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: rgba(10, 14, 35, 0.88);
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--gold);
+    }
+
+    /* Game Menu Grid */
+    .game-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .game-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .game-item:hover {
+      border-color: var(--gold);
+      background: rgba(255, 209, 102, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .game-item-icon {
+      font-size: 1.9rem;
+      background: rgba(255, 255, 255, 0.06);
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .game-item-info h3 {
+      font-size: 0.98rem;
+      color: var(--gold);
+      margin-bottom: 3px;
+    }
+
+    .game-item-info p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* Difficulty Selector Pills */
+    .diff-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .diff-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      padding: 12px 6px;
+      color: #fff;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .diff-btn:hover, .diff-btn.active {
+      border-color: var(--gold);
+      background: rgba(255, 209, 102, 0.18);
+      color: var(--gold);
+    }
+
+    /* Gameplay HUD */
+    .hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .badge-round {
+      background: rgba(139, 92, 246, 0.25);
+      color: #ddd6fe;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .score-pill {
+      background: rgba(255, 209, 102, 0.15);
+      border: 1px solid rgba(255, 209, 102, 0.4);
+      color: var(--gold);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    /* Chain Reaction Words */
+    .chain-stream {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      background: rgba(10, 14, 35, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 12px;
+      max-height: 150px;
+      overflow-y: auto;
+      margin: 10px 0;
+    }
+
+    .chain-chip {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .chain-chip.latest {
+      border-color: var(--gold);
+      background: rgba(255, 209, 102, 0.2);
+      color: var(--gold);
+      font-weight: 800;
+    }
+
+    /* Cosmic Bomb Pulse */
+    .bomb-box {
+      background: radial-gradient(circle, rgba(251, 113, 133, 0.22) 0%, rgba(10, 14, 35, 0.85) 75%);
+      border: 1.5px solid var(--danger);
+      border-radius: 18px;
+      padding: 18px 14px;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .bomb-icon {
+      font-size: 3.1rem;
+      display: inline-block;
+      animation: bombShake 0.45s infinite alternate;
+    }
+
+    @keyframes bombShake {
+      from { transform: scale(1) rotate(-5deg); }
+      to { transform: scale(1.12) rotate(5deg); }
+    }
+
+    /* Memory Co-op Board */
+    .memory-grid {
+      display: grid;
+      gap: 6px;
+      margin: 10px auto;
+      width: 100%;
+    }
+
+    .memory-grid.grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .memory-grid.grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+    .mem-card {
+      aspect-ratio: 1 / 1;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(30, 41, 82, 0.9));
+      border: 1px solid rgba(255, 209, 102, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+      user-select: none;
+    }
+
+    .memory-grid.grid-6 .mem-card {
+      font-size: 1.05rem;
+      border-radius: 8px;
+    }
+
+    .mem-card.flipped {
+      background: rgba(255, 209, 102, 0.2);
+      border-color: var(--gold);
+      transform: scale(1.03);
+    }
+
+    .mem-card.matched {
+      background: rgba(52, 211, 153, 0.22);
+      border-color: var(--success);
+      opacity: 0.78;
+      cursor: default;
+    }
+
+    /* Codebreaker UI */
+    .code-slots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .code-slot {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(10, 14, 35, 0.9);
+      border: 2px dashed rgba(255, 209, 102, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      cursor: pointer;
+    }
+
+    .code-slot.filled {
+      border-style: solid;
+      border-color: var(--gold);
+      background: rgba(255, 209, 102, 0.14);
+    }
+
+    .symbol-picker {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .sym-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sym-btn:active {
+      transform: scale(0.9);
+    }
+
+    .code-history {
+      max-height: 155px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .code-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 14, 35, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 7px 12px;
+      font-size: 0.82rem;
+    }
+
+    /* Hangman UI */
+    .hangman-word {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin: 14px 0;
+    }
+
+    .letter-box {
+      min-width: 26px;
+      height: 34px;
+      border-bottom: 2.5px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .letter-space {
+      width: 14px;
+    }
+
+    .qwerty-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .key-btn {
+      width: 31px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .key-btn.used-right {
+      background: rgba(52, 211, 153, 0.28);
+      border-color: var(--success);
+      color: var(--success);
+      opacity: 0.7;
+    }
+
+    .key-btn.used-wrong {
+      background: rgba(251, 113, 133, 0.22);
+      border-color: var(--danger);
+      color: var(--danger);
+      opacity: 0.45;
+    }
+
+    /* Floating Chat & Emoji Bar */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: rgba(12, 16, 40, 0.92);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border-glass);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .emoji-quick {
+      display: flex;
+      gap: 6px;
+    }
+
+    .emoji-btn {
+      background: rgba(255, 255, 255, 0.07);
+      border: none;
+      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+      font-size: 1.15rem;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .emoji-btn:active {
+      transform: scale(1.25);
+    }
+
+    .chat-toggle-btn {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .unread-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger);
+      color: #fff;
+      font-size: 0.7rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    /* Chat Drawer */
+    .chat-drawer {
+      position: fixed;
+      bottom: 62px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 94%;
+      max-width: 450px;
+      height: 320px;
+      background: rgba(15, 20, 48, 0.96);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--gold);
+      border-radius: 20px;
+      z-index: 150;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .msg-bubble {
+      max-width: 78%;
+      padding: 8px 12px;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      line-height: 1.35;
+      word-wrap: break-word;
+    }
+
+    .msg-me {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #ffd166 0%, #f59e0b 100%);
+      color: #111827;
+      border-bottom-right-radius: 4px;
+      font-weight: 600;
+    }
+
+    .msg-partner {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-quick-replies {
+      display: flex;
+      gap: 6px;
+      padding: 6px 10px;
+      overflow-x: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .quick-chip {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Exit Modal Overlay */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 6, 18, 0.82);
+      backdrop-filter: blur(8px);
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #121734;
+      border: 1px solid var(--gold);
+      border-radius: 22px;
+      padding: 22px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+      animation: fadeSlide 0.25s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Latar Langit Berbintang -->
+  <canvas id="starCanvas"></canvas>
+
+  <!-- Container Notifikasi Kustom -->
+  <div id="toast-container"></div>
+
+  <!-- Modal Konfirmasi Exit -->
+  <div id="exitModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">🚪✨</div>
+      <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 8px;">Keluar dari Room Batch 2?</h3>
+      <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 18px;">
+        Pasanganmu akan mendapat notifikasi real-time bahwa kamu keluar, dan room ini akan ditutup bersih agar bisa dimainkan lagi lain kali.
+      </p>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-outline" onclick="closeExitModal()">Batal</button>
+        <button class="btn btn-danger-outline" style="font-weight: 800;" onclick="confirmExitRoom()">Ya, Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <span style="font-size: 1.4rem;">♍✨♐</span>
+        <h1>VirSagi Batch 2</h1>
+      </div>
+      <div class="header-controls">
+        <button class="icon-btn" id="btnSound" title="Suara On/Off">🔊</button>
+        <button class="icon-btn hidden" id="btnHome" title="Kembali ke Menu Game">🏠</button>
+        <button class="icon-btn danger-btn hidden" id="btnExit" title="Keluar Room" onclick="openExitModal()">🚪</button>
+      </div>
+    </header>
+
+    <!-- Status Koneksi P2P -->
+    <div class="status-bar">
+      <div>
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Pilih peranmu untuk masuk</span>
+      </div>
+      <div id="roleBadge" style="font-weight: 700; color: var(--gold);">✨ Batch 2</div>
+    </div>
+
+    <!-- SCREEN 1: PERMANENT ROOM DIRECT CONNECT -->
+    <section id="screenLobby" class="card">
+      <div style="text-align: center;">
+        <span class="perm-room-badge">🌌 PERMANENT ROOM: VIRSAGI-BATCH2</span>
+        <h2 style="font-size: 1.2rem; color: var(--gold); margin-bottom: 6px;">Portal Bintang Berdua</h2>
+        <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.4;">
+          <strong>Virgo Boy</strong> membuka ruang sebagai Host, dan <strong>Sagittarius Girl</strong> langsung klik gabung.
+        </p>
+      </div>
+
+      <div id="roleSelectButtons" class="role-connect-grid">
+        <button class="role-action-card role-virgo-btn" onclick="startAsVirgoHost()">
+          <div class="role-avatar">♍</div>
+          <div>
+            <strong style="color: var(--virgo-color); font-size: 1.05rem; display: block;">Aku Virgo Boy (Host)</strong>
+            <span style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.3; display: block; margin-top: 2px;">
+              Buka ruang permanen Batch 2 & tunggu Sagittarius masuk
+            </span>
+          </div>
+        </button>
+
+        <button class="role-action-card role-sagi-btn" onclick="joinAsSagittariusGuest()">
+          <div class="role-avatar">♐</div>
+          <div>
+            <strong style="color: var(--sagi-color); font-size: 1.05rem; display: block;">Aku Sagittarius Girl (Gabung)</strong>
+            <span style="font-size: 0.78rem; color: #cbd5e1; line-height: 1.3; display: block; margin-top: 2px;">
+              Langsung terhubung otomatis ke ruang Virgo Boy
+            </span>
+          </div>
+        </button>
+      </div>
+
+      <div id="connectingPanel" class="connecting-panel hidden">
+        <div class="spinner-ring"></div>
+        <div id="connectingTitle" style="font-weight: 700; color: var(--gold); font-size: 0.95rem; margin-bottom: 4px;">
+          Menyiapkan Sinyal Bintang...
+        </div>
+        <div id="connectingSub" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px;">
+          Mohon tunggu sebentar...
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: center;">
+          <button class="btn btn-secondary btn-sm" onclick="retryConnection()">🔄 Coba Sambung Ulang</button>
+          <button class="btn btn-danger-outline btn-sm" onclick="resetLobby(true)">🚪 Keluar / Ganti Peran</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: MENU 5 GAME BATCH 2 -->
+    <section id="screenMenu" class="card hidden">
+      <div style="text-align: center; margin-bottom: 8px;">
+        <h2 style="font-size: 1.2rem; color: var(--gold);">Arena Co-op & Strategi ✨</h2>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">
+          Pilih 1 dari 5 permainan baru untuk dimainkan berdua!
+        </p>
+      </div>
+
+      <div class="game-grid">
+        <div class="game-item" onclick="selectGame('chain')">
+          <div class="game-item-icon">🔗</div>
+          <div class="game-item-info">
+            <h3>1. Chain Reaction (50 Kata Awal)</h3>
+            <p>Bergantian sambung kata berhubungan dalam 12 detik sebelum rantai terputus!</p>
+          </div>
+        </div>
+
+        <div class="game-item" onclick="selectGame('bomb')">
+          <div class="game-item-icon">💣</div>
+          <div class="game-item-info">
+            <h3>2. Cosmic Bomb (50 Kategori)</h3>
+            <p>Sebutkan 1 jawaban sesuai kategori lalu lempar bom sebelum meledak!</p>
+          </div>
+        </div>
+
+        <div class="game-item" onclick="showDifficultyPicker('memory')">
+          <div class="game-item-icon">🧩</div>
+          <div class="game-item-info">
+            <h3>3. Memory Co-op (Easy / Med / Hard)</h3>
+            <p>Buka kartu bintang berdua secara bergantian (16, 24, atau 36 kartu).</p>
+          </div>
+        </div>
+
+        <div class="game-item" onclick="showDifficultyPicker('codebreaker')">
+          <div class="game-item-icon">🔐</div>
+          <div class="game-item-info">
+            <h3>4. Cosmic Codebreaker</h3>
+            <p>Pecahkan 4 kode simbol kosmik rahasia dengan ribuan variasi acak!</p>
+          </div>
+        </div>
+
+        <div class="game-item" onclick="selectGame('hangman')">
+          <div class="game-item-icon">🧭</div>
+          <div class="game-item-info">
+            <h3>5. Cosmic Hangman (Custom Kata)</h3>
+            <p>Buat kata rahasia & petunjukmu sendiri, lalu pasangan menebak hurufnya!</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button class="btn btn-danger-outline" onclick="openExitModal()">🚪 Keluar dari Room</button>
+      </div>
+    </section>
+
+    <!-- SCREEN 2B: PILIH LEVEL KESULITAN (MEMORY & CODEBREAKER) -->
+    <section id="screenDifficulty" class="card hidden" style="text-align: center;">
+      <h2 id="diffGameTitle" style="font-size: 1.15rem; color: var(--gold); margin-bottom: 6px;">Pilih Tingkat Kesulitan</h2>
+      <p id="diffGameDesc" style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;"></p>
+
+      <div class="diff-grid" id="diffButtonsContainer"></div>
+
+      <button class="btn btn-outline" style="margin-top: 10px;" onclick="switchScreen('screenMenu')">⬅️ Kembali ke Menu</button>
+    </section>
+
+    <!-- SCREEN 3: ARENA PERMAINAN -->
+    <section id="screenGame" class="card hidden">
+      <div class="hud-top">
+        <span class="badge-round" id="hudLeft">Info</span>
+        <span id="hudTitle" style="font-weight: 700; font-size: 0.9rem; color: var(--gold);">Game</span>
+        <span class="score-pill" id="hudRight">✨ 0</span>
+      </div>
+
+      <div id="gamePlayArea"></div>
+    </section>
+  </div>
+
+  <!-- CHAT DRAWER -->
+  <div id="chatDrawer" class="chat-drawer hidden">
+    <div class="chat-header">
+      <span>💬 Obrolan Rasi Bintang</span>
+      <button onclick="toggleChat()" style="background:none; border:none; color:#fff; font-size:1.1rem; cursor:pointer;">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin: auto;">
+        Kirim pesan atau stiker lucu ke pasanganmu ✨
+      </div>
+    </div>
+    <div class="chat-quick-replies">
+      <button class="quick-chip" onclick="sendQuickChat('Buruan lempar bomnya! 💣😂')">Buruan lempar bomnya! 💣😂</button>
+      <button class="quick-chip" onclick="sendQuickChat('Inget posisi kartunya ya! 🧩')">Inget posisi kartunya ya! 🧩</button>
+      <button class="quick-chip" onclick="sendQuickChat('Susah banget kodenya 🤯')">Susah banget kodenya 🤯</button>
+      <button class="quick-chip" onclick="sendQuickChat('Haha ketebak juga! 😎')">Haha ketebak juga! 😎</button>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Ketik pesan lucu..." onkeypress="if(event.key==='Enter') sendChat()" />
+      <button class="btn btn-primary btn-sm" onclick="sendChat()">Kirim</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM EMOJI & CHAT BAR -->
+  <div class="bottom-bar">
+    <div class="emoji-quick">
+      <button class="emoji-btn" onclick="sendReaction('❤️')">❤️</button>
+      <button class="emoji-btn" onclick="sendReaction('😂')">😂</button>
+      <button class="emoji-btn" onclick="sendReaction('💣')">💣</button>
+      <button class="emoji-btn" onclick="sendReaction('🔥')">🔥</button>
+      <button class="emoji-btn" onclick="sendReaction('✨')">✨</button>
+    </div>
+    <button class="chat-toggle-btn" onclick="toggleChat()">
+      💬 Chat
+      <span class="unread-badge hidden" id="unreadBadge">0</span>
+    </button>
+  </div>
+
+  <script>
+    /* =========================================================================
+       1. BANK SOAL BATCH 2 (50 KATA CHAIN REACTION + 50 KATEGORI COSMIC BOMB)
+       ========================================================================= */
+    const CHAIN_STARTERS = [
+      "Bintang", "Kopi", "Pantai", "Hujan", "Kucing",
+      "Bulan", "Cokelat", "Kereta", "Kamera", "Pelangi",
+      "Buku", "Musik", "Gunung", "Malam", "Api",
+      "Es Krim", "Pesawat", "Bunga", "Jam", "Kunci",
+      "Rumah", "Laut", "Lampu", "Sepatu", "Roti",
+      "Awan", "Cermin", "Surat", "Pesta", "Hutan",
+      "Mimpi", "Bola", "Payung", "Gitar", "Nasi",
+      "Roket", "Salju", "Jembatan", "Topi", "Permen",
+      "Pulau", "Taman", "Film", "Kado", "Sungai",
+      "Mobil", "Dapur", "Pasar", "Cincin", "Waktu"
+    ];
+
+    const BOMB_CATEGORIES = [
+      "Nama buah-buahan berwarna merah atau kuning",
+      "Makanan khas Indonesia yang berkuah",
+      "Nama negara di benua Asia",
+      "Benda yang selalu ada di dalam tas",
+      "Hewan yang bisa hidup di air",
+      "Minuman dingin yang sering dijual di kafe",
+      "Nama kota di Pulau Jawa",
+      "Benda yang ada di dalam kamar tidur",
+      "Judul film animasi atau kartun terkenal",
+      "Nama profesi atau pekerjaan",
+      "Makanan yang digoreng",
+      "Nama olahraga yang menggunakan bola",
+      "Benda elektronik di dalam rumah",
+      "Nama bunga atau tanaman hias",
+      "Warna selain merah, kuning, biru, hijau",
+      "Cemilan atau jajanan pasar",
+      "Nama planet atau benda luar angkasa",
+      "Alat musik yang dipetik atau ditiup",
+      "Nama bulan atau hari dalam bahasa Inggris",
+      "Pakaian atau aksesoris yang dipakai ke pesta",
+      "Hewan berkaki empat",
+      "Benda yang terbuat dari kaca atau plastik",
+      "Nama superhero atau karakter komik",
+      "Makanan yang rasanya manis",
+      "Nama kendaraan darat, laut, atau udara",
+      "Benda yang ada di dapur untuk memasak",
+      "Nama merek HP atau gadget terkenal",
+      "Kegiatan yang dilakukan saat liburan",
+      "Nama sungai, gunung, atau pantai di Indonesia",
+      "Sayuran yang sering ada di sup",
+      "Benda yang berbentuk bulat",
+      "Nama hewan yang bersayap",
+      "Kata sifat untuk memuji seseorang",
+      "Minuman hangat saat cuaca dingin",
+      "Nama aplikasi media sosial atau chat",
+      "Benda yang ada di kamar mandi",
+      "Makanan yang berbahan dasar tepung",
+      "Nama ibu kota negara di dunia",
+      "Alat tulis atau perlengkapan kantor",
+      "Nama rasi bintang atau zodiak",
+      "Makanan pedas favorit banyak orang",
+      "Benda yang mengeluarkan cahaya",
+      "Nama hewan serangga",
+      "Genre musik atau tarian",
+      "Benda yang dipakai saat hujan turun",
+      "Nama bumbu dapur atau rempah-rempah",
+      "Permainan tradisional atau board game",
+      "Bagian dari tubuh manusia",
+      "Tempat wisata populer di Indonesia",
+      "Hal yang bikin bahagia secara instan"
+    ];
+
+    const MEMORY_ICONS = [
+      "♍", "♐", "🌙", "⭐", "🪐", "☄️", "🚀", "🛸",
+      "🌌", "🔭", "💖", "🔥", "🍀", "🦋", "🐱", "🦊",
+      "🍓", "🍩"
+    ];
+
+    const CODE_SYMBOLS_POOL = ["🌙", "⭐", "🪐", "🔥", "💎", "🍀", "⚡", "🌸"];
+
+    /* =========================================================================
+       2. WEB AUDIO API (EFEK SUARA SINTESIS)
+       ========================================================================= */
+    let soundEnabled = true;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(540, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'tick') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(900, now);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } else if (type === 'boom') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(35, now + 0.55);
+        gain.gain.setValueAtTime(0.28, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+        osc.start(now);
+        osc.stop(now + 0.55);
+      } else if (type === 'match') {
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(freq, now + idx * 0.08);
+          g.gain.setValueAtTime(0.15, now + idx * 0.08);
+          g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(now + idx * 0.08);
+          o.stop(now + idx * 0.08 + 0.35);
+        });
+      } else if (type === 'miss') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.linearRampToValueAtTime(160, now + 0.25);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'chat') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(680, now);
+        osc.frequency.setValueAtTime(920, now + 0.06);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+        osc.start(now);
+        osc.stop(now + 0.16);
+      }
+    }
+
+    document.getElementById('btnSound').onclick = () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById('btnSound').textContent = soundEnabled ? '🔊' : '🔇';
+      showToast(soundEnabled ? 'Efek suara diaktifkan ✨' : 'Efek suara dimatikan 🔇');
+    };
+
+    /* =========================================================================
+       3. NOTIFIKASI KUSTOM & ANIMASI EMOJI
+       ========================================================================= */
+    function showToast(msg, icon = '✨') {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.innerHTML = `<span style="font-size:1.2rem;">${icon}</span><span>${msg}</span>`;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.classList.add('fade-out');
+        setTimeout(() => el.remove(), 300);
+      }, 3400);
+    }
+
+    function spawnFloatingEmoji(emoji) {
+      for (let i = 0; i < 4; i++) {
+        setTimeout(() => {
+          const el = document.createElement('div');
+          el.className = 'floating-emoji';
+          el.textContent = emoji;
+          el.style.left = (15 + Math.random() * 70) + '%';
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 2400);
+        }, i * 140);
+      }
+    }
+
+    /* =========================================================================
+       4. LATAR BELAKANG LANGIT BERBINTANG
+       ========================================================================= */
+    const starCanvas = document.getElementById('starCanvas');
+    const sCtx = starCanvas.getContext('2d');
+    let stars = [];
+    let shootingStars = [];
+
+    function resizeStarCanvas() {
+      starCanvas.width = window.innerWidth;
+      starCanvas.height = window.innerHeight;
+      stars = Array.from({ length: 110 }, () => ({
+        x: Math.random() * starCanvas.width,
+        y: Math.random() * starCanvas.height,
+        r: Math.random() * 1.6 + 0.3,
+        alpha: Math.random(),
+        speed: Math.random() * 0.015 + 0.004
+      }));
+    }
+    window.addEventListener('resize', resizeStarCanvas);
+    resizeStarCanvas();
+
+    function animateStars() {
+      sCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+
+      stars.forEach(st => {
+        st.alpha += st.speed;
+        if (st.alpha > 1 || st.alpha < 0.15) st.speed *= -1;
+        sCtx.beginPath();
+        sCtx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+        sCtx.fillStyle = `rgba(255, 244, 214, ${st.alpha})`;
+        sCtx.fill();
+      });
+
+      if (Math.random() < 0.012 && shootingStars.length < 2) {
+        shootingStars.push({
+          x: Math.random() * starCanvas.width,
+          y: Math.random() * (starCanvas.height * 0.4),
+          vx: -(Math.random() * 5 + 4),
+          vy: Math.random() * 3 + 2,
+          life: 1
+        });
+      }
+
+      shootingStars.forEach((ss, idx) => {
+        sCtx.beginPath();
+        sCtx.moveTo(ss.x, ss.y);
+        sCtx.lineTo(ss.x - ss.vx * 4, ss.y - ss.vy * 4);
+        sCtx.strokeStyle = `rgba(255, 209, 102, ${ss.life})`;
+        sCtx.lineWidth = 2;
+        sCtx.stroke();
+        ss.x += ss.vx;
+        ss.y += ss.vy;
+        ss.life -= 0.025;
+        if (ss.life <= 0) shootingStars.splice(idx, 1);
+      });
+
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+
+    /* =========================================================================
+       5. KONEKSI P2P PERMANENT ROOM & CLEAN EXIT MANAGEMENT
+       ========================================================================= */
+    const PERMANENT_HOST_ID = 'VIRSAGI-BATCH2-HOST-PERMANENT-2026';
+
+    const PEER_CONFIG = {
+      debug: 1,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { urls: 'stun:stun4.l.google.com:19302' }
+        ]
+      }
+    };
+
+    let peer = null;
+    let conn = null;
+    let isHost = false;
+    let myZodiac = 'Virgo';
+    let partnerZodiac = 'Sagittarius';
+    let retryTimer = null;
+    let activeGameTimer = null;
+    let unreadChat = 0;
+    let chatOpen = false;
+    let intentionalExit = false;
+
+    function updateConnectionUI(state, text) {
+      const dot = document.getElementById('statusDot');
+      const label = document.getElementById('statusText');
+      dot.className = 'status-dot ' + state;
+      label.textContent = text;
+    }
+
+    function showConnectingUI(title, sub) {
+      document.getElementById('roleSelectButtons').classList.add('hidden');
+      document.getElementById('connectingPanel').classList.remove('hidden');
+      document.getElementById('connectingTitle').textContent = title;
+      document.getElementById('connectingSub').textContent = sub;
+    }
+
+    function openExitModal() {
+      playSound('click');
+      document.getElementById('exitModal').classList.remove('hidden');
+    }
+
+    function closeExitModal() {
+      playSound('click');
+      document.getElementById('exitModal').classList.add('hidden');
+    }
+
+    function confirmExitRoom() {
+      closeExitModal();
+      intentionalExit = true;
+      sendData({ type: 'PLAYER_EXIT', zodiac: myZodiac });
+      showToast('Kamu keluar dari room. Sesi ditutup bersih 👋', '🚪');
+      setTimeout(() => {
+        resetLobby(false);
+      }, 250);
+    }
+
+    function resetLobby(playClick = true) {
+      if (playClick) playSound('click');
+      intentionalExit = true;
+      clearInterval(retryTimer);
+      clearInterval(activeGameTimer);
+
+      if (conn) {
+        try { conn.close(); } catch (e) {}
+        conn = null;
+      }
+      if (peer) {
+        try { peer.destroy(); } catch (e) {}
+        peer = null;
+      }
+
+      if (chatOpen) {
+        chatOpen = false;
+        document.getElementById('chatDrawer').classList.add('hidden');
+      }
+
+      document.getElementById('btnHome').classList.add('hidden');
+      document.getElementById('btnExit').classList.add('hidden');
+      switchScreen('screenLobby');
+      document.getElementById('roleSelectButtons').classList.remove('hidden');
+      document.getElementById('connectingPanel').classList.add('hidden');
+      document.getElementById('roleBadge').textContent = '✨ Batch 2';
+      updateConnectionUI('', 'Room kosong • Pilih peranmu');
+    }
+
+    window.addEventListener('beforeunload', () => {
+      if (conn && conn.open) {
+        try { conn.send({ type: 'PLAYER_EXIT', zodiac: myZodiac }); } catch (e) {}
+      }
+      if (peer) {
+        try { peer.destroy(); } catch (e) {}
+      }
+    });
+
+    function retryConnection() {
+      playSound('click');
+      if (isHost) startAsVirgoHost();
+      else joinAsSagittariusGuest();
+    }
+
+    function startAsVirgoHost() {
+      playSound('click');
+      intentionalExit = false;
+      clearInterval(retryTimer);
+      if (peer) { try { peer.destroy(); } catch (e) {} }
+
+      isHost = true;
+      myZodiac = 'Virgo';
+      partnerZodiac = 'Sagittarius';
+      document.getElementById('roleBadge').textContent = '♍ Virgo Boy';
+      document.getElementById('btnExit').classList.remove('hidden');
+      updateConnectionUI('waiting', 'Membuka ruang permanen...');
+      showConnectingUI(
+        '♍ Ruang Virgo Boy Sedang Dibuka...',
+        'Mendaftarkan sinyal Batch 2. Tunggu sebentar...'
+      );
+
+      peer = new Peer(PERMANENT_HOST_ID, PEER_CONFIG);
+
+      peer.on('open', () => {
+        updateConnectionUI('waiting', 'Menunggu Sagittarius Girl...');
+        showConnectingUI(
+          '♍ Ruang Permanen Siap! ✨',
+          'Minta pacarmu membuka halaman ini dan langsung klik tombol "Aku Sagittarius Girl (Gabung)".'
+        );
+        showToast('Ruang Virgo Boy aktif! Menunggu dia klik gabung 🌠', '♍');
+      });
+
+      peer.on('connection', (connection) => {
+        if (conn && conn.open) {
+          connection.close();
+          return;
+        }
+        conn = connection;
+        setupConnectionHandlers();
+      });
+
+      peer.on('error', (err) => {
+        if (intentionalExit) return;
+        if (err.type === 'unavailable-id') {
+          showConnectingUI(
+            '⚠️ Sesi Lama Masih Aktif',
+            'Ruang sebelumnya belum tertutup sepenuhnya. Mencoba mengambil alih dalam 3 detik...'
+          );
+          setTimeout(() => {
+            if (isHost && !intentionalExit && (!conn || !conn.open)) startAsVirgoHost();
+          }, 3000);
+        } else {
+          showToast('Sinyal terganggu (' + err.type + '), klik Coba Sambung Ulang', '⚠️');
+        }
+      });
+    }
+
+    function joinAsSagittariusGuest() {
+      playSound('click');
+      intentionalExit = false;
+      clearInterval(retryTimer);
+      if (peer) { try { peer.destroy(); } catch (e) {} }
+
+      isHost = false;
+      myZodiac = 'Sagittarius';
+      partnerZodiac = 'Virgo';
+      document.getElementById('roleBadge').textContent = '♐ Sagittarius Girl';
+      document.getElementById('btnExit').classList.remove('hidden');
+      updateConnectionUI('waiting', 'Mencari ruang Virgo Boy...');
+      showConnectingUI(
+        '♐ Menghubungkan ke Virgo Boy...',
+        'Mencari sinyal ruang permanen. Jika Virgo Boy belum klik buka ruang, sistem otomatis menunggu...'
+      );
+
+      peer = new Peer(PEER_CONFIG);
+
+      peer.on('open', () => {
+        attemptConnectToHost();
+        retryTimer = setInterval(() => {
+          if (intentionalExit) { clearInterval(retryTimer); return; }
+          if (!conn || !conn.open) attemptConnectToHost();
+          else clearInterval(retryTimer);
+        }, 3000);
+      });
+
+      peer.on('error', (err) => {
+        if (intentionalExit) return;
+        if (err.type === 'peer-unavailable') {
+          document.getElementById('connectingTitle').textContent = '⏳ Menunggu Virgo Boy Membuka Ruang...';
+          document.getElementById('connectingSub').textContent = 'Pastikan pacarmu sudah klik "Aku Virgo Boy (Host)". Sistem otomatis masuk setiap 3 detik.';
+        } else {
+          showToast('Mencoba menghubungkan ulang... (' + err.type + ')', '🔄');
+        }
+      });
+    }
+
+    function attemptConnectToHost() {
+      if (intentionalExit || !peer) return;
+      if (conn) { try { conn.close(); } catch (e) {} }
+      conn = peer.connect(PERMANENT_HOST_ID, { reliable: true, serialization: 'json' });
+      setupConnectionHandlers();
+    }
+
+    function setupConnectionHandlers() {
+      conn.on('open', () => {
+        clearInterval(retryTimer);
+        playSound('match');
+        updateConnectionUI('online', `Terhubung: Virgo ♍ ❤️ ♐ Sagittarius`);
+        showToast(`Berhasil terhubung dengan ${partnerZodiac}! 🎉`, '💖');
+        sendData({ type: 'HANDSHAKE', zodiac: myZodiac });
+        switchScreen('screenMenu');
+        document.getElementById('btnHome').classList.remove('hidden');
+        document.getElementById('btnExit').classList.remove('hidden');
+      });
+
+      conn.on('data', (data) => {
+        handleIncomingData(data);
+      });
+
+      conn.on('close', () => {
+        if (intentionalExit) return;
+        clearInterval(activeGameTimer);
+        if (isHost) {
+          updateConnectionUI('waiting', 'Sagittarius keluar • Menunggu masuk...');
+          showToast('Sagittarius Girl telah keluar dari room 👋', '🚪');
+          document.getElementById('btnHome').classList.add('hidden');
+          switchScreen('screenLobby');
+          showConnectingUI(
+            '♍ Sagittarius Keluar dari Room',
+            'Ruang masih terbuka jika ingin masuk lagi, atau klik Keluar untuk mengosongkan room.'
+          );
+        } else {
+          showToast('Virgo Boy telah keluar & menutup room 👋', '🚪');
+          resetLobby(false);
+        }
+      });
+    }
+
+    function sendData(payload) {
+      if (conn && conn.open) conn.send(payload);
+    }
+
+    /* =========================================================================
+       6. CHAT & EMOJI REACTION
+       ========================================================================= */
+    function toggleChat() {
+      playSound('click');
+      chatOpen = !chatOpen;
+      document.getElementById('chatDrawer').classList.toggle('hidden', !chatOpen);
+      if (chatOpen) {
+        unreadChat = 0;
+        document.getElementById('unreadBadge').classList.add('hidden');
+      }
+    }
+
+    function sendChat() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      appendChatMessage(text, true);
+      sendData({ type: 'CHAT', text });
+      input.value = '';
+      playSound('chat');
+    }
+
+    function sendQuickChat(text) {
+      appendChatMessage(text, true);
+      sendData({ type: 'CHAT', text });
+      playSound('chat');
+    }
+
+    function appendChatMessage(text, isMe) {
+      const box = document.getElementById('chatMessages');
+      if (box.children.length === 1 && box.children[0].style.textAlign === 'center') box.innerHTML = '';
+      const div = document.createElement('div');
+      div.className = 'msg-bubble ' + (isMe ? 'msg-me' : 'msg-partner');
+      div.textContent = text;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+
+      if (!isMe && !chatOpen) {
+        unreadChat++;
+        const badge = document.getElementById('unreadBadge');
+        badge.textContent = unreadChat;
+        badge.classList.remove('hidden');
+        showToast(`${partnerZodiac}: ${text}`, '💬');
+      }
+    }
+
+    function sendReaction(emoji) {
+      playSound('click');
+      spawnFloatingEmoji(emoji);
+      sendData({ type: 'EMOJI', emoji });
+    }
+
+    /* =========================================================================
+       7. NAVIGASI & STATE GLOBAL GAME BATCH 2
+       ========================================================================= */
+    let state = {};
+
+    function switchScreen(screenId) {
+      ['screenLobby', 'screenMenu', 'screenDifficulty', 'screenGame'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    function requestBackToMenu() {
+      playSound('click');
+      clearInterval(activeGameTimer);
+      switchScreen('screenMenu');
+      sendData({ type: 'BACK_MENU' });
+    }
+
+    document.getElementById('btnHome').onclick = requestBackToMenu;
+
+    function showDifficultyPicker(mode) {
+      playSound('click');
+      switchScreen('screenDifficulty');
+      const container = document.getElementById('diffButtonsContainer');
+
+      if (mode === 'memory') {
+        document.getElementById('diffGameTitle').textContent = '🧩 Memory Co-op';
+        document.getElementById('diffGameDesc').textContent = 'Pilih jumlah kartu bintang yang akan dibuka berdua secara bergantian:';
+        container.innerHTML = `
+          <button class="diff-btn" onclick="startMemoryGame('easy')">🌟 Easy<br><span style="font-size:0.72rem;color:var(--text-muted);">16 Kartu</span></button>
+          <button class="diff-btn" onclick="startMemoryGame('medium')">🔥 Medium<br><span style="font-size:0.72rem;color:var(--text-muted);">24 Kartu</span></button>
+          <button class="diff-btn" onclick="startMemoryGame('hard')">👑 Hard<br><span style="font-size:0.72rem;color:var(--text-muted);">36 Kartu</span></button>
+        `;
+      } else if (mode === 'codebreaker') {
+        document.getElementById('diffGameTitle').textContent = '🔐 Cosmic Codebreaker';
+        document.getElementById('diffGameDesc').textContent = 'Pilih tingkat kerumitan variasi simbol rahasia:';
+        container.innerHTML = `
+          <button class="diff-btn" onclick="startCodebreakerGame('easy')">🌟 Easy<br><span style="font-size:0.72rem;color:var(--text-muted);">6 Simbol (1.296 Variasi)</span></button>
+          <button class="diff-btn" onclick="startCodebreakerGame('medium')">🔥 Medium<br><span style="font-size:0.72rem;color:var(--text-muted);">7 Simbol (2.401 Variasi)</span></button>
+          <button class="diff-btn" onclick="startCodebreakerGame('hard')">👑 Hard<br><span style="font-size:0.72rem;color:var(--text-muted);">8 Simbol (4.096 Variasi)</span></button>
+        `;
+      }
+    }
+
+    function selectGame(mode) {
+      playSound('click');
+      if (mode === 'chain') {
+        const startWord = CHAIN_STARTERS[Math.floor(Math.random() * CHAIN_STARTERS.length)];
+        const payload = { type: 'INIT_CHAIN', startWord, turn: 'Virgo' };
+        sendData(payload);
+        initChainGame(payload);
+      } else if (mode === 'bomb') {
+        const category = BOMB_CATEGORIES[Math.floor(Math.random() * BOMB_CATEGORIES.length)];
+        const fuseSeconds = Math.floor(Math.random() * 18) + 18; // Acak 18 - 35 detik
+        const payload = { type: 'INIT_BOMB', category, fuseSeconds, holder: 'Virgo' };
+        sendData(payload);
+        initBombGame(payload);
+      } else if (mode === 'hangman') {
+        const payload = { type: 'INIT_HANGMAN', setter: 'Virgo' };
+        sendData(payload);
+        initHangmanSetup('Virgo');
+      }
+    }
+
+    /* =========================================================================
+       8. HANDLER PESAN P2P BATCH 2
+       ========================================================================= */
+    function handleIncomingData(data) {
+      switch (data.type) {
+        case 'HANDSHAKE':
+          updateConnectionUI('online', `Terhubung: Virgo ♍ ❤️ ♐ Sagittarius`);
+          break;
+
+        case 'PLAYER_EXIT':
+          playSound('miss');
+          clearInterval(activeGameTimer);
+          showToast(`${data.zodiac || partnerZodiac} keluar dari room! 👋`, '🚪');
+          if (conn) { try { conn.close(); } catch (e) {} }
+          break;
+
+        case 'CHAT':
+          playSound('chat');
+          appendChatMessage(data.text, false);
+          break;
+
+        case 'EMOJI':
+          spawnFloatingEmoji(data.emoji);
+          break;
+
+        case 'BACK_MENU':
+          clearInterval(activeGameTimer);
+          switchScreen('screenMenu');
+          showToast(`${partnerZodiac} kembali ke menu utama`, '🏠');
+          break;
+
+        /* --- CHAIN REACTION --- */
+        case 'INIT_CHAIN':
+          initChainGame(data);
+          break;
+        case 'CHAIN_WORD':
+          handleChainWordReceived(data.word, data.nextTurn);
+          break;
+        case 'CHAIN_OVER':
+          renderChainGameOver(data.loser);
+          break;
+
+        /* --- COSMIC BOMB --- */
+        case 'INIT_BOMB':
+          initBombGame(data);
+          break;
+        case 'BOMB_PASS':
+          handleBombPassed(data.answer, data.nextHolder);
+          break;
+        case 'BOMB_EXPLODED':
+          renderBombExplosion(data.loser);
+          break;
+
+        /* --- MEMORY CO-OP --- */
+        case 'INIT_MEMORY':
+          initMemoryBoard(data);
+          break;
+        case 'MEMORY_FLIP':
+          handleMemoryCardFlip(data.index, false);
+          break;
+
+        /* --- CODEBREAKER --- */
+        case 'INIT_CODEBREAKER':
+          initCodebreakerBoard(data);
+          break;
+        case 'CODE_SUBMIT':
+          processCodeGuess(data.guess, false);
+          break;
+
+        /* --- HANGMAN --- */
+        case 'INIT_HANGMAN':
+          initHangmanSetup(data.setter);
+          break;
+        case 'HANGMAN_SET_WORD':
+          startHangmanGuessing(data.secretWord, data.hint);
+          break;
+        case 'HANGMAN_LETTER':
+          processHangmanLetter(data.letter, false);
+          break;
+      }
+    }
+
+    /* =========================================================================
+       9. GAME 1: CHAIN REACTION (50 KATA AWAL RANDOM)
+       ========================================================================= */
+    function initChainGame({ startWord, turn }) {
+      clearInterval(activeGameTimer);
+      state = {
+        mode: 'chain',
+        words: [startWord],
+        turn,
+        timeLeft: 12,
+        gameOver: false
+      };
+      switchScreen('screenGame');
+      document.getElementById('hudTitle').textContent = '🔗 Chain Reaction';
+      renderChainUI();
+      startChainTimer();
+    }
+
+    function startChainTimer() {
+      clearInterval(activeGameTimer);
+      state.timeLeft = 12;
+      activeGameTimer = setInterval(() => {
+        if (state.gameOver) { clearInterval(activeGameTimer); return; }
+        state.timeLeft--;
+        const tEl = document.getElementById('chainTimer');
+        if (tEl) tEl.textContent = state.timeLeft + 'd';
+        if (state.timeLeft <= 4 && state.timeLeft > 0) playSound('tick');
+
+        if (state.timeLeft <= 0) {
+          clearInterval(activeGameTimer);
+          if (state.turn === myZodiac) {
+            sendData({ type: 'CHAIN_OVER', loser: myZodiac });
+            renderChainGameOver(myZodiac);
+          }
+        }
+      }, 1000);
+    }
+
+    function renderChainUI() {
+      const isMyTurn = state.turn === myZodiac;
+      const lastWord = state.words[state.words.length - 1];
+      document.getElementById('hudLeft').textContent = `Rantai: ${state.words.length} Kata`;
+      document.getElementById('hudRight').textContent = `⏱️ ${state.timeLeft}d`;
+
+      const area = document.getElementById('gamePlayArea');
+      area.innerHTML = `
+        <div style="text-align:center; font-size:0.82rem; color:${isMyTurn ? 'var(--success)' : 'var(--gold)'}; font-weight:700;">
+          ${isMyTurn ? '⚡ GILIRANMU! Sambung kata dari:' : `⏳ Menunggu ${partnerZodiac} menyambung kata:`}
+        </div>
+        <div style="text-align:center; font-size:1.6rem; font-weight:800; color:var(--gold); margin:8px 0;">
+          "${lastWord}"
+        </div>
+        <div style="text-align:center; font-size:0.85rem; color:var(--danger); font-weight:700;">
+          Sisa Waktu: <span id="chainTimer">${state.timeLeft}d</span>
+        </div>
+        <div class="chain-stream" id="chainStream">
+          ${state.words.map((w, i) => `<span class="chain-chip ${i === state.words.length - 1 ? 'latest' : ''}">${w}</span>`).join('')}
+        </div>
+        ${isMyTurn ? `
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <input type="text" id="chainInput" placeholder="Ketik 1 kata berhubungan..." onkeypress="if(event.key==='Enter') submitChainWord()" />
+            <button class="btn btn-primary btn-sm" onclick="submitChainWord()">Kirim</button>
+          </div>
+        ` : `
+          <div style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-top:12px;">
+            Siap-siap giliran berikutnya setelah ${partnerZodiac}...
+          </div>
+        `}
+      `;
+
+      const stream = document.getElementById('chainStream');
+      if (stream) stream.scrollTop = stream.scrollHeight;
+      const inp = document.getElementById('chainInput');
+      if (inp) inp.focus();
+    }
+
+    function submitChainWord() {
+      if (state.turn !== myZodiac || state.gameOver) return;
+      const inp = document.getElementById('chainInput');
+      const raw = inp ? inp.value.trim() : '';
+      if (!raw) return;
+
+      const clean = raw.replace(/[^a-zA-Z0-9\s-]/g, '').trim();
+      if (!clean) return;
+
+      if (state.words.some(w => w.toLowerCase() === clean.toLowerCase())) {
+        showToast('Kata itu sudah dipakai di rantai ini! Cari kata lain!', '⚠️');
+        playSound('miss');
+        return;
+      }
+
+      playSound('click');
+      const nextTurn = partnerZodiac;
+      state.words.push(clean);
+      state.turn = nextTurn;
+      sendData({ type: 'CHAIN_WORD', word: clean, nextTurn });
+      renderChainUI();
+      startChainTimer();
+    }
+
+    function handleChainWordReceived(word, nextTurn) {
+      playSound('match');
+      state.words.push(word);
+      state.turn = nextTurn;
+      renderChainUI();
+      startChainTimer();
+    }
+
+    function renderChainGameOver(loser) {
+      state.gameOver = true;
+      clearInterval(activeGameTimer);
+      playSound('boom');
+      const total = state.words.length;
+      const area = document.getElementById('gamePlayArea');
+      area.innerHTML = `
+        <div style="text-align:center; padding:10px 0;">
+          <div style="font-size:2.4rem; margin-bottom:6px;">💥🔗</div>
+          <h3 style="color:var(--danger); margin-bottom:6px;">Waktu Habis di Giliran ${loser}!</h3>
+          <p style="font-size:0.9rem; color:var(--gold); font-weight:700; margin-bottom:10px;">
+            Total Panjang Rantai Kata: ${total} Kata!
+          </p>
+          <div class="chain-stream">
+            ${state.words.map(w => `<span class="chain-chip">${w}</span>`).join('')}
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px;">
+            <button class="btn btn-primary" onclick="selectGame('chain')">🔄 Main Lagi (Kata Baru)</button>
+            <button class="btn btn-outline" onclick="requestBackToMenu()">🏠 Pilih Game Lain</button>
+          </div>
+        </div>
+      `;
+    }
+
+    /* =========================================================================
+       10. GAME 2: COSMIC BOMB (50 KATEGORI RANDOM)
+       ========================================================================= */
+    function initBombGame({ category, fuseSeconds, holder }) {
+      clearInterval(activeGameTimer);
+      state = {
+        mode: 'bomb',
+        category,
+        fuseLeft: fuseSeconds,
+        holder,
+        usedAnswers: [],
+        exploded: false
+      };
+      switchScreen('screenGame');
+      document.getElementById('hudTitle').textContent = '💣 Cosmic Bomb';
+      renderBombUI();
+
+      // Host menjadi otoritas timer bom agar sinkron & adil
+      activeGameTimer = setInterval(() => {
+        if (state.exploded) { clearInterval(activeGameTimer); return; }
+        state.fuseLeft--;
+        playSound('tick');
+        if (state.fuseLeft <= 0 && isHost) {
+          clearInterval(activeGameTimer);
+          sendData({ type: 'BOMB_EXPLODED', loser: state.holder });
+          renderBombExplosion(state.holder);
+        }
+      }, 1000);
+    }
+
+    function renderBombUI() {
+      const isHolding = state.holder === myZodiac;
+      document.getElementById('hudLeft').textContent = `Lemparan: ${state.usedAnswers.length}x`;
+      document.getElementById('hudRight').textContent = isHolding ? '🔥 DI KAMU!' : `💣 Di ${partnerZodiac}`;
+
+      const area = document.getElementById('gamePlayArea');
+      area.innerHTML = `
+        <div style="text-align:center; font-size:0.78rem; color:var(--text-muted); margin-bottom:4px;">KATEGORI BOM:</div>
+        <div style="text-align:center; font-size:1.08rem; font-weight:800; color:var(--gold); margin-bottom:10px;">
+          "${state.category}"
+        </div>
+
+        <div class="bomb-box">
+          <div class="bomb-icon">💣</div>
+          <div style="font-weight:800; font-size:1rem; color:${isHolding ? 'var(--danger)' : 'var(--virgo-color)'}; margin-top:6px;">
+            ${isHolding ? '⚠️ BOM ADA DI TANGANMU! CEPAT JAWAB!' : `😅 Bom sedang dipegang ${partnerZodiac}...`}
+          </div>
+          <div style="font-size:0.76rem; color:var(--text-muted); margin-top:4px;">
+            Timer rahasia sedang berdetak! Jangan sampai meledak di layarmu!
+          </div>
+        </div>
+
+        ${isHolding ? `
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <input type="text" id="bombInput" placeholder="Ketik jawaban & lempar..." onkeypress="if(event.key==='Enter') passCosmicBomb()" />
+            <button class="btn btn-primary btn-sm" onclick="passCosmicBomb()">🚀 Lempar!</button>
+          </div>
+        ` : ''}
+
+        <div class="chain-stream" style="margin-top:12px;">
+          ${state.usedAnswers.length === 0
+            ? '<span style="font-size:0.76rem; color:var(--text-muted);">Belum ada jawaban yang dilempar...</span>'
+            : state.usedAnswers.map(a => `<span class="chain-chip">${a}</span>`).join('')}
+        </div>
+      `;
+
+      const inp = document.getElementById('bombInput');
+      if (inp) inp.focus();
+    }
+
+    function passCosmicBomb() {
+      if (state.holder !== myZodiac || state.exploded) return;
+      const inp = document.getElementById('bombInput');
+      const ans = inp ? inp.value.trim() : '';
+      if (!ans) return;
+
+      if (state.usedAnswers.some(a => a.toLowerCase() === ans.toLowerCase())) {
+        showToast('Jawaban itu sudah disebut! Cari yang lain!', '⚠️');
+        playSound('miss');
+        return;
+      }
+
+      playSound('click');
+      const nextHolder = partnerZodiac;
+      state.usedAnswers.push(ans);
+      state.holder = nextHolder;
+      sendData({ type: 'BOMB_PASS', answer: ans, nextHolder });
+      renderBombUI();
+    }
+
+    function handleBombPassed(answer, nextHolder) {
+      playSound('match');
+      state.usedAnswers.push(answer);
+      state.holder = nextHolder;
+      renderBombUI();
+    }
+
+    function renderBombExplosion(loser) {
+      state.exploded = true;
+      clearInterval(activeGameTimer);
+      playSound('boom');
+      spawnFloatingEmoji('💥');
+
+      const area = document.getElementById('gamePlayArea');
+      area.innerHTML = `
+        <div style="text-align:center; padding:12px 0;">
+          <div style="font-size:3.5rem; margin-bottom:6px;">💥💣💥</div>
+          <h3 style="color:var(--danger); font-size:1.25rem; margin-bottom:6px;">DUARRR! Bom Meledak di ${loser}!</h3>
+          <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:14px;">
+            Kalian berhasil melempar bom sebanyak <strong>${state.usedAnswers.length} kali</strong> sebelum meledak!
+          </p>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <button class="btn btn-primary" onclick="selectGame('bomb')">🔄 Main Lagi (Kategori Baru)</button>
+            <button class="btn btn-outline" onclick="requestBackToMenu()">🏠 Pilih Game Lain</button>
+          </div>
+        </div>
+      `;
+    }
+
+    /* =========================================================================
+       11. GAME 3: MEMORY CO-OP (EASY 16, MEDIUM 24, HARD 36 KARTU)
+       ========================================================================= */
+    function startMemoryGame(level) {
+      playSound('click');
+      const pairCount = level === 'easy' ? 8 : (level === 'medium' ? 12 : 18);
+      const selectedIcons = MEMORY_ICONS.slice(0, pairCount);
+      const deck = [...selectedIcons, ...selectedIcons]
+        .sort(() => 0.5 - Math.random())
+        .map((icon, idx) => ({ id: idx, icon, flipped: false, matched: false }));
+
+      const payload = { type: 'INIT_MEMORY', level, deck, turn: 'Virgo' };
+      sendData(payload);
+      initMemoryBoard(payload);
+    }
+
+    function initMemoryBoard({ level, deck, turn }) {
+      clearInterval(activeGameTimer);
+      state = {
+        mode: 'memory',
+        level,
+        deck,
+        turn,
+        flippedIndices: [],
+        moves: 0,
+        lockBoard: false
+      };
+      switchScreen('screenGame');
+      document.getElementById('hudTitle').textContent = `🧩 Memory (${level.toUpperCase()})`;
+      renderMemoryUI();
+    }
+
+    function renderMemoryUI() {
+      const matchedPairs = state.deck.filter(c => c.matched).length / 2;
+      const totalPairs = state.deck.length / 2;
+      const isMyTurn = state.turn === myZodiac;
+      const gridColsClass = state.deck.length === 16 ? 'grid-4' : 'grid-6';
+
+      document.getElementById('hudLeft').textContent = `Cocok: ${matchedPairs}/${totalPairs}`;
+      document.getElementById('hudRight').textContent = `Langkah: ${state.moves}`;
+
+      const area = document.getElementById('gamePlayArea');
+      if (matchedPairs === totalPairs) {
+        playSound('match');
+        spawnFloatingEmoji('🎉');
+        area.innerHTML = `
+          <div style="text-align:center; padding:14px 0;">
+            <div style="font-size:2.8rem; margin-bottom:8px;">🏆✨</div>
+            <h3 style="color:var(--success); margin-bottom:6px;">Semua Kartu Terbuka!</h3>
+            <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:16px;">
+              Kerja sama Virgo & Sagittarius berhasil menyelesaikan level <strong>${state.level.toUpperCase()}</strong> dalam <strong>${state.moves} langkah</strong>!
+            </p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <button class="btn btn-primary" onclick="showDifficultyPicker('memory')">🔄 Main Level Lain</button>
+              <button class="btn btn-outline" onclick="requestBackToMenu()">🏠 Pilih Game Lain</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      area.innerHTML = `
+        <div style="text-align:center; font-size:0.82rem; font-weight:700; color:${isMyTurn ? 'var(--success)' : 'var(--gold)'}; margin-bottom:8px;">
+          ${isMyTurn ? '✨ Giliranmu membuka 2 kartu!' : `👀 Giliran ${partnerZodiac} membuka kartu...`}
+        </div>
+        <div class="memory-grid ${gridColsClass}">
+          ${state.deck.map((card, idx) => `
+            <div class="mem-card ${card.flipped ? 'flipped' : ''} ${card.matched ? 'matched' : ''}" onclick="onMemoryCardClick(${idx})">
+              ${card.flipped || card.matched ? card.icon : '✦'}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function onMemoryCardClick(idx) {
+      if (state.turn !== myZodiac || state.lockBoard) return;
+      const card = state.deck[idx];
+      if (!card || card.flipped || card.matched) return;
+
+      sendData({ type: 'MEMORY_FLIP', index: idx });
+      handleMemoryCardFlip(idx, true);
+    }
+
+    function handleMemoryCardFlip(idx, isLocal) {
+      const card = state.deck[idx];
+      if (!card || card.flipped || card.matched) return;
+
+      playSound('click');
+      card.flipped = true;
+      state.flippedIndices.push(idx);
+      renderMemoryUI();
+
+      if (state.flippedIndices.length === 2) {
+        state.lockBoard = true;
+        state.moves++;
+        const [i1, i2] = state.flippedIndices;
+        const c1 = state.deck[i1];
+        const c2 = state.deck[i2];
+
+        if (c1.icon === c2.icon) {
+          setTimeout(() => {
+            playSound('match');
+            c1.matched = true;
+            c2.matched = true;
+            state.flippedIndices = [];
+            state.lockBoard = false;
+            // Pemain yang berhasil mencocokkan lanjut giliran
+            renderMemoryUI();
+          }, 500);
+        } else {
+          setTimeout(() => {
+            playSound('miss');
+            c1.flipped = false;
+            c2.flipped = false;
+            state.flippedIndices = [];
+            state.lockBoard = false;
+            state.turn = state.turn === 'Virgo' ? 'Sagittarius' : 'Virgo';
+            renderMemoryUI();
+          }, 850);
+        }
+      }
+    }
+
+    /* =========================================================================
+       12. GAME 4: COSMIC CODEBREAKER (RIBUAN VARIASI ALGORITMIK)
+       ========================================================================= */
+    function startCodebreakerGame(level) {
+      playSound('click');
+      const symCount = level === 'easy' ? 6 : (level === 'medium' ? 7 : 8);
+      const maxAttempts = level === 'easy' ? 8 : (level === 'medium' ? 8 : 9);
+      const pool = CODE_SYMBOLS_POOL.slice(0, symCount);
+
+      // Generate 4 kode rahasia acak (bisa berulang untuk ribuan variasi unik)
+      const secretCode = Array.from({ length: 4 }, () => pool[Math.floor(Math.random() * pool.length)]);
+
+      const payload = { type: 'INIT_CODEBREAKER', level, pool, secretCode, maxAttempts, turn: 'Virgo' };
+      sendData(payload);
+      initCodebreakerBoard(payload);
+    }
+
+    function initCodebreakerBoard({ level, pool, secretCode, maxAttempts, turn }) {
+      clearInterval(activeGameTimer);
+      state = {
+        mode: 'codebreaker',
+        level,
+        pool,
+        secretCode,
+        maxAttempts,
+        turn,
+        currentGuess: [null, null, null, null],
+        history: [],
+        solved: false
+      };
+      switchScreen('screenGame');
+      document.getElementById('hudTitle').textContent = '🔐 Codebreaker';
+      renderCodebreakerUI();
+    }
+
+    function renderCodebreakerUI() {
+      const isMyTurn = state.turn === myZodiac;
+      const attemptsLeft = state.maxAttempts - state.history.length;
+      document.getElementById('hudLeft').textContent = `Sisa Coba: ${attemptsLeft}x`;
+      document.getElementById('hudRight').textContent = `${state.pool.length} Simbol`;
+
+      const area = document.getElementById('gamePlayArea');
+
+      if (state.solved || attemptsLeft <= 0) {
+        area.innerHTML = `
+          <div style="text-align:center; padding:10px 0;">
+            <div style="font-size:2.6rem; margin-bottom:6px;">${state.solved ? '🔓✨' : '🔒💥'}</div>
+            <h3 style="color:${state.solved ? 'var(--success)' : 'var(--danger)'}; margin-bottom:6px;">
+              ${state.solved ? 'Brankas Kosmik Terbuka!' : 'Kesempatan Habis!'}
+            </h3>
+            <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:8px;">Kode Rahasia Sebenarnya:</p>
+            <div class="code-slots">
+              ${state.secretCode.map(s => `<div class="code-slot filled">${s}</div>`).join('')}
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px;">
+              <button class="btn btn-primary" onclick="showDifficultyPicker('codebreaker')">🔄 Main Lagi (Kode Acak Baru)</button>
+              <button class="btn btn-outline" onclick="requestBackToMenu()">🏠 Pilih Game Lain</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      area.innerHTML = `
+        <div style="text-align:center; font-size:0.8rem; color:${isMyTurn ? 'var(--success)' : 'var(--gold)'}; font-weight:700;">
+          ${isMyTurn ? '🔑 Giliranmu menyusun 4 kombinasi simbol!' : `⏳ Menunggu ${partnerZodiac} menyusun kombinasi...`}
+        </div>
+
+        <div class="code-slots">
+          ${state.currentGuess.map((sym, idx) => `
+            <div class="code-slot ${sym ? 'filled' : ''}" onclick="clearCodeSlot(${idx})">
+              ${sym || '?'}
+            </div>
+          `).join('')}
+        </div>
+
+        ${isMyTurn ? `
+          <div class="symbol-picker">
+            ${state.pool.map(sym => `<button class="sym-btn" onclick="pickCodeSymbol('${sym}')">${sym}</button>`).join('')}
+          </div>
+          <button class="btn btn-primary" style="margin-top:6px;" onclick="submitCodeGuess()">🚀 Uji Kombinasi Kode</button>
+        ` : ''}
+
+        <div class="code-history">
+          ${state.history.length === 0
+            ? '<div style="text-align:center; font-size:0.76rem; color:var(--text-muted); padding:8px;">Belum ada percobaan. Ketuk simbol di atas untuk mengisi slot!</div>'
+            : state.history.map((item, idx) => `
+              <div class="code-row">
+                <span>#${idx + 1} (${item.by}): <strong>${item.guess.join(' ')}</strong></span>
+                <span style="font-weight:700; color:var(--gold);">🎯 ${item.exact} Pas | 🔄 ${item.misplaced} Geser</span>
+              </div>
+            `).join('')}
+        </div>
+      `;
+    }
+
+    function pickCodeSymbol(sym) {
+      if (state.turn !== myZodiac) return;
+      const emptyIdx = state.currentGuess.indexOf(null);
+      if (emptyIdx === -1) {
+        showToast('Semua 4 slot sudah terisi! Ketuk slot untuk menghapus.', '💡');
+        return;
+      }
+      playSound('click');
+      state.currentGuess[emptyIdx] = sym;
+      renderCodebreakerUI();
+    }
+
+    function clearCodeSlot(idx) {
+      if (state.turn !== myZodiac) return;
+      playSound('click');
+      state.currentGuess[idx] = null;
+      renderCodebreakerUI();
+    }
+
+    function submitCodeGuess() {
+      if (state.turn !== myZodiac) return;
+      if (state.currentGuess.includes(null)) {
+        showToast('Lengkapi semua 4 slot simbol dulu!', '🔐');
+        return;
+      }
+      const guess = [...state.currentGuess];
+      sendData({ type: 'CODE_SUBMIT', guess });
+      processCodeGuess(guess, true);
+    }
+
+    function processCodeGuess(guess, isLocal) {
+      // Evaluasi Exact Match & Misplaced Match (algoritma Mastermind akurat)
+      let exact = 0;
+      let misplaced = 0;
+      const secretCopy = [...state.secretCode];
+      const guessCopy = [...guess];
+
+      for (let i = 0; i < 4; i++) {
+        if (guessCopy[i] === secretCopy[i]) {
+          exact++;
+          secretCopy[i] = null;
+          guessCopy[i] = null;
+        }
+      }
+
+      for (let i = 0; i < 4; i++) {
+        if (guessCopy[i] !== null) {
+          const foundIdx = secretCopy.indexOf(guessCopy[i]);
+          if (foundIdx !== -1) {
+            misplaced++;
+            secretCopy[foundIdx] = null;
+          }
+        }
+      }
+
+      state.history.push({
+        by: state.turn,
+        guess,
+        exact,
+        misplaced
+      });
+
+      state.currentGuess = [null, null, null, null];
+
+      if (exact === 4) {
+        state.solved = true;
+        playSound('match');
+        spawnFloatingEmoji('🔓');
+      } else {
+        playSound('click');
+        state.turn = state.turn === 'Virgo' ? 'Sagittarius' : 'Virgo';
+      }
+
+      renderCodebreakerUI();
+    }
+
+    /* =========================================================================
+       13. GAME 5: COSMIC HANGMAN (BUAT KATA RAHASIA SENDIRI)
+       ========================================================================= */
+    function initHangmanSetup(setter) {
+      clearInterval(activeGameTimer);
+      state = {
+        mode: 'hangman',
+        setter,
+        secretWord: '',
+        hint: '',
+        guessedLetters: [],
+        wrongCount: 0,
+        maxWrong: 6
+      };
+      switchScreen('screenGame');
+      document.getElementById('hudTitle').textContent = '🧭 Cosmic Hangman';
+      document.getElementById('hudLeft').textContent = 'Custom Kata';
+      document.getElementById('hudRight').textContent = `Pembuat: ${setter}`;
+
+      const amISetter = setter === myZodiac;
+      const area = document.getElementById('gamePlayArea');
+
+      if (amISetter) {
+        area.innerHTML = `
+          <div style="text-align:center; font-weight:700; color:var(--gold); margin-bottom:6px;">
+            ✍️ Buat Kata / Frasa Rahasia Sendiri!
+          </div>
+          <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
+            Bisa nama makanan, kenangan berdua, atau istilah khusus (hanya huruf A-Z & spasi).
+          </p>
+          <input type="text" id="hangmanWordInput" placeholder="Contoh: NASI GORENG SPESIAL" maxlength="26" style="margin-bottom:10px; text-transform:uppercase;" />
+          <input type="text" id="hangmanHintInput" placeholder="Petunjuk singkat (Contoh: Makanan favorit kita)" maxlength="45" style="margin-bottom:12px;" />
+          <button class="btn btn-primary" onclick="submitCustomHangman()">🚀 Kunci & Tantang ${partnerZodiac}</button>
+        `;
+      } else {
+        area.innerHTML = `
+          <div style="text-align:center; padding:24px 10px;">
+            <div style="font-size:2.5rem; margin-bottom:8px;">✍️🔮</div>
+            <h3 style="color:var(--gold); margin-bottom:6px;">${partnerZodiac} Sedang Merangkai Kata Rahasia...</h3>
+            <p style="font-size:0.82rem; color:var(--text-muted);">
+              Siapkan instingmu untuk menebak huruf demi huruf!
+            </p>
+          </div>
+        `;
+      }
+    }
+
+    function submitCustomHangman() {
+      const wordRaw = document.getElementById('hangmanWordInput').value.trim().toUpperCase();
+      const hintRaw = document.getElementById('hangmanHintInput').value.trim();
+
+      const cleanWord = wordRaw.replace(/[^A-Z\s]/g, '').replace(/\s+/g, ' ').trim();
+      if (cleanWord.length < 2) {
+        showToast('Masukkan minimal 2 huruf A-Z ya!', '✍️');
+        return;
+      }
+      const hint = hintRaw || 'Tebak kata rahasia dari pasanganmu!';
+
+      playSound('click');
+      sendData({ type: 'HANGMAN_SET_WORD', secretWord: cleanWord, hint });
+      startHangmanGuessing(cleanWord, hint);
+    }
+
+    function startHangmanGuessing(secretWord, hint) {
+      state.secretWord = secretWord;
+      state.hint = hint;
+      state.guessedLetters = [];
+      state.wrongCount = 0;
+      renderHangmanPlayUI();
+    }
+
+    function renderHangmanPlayUI() {
+      const amISetter = state.setter === myZodiac;
+      const energyLeft = state.maxWrong - state.wrongCount;
+      document.getElementById('hudLeft').textContent = `Energi: ${'🚀'.repeat(Math.max(0, energyLeft)) || '💥'}`;
+      document.getElementById('hudRight').textContent = `Salah: ${state.wrongCount}/${state.maxWrong}`;
+
+      const chars = state.secretWord.split('');
+      const isWon = chars.every(ch => ch === ' ' || state.guessedLetters.includes(ch));
+      const isLost = state.wrongCount >= state.maxWrong;
+
+      const area = document.getElementById('gamePlayArea');
+      const nextSetter = state.setter === 'Virgo' ? 'Sagittarius' : 'Virgo';
+
+      if (isWon || isLost) {
+        if (isWon) { playSound('match'); spawnFloatingEmoji('🎉'); }
+        else { playSound('boom'); }
+
+        area.innerHTML = `
+          <div style="text-align:center; padding:10px 0;">
+            <div style="font-size:2.8rem; margin-bottom:6px;">${isWon ? '🚀✨' : '💥🛸'}</div>
+            <h3 style="color:${isWon ? 'var(--success)' : 'var(--danger)'}; margin-bottom:6px;">
+              ${isWon ? 'Berhasil Tertebak!' : 'Energi Roket Habis!'}
+            </h3>
+            <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:6px;">Kata Rahasianya Adalah:</p>
+            <div style="font-size:1.35rem; font-weight:800; color:var(--gold); letter-spacing:2px; margin-bottom:16px;">
+              "${state.secretWord}"
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <button class="btn btn-primary" onclick="switchHangmanTurn('${nextSetter}')">🔄 Gantian ${nextSetter} Buat Kata</button>
+              <button class="btn btn-outline" onclick="requestBackToMenu()">🏠 Pilih Game Lain</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+      area.innerHTML = `
+        <div style="text-align:center; font-size:0.78rem; color:var(--gold); font-weight:700;">
+          💡 Petunjuk: "${state.hint}"
+        </div>
+
+        <div class="hangman-word">
+          ${chars.map(ch => {
+            if (ch === ' ') return `<div class="letter-space"></div>`;
+            const revealed = state.guessedLetters.includes(ch) || amISetter;
+            return `<div class="letter-box" style="${amISetter && !state.guessedLetters.includes(ch) ? 'opacity:0.45;' : ''}">${revealed ? ch : ''}</div>`;
+          }).join('')}
+        </div>
+
+        ${amISetter ? `
+          <div style="text-align:center; font-size:0.82rem; color:var(--text-muted); margin-top:10px;">
+            👀 Menyaksikan <strong>${partnerZodiac}</strong> menebak kata rahasiamu...
+          </div>
+        ` : `
+          <div class="qwerty-grid">
+            ${alphabet.map(letChar => {
+              const used = state.guessedLetters.includes(letChar);
+              const isRight = used && state.secretWord.includes(letChar);
+              const cls = used ? (isRight ? 'used-right' : 'used-wrong') : '';
+              return `<button class="key-btn ${cls}" ${used ? 'disabled' : ''} onclick="guessHangmanLetter('${letChar}')">${letChar}</button>`;
+            }).join('')}
+          </div>
+        `}
+      `;
+    }
+
+    function switchHangmanTurn(nextSetter) {
+      playSound('click');
+      sendData({ type: 'INIT_HANGMAN', setter: nextSetter });
+      initHangmanSetup(nextSetter);
+    }
+
+    function guessHangmanLetter(letter) {
+      if (state.setter === myZodiac) return;
+      if (state.guessedLetters.includes(letter)) return;
+      sendData({ type: 'HANGMAN_LETTER', letter });
+      processHangmanLetter(letter, true);
+    }
+
+    function processHangmanLetter(letter, isLocal) {
+      if (state.guessedLetters.includes(letter)) return;
+      state.guessedLetters.push(letter);
+      if (state.secretWord.includes(letter)) {
+        playSound('click');
+      } else {
+        state.wrongCount++;
+        playSound('miss');
+      }
+      renderHangmanPlayUI();
+    }
+  </script>
+</body>
+</html>
