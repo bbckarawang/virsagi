@@ -268,19 +268,8 @@
   .btn-green { background: linear-gradient(135deg, #2ba87a, #196b4d); }
   .btn-yellow { background: linear-gradient(135deg, #f5c451, #c98f1d); color: #191204; border-color: #fff0bd; }
   .btn-dark { background: rgba(45, 48, 82, 0.85); }
-  .btn-purple { background: linear-gradient(135deg, #7c4dff, #4c28b5); }
 
   .row { display: flex; gap: 10px; }
-
-  .invite-banner {
-    background: linear-gradient(135deg, rgba(124, 77, 255, 0.25), rgba(240, 185, 66, 0.18));
-    border: 1.5px solid var(--gold-bright);
-    border-radius: 16px;
-    padding: 12px 14px;
-    text-align: center;
-    font-size: 13px;
-    line-height: 1.45;
-  }
 
   .perm-badge {
     display: inline-flex;
@@ -299,7 +288,7 @@
     background: radial-gradient(circle, #181636 0%, #090a17 100%);
     border: 1.5px solid var(--gold-bright);
     border-radius: 16px;
-    padding: 12px;
+    padding: 14px;
     text-align: center;
     box-shadow: inset 0 0 18px rgba(240, 185, 66, 0.15);
   }
@@ -313,31 +302,11 @@
     margin: 4px 0;
   }
 
-  .share-link-box {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    background: rgba(5, 7, 16, 0.65);
-    padding: 6px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 226, 138, 0.2);
-  }
-  .share-link-text {
-    flex: 1;
-    font-size: 12px;
-    color: #dcd4ff;
-    padding-left: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    user-select: all;
-  }
-
   .player-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-height: 175px;
+    max-height: 195px;
     overflow-y: auto;
   }
   .player-item {
@@ -359,7 +328,6 @@
     position: relative;
   }
 
-  /* Dekorasi Rasi Bintang Halus di Tengah Meja */
   .zodiac-watermark {
     position: absolute;
     inset: 0;
@@ -871,8 +839,12 @@
   }
   .dialog-actions {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 9px;
     margin-top: 4px;
+  }
+  .dialog-actions.row-actions {
+    flex-direction: row;
   }
   .dialog-actions .btn {
     flex: 1;
@@ -923,17 +895,13 @@
   </div>
 
   <div class="card-panel" id="setupPanel">
-    <div class="invite-banner" id="inviteLinkBanner" style="display:none;">
-      ✨ Undangan Room Permanen <strong id="invitedCodeLabel" style="color:var(--gold-bright);">VIRGOSAGI</strong>! Tulis namamu lalu masuk ke orbit permainan.
-    </div>
-
     <div>
       <label class="field-label">Nama Pemain</label>
       <input type="text" id="playerNameInput" placeholder="Masukkan Namamu (misal: Virgo / Sagi)" maxlength="14">
     </div>
 
     <div id="hostCreateSection">
-      <label class="field-label">Kode Room Permanen (Bisa Dipakai Ulang)</label>
+      <label class="field-label">Kode Room Permanen</label>
       <div class="row" style="margin-bottom:10px;">
         <input type="text" id="permRoomCodeInput" value="VIRGOSAGI" placeholder="NAMA ROOM PERMANEN" maxlength="14" style="text-transform:uppercase; font-weight:700; letter-spacing:2px; text-align:center;">
       </div>
@@ -955,14 +923,8 @@
     <div class="room-code-box">
       <div class="perm-badge">♾️ ROOM PERMANEN AKTIF</div>
       <span id="displayRoomCode">VIRGOSAGI</span>
-      <div style="font-size:11px; color:#cfc6ff;">Simpan link ini — bisa dipakai kapan saja untuk main lagi!</div>
+      <div style="font-size:11px; color:#cfc6ff;">Gunakan kode room permanen ini kapan saja untuk bermain bersama.</div>
     </div>
-
-    <div class="share-link-box">
-      <div class="share-link-text" id="shareLinkText">-</div>
-      <button class="btn btn-purple" style="padding:9px 12px; font-size:12px; border-radius:11px;" onclick="copyShareLink()">🔗 Salin Link</button>
-    </div>
-    <button class="btn btn-blue" style="padding:10px 14px; font-size:13px;" onclick="nativeShareLink()">📤 Bagikan Link Undangan</button>
 
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <strong id="playerCountLabel" style="color:var(--gold-bright);">Penjelajah Bintang (1/8)</strong>
@@ -973,6 +935,7 @@
 
     <button class="btn btn-green" id="startGameBtn" onclick="startGame()" style="display:none;">🃏 Mulai Bagikan Kartu Astral!</button>
     <div id="waitingHostText" style="text-align:center; font-size:13px; color:#d7ceff; display:none;">Menunggu Penjaga Room memulai ronde...</div>
+    <button class="btn btn-red" style="padding:11px 14px; font-size:13px;" onclick="confirmLeaveRoomFromLobby()">🚪 Keluar Room</button>
   </div>
 </div>
 
@@ -991,7 +954,7 @@
       <span id="topRoomTag" style="color:var(--gold-bright); font-weight:700;">VIRGOSAGI</span>
     </div>
     <button class="btn btn-yellow" id="catchUnoBtn" style="padding:6px 12px; font-size:12px; display:none;" onclick="catchLupaUno()">🚨 Tangkap Lupa UNO!</button>
-    <button class="btn btn-dark" style="padding:6px 10px; font-size:12px;" onclick="confirmExitGame()">Ruang Room</button>
+    <button class="btn btn-red" style="padding:6px 12px; font-size:12px;" onclick="openExitOptions()">🚪 Exit</button>
   </div>
 
   <!-- Kursi Lawan -->
@@ -1112,7 +1075,7 @@ function playSound(type) {
 }
 
 /* ================= ELEGAN DIALOG HELPER ================= */
-function showElegantDialog({ icon = '✨', title = '', desc = '', buttons = [] }) {
+function showElegantDialog({ icon = '✨', title = '', desc = '', buttons = [], horizontal = false }) {
   const modal = document.getElementById('elegantDialogModal');
   document.getElementById('dialogIcon').textContent = icon;
   document.getElementById('dialogTitle').textContent = title;
@@ -1120,6 +1083,7 @@ function showElegantDialog({ icon = '✨', title = '', desc = '', buttons = [] }
 
   const actionsEl = document.getElementById('dialogActions');
   actionsEl.innerHTML = '';
+  actionsEl.classList.toggle('row-actions', horizontal);
 
   buttons.forEach(b => {
     const btn = document.createElement('button');
@@ -1141,7 +1105,7 @@ const funnyTips = [
   "Merangkai 108 kartu di antara gugus bintang...",
   "Perfeksionis Virgo menghitung peluang +4...",
   "Panah Sagitarius siap membalikkan arah orbit...",
-  "Menyiapkan ruang astral permanen tanpa batas..."
+  "Menyiapkan ruang astral permanen..."
 ];
 let tipIdx = 0;
 const tipTimer = setInterval(() => {
@@ -1152,18 +1116,17 @@ const tipTimer = setInterval(() => {
 
 window.addEventListener('load', () => {
   restoreSavedProfile();
-  initInviteFromUrl();
   setTimeout(() => {
     clearInterval(tipTimer);
     document.getElementById('loadingScreen').classList.add('hidden');
-  }, 1600);
+  }, 1500);
 });
 
 /* ================= PERMANENT ROOM & STORAGE HELPER ================= */
 const STORAGE_KEY_NAME = "uno_astral_player_name";
 const STORAGE_KEY_ROOM = "uno_astral_perm_room";
 let activeRoomCode = "VIRGOSAGI";
-let isInvitedViaLink = false;
+let intentionalExit = false;
 
 function sanitizeRoomCode(raw) {
   return (raw || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 14);
@@ -1185,73 +1148,10 @@ function saveProfile(name, roomCode) {
   if (roomCode) localStorage.setItem(STORAGE_KEY_ROOM, roomCode);
 }
 
-function buildShareUrl(code) {
-  const url = new URL(window.location.href);
-  url.searchParams.set('room', code);
-  return url.toString();
-}
-
-function initInviteFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const roomParam = sanitizeRoomCode(params.get('room'));
-  if (roomParam.length >= 3) {
-    isInvitedViaLink = true;
-    activeRoomCode = roomParam;
-    document.getElementById('joinCodeInput').value = roomParam;
-    document.getElementById('permRoomCodeInput').value = roomParam;
-    document.getElementById('invitedCodeLabel').textContent = roomParam;
-    document.getElementById('inviteLinkBanner').style.display = 'block';
-    document.getElementById('hostCreateSection').style.display = 'none';
-    document.getElementById('joinBtn').textContent = 'Masuk Room';
-  }
-}
-
-function updateRoomShareUI(code) {
+function updateRoomUI(code) {
   activeRoomCode = code;
   document.getElementById('displayRoomCode').textContent = code;
   document.getElementById('topRoomTag').textContent = code;
-  document.getElementById('shareLinkText').textContent = buildShareUrl(code);
-  const url = new URL(window.location.href);
-  url.searchParams.set('room', code);
-  window.history.replaceState({}, '', url.toString());
-}
-
-function copyShareLink() {
-  if (!activeRoomCode) return;
-  const link = buildShareUrl(activeRoomCode);
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(link).then(() => {
-      showFunnyToast("🔗 Link Room Permanen tersalin!");
-    }).catch(() => fallbackCopy(link));
-  } else {
-    fallbackCopy(link);
-  }
-}
-
-function fallbackCopy(text) {
-  const temp = document.createElement('textarea');
-  temp.value = text;
-  document.body.appendChild(temp);
-  temp.select();
-  document.execCommand('copy');
-  temp.remove();
-  showFunnyToast("🔗 Link Room Permanen tersalin!");
-}
-
-async function nativeShareLink() {
-  if (!activeRoomCode) return;
-  const link = buildShareUrl(activeRoomCode);
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title: 'UNO Astral — Virgo ♍ & Sagitarius ♐',
-        text: `Gabung ke Room Permanen "${activeRoomCode}" untuk main UNO Astral!`,
-        url: link
-      });
-    } catch (e) {}
-  } else {
-    copyShareLink();
-  }
 }
 
 /* ================= PEERJS & STATE MULTIPLAYER ================= */
@@ -1284,11 +1184,12 @@ function showFunnyToast(msg) {
   toast.textContent = msg;
   toast.classList.add('show');
   clearTimeout(toast._t);
-  toast._t = setTimeout(() => toast.classList.remove('show'), 2400);
+  toast._t = setTimeout(() => toast.classList.remove('show'), 2600);
 }
 
 /* ================= LOBBY & PERMANENT ROOM LOGIC ================= */
 function openPermanentRoom() {
+  intentionalExit = false;
   myName = document.getElementById('playerNameInput').value.trim() || "Virgo ♍";
   const code = sanitizeRoomCode(document.getElementById('permRoomCodeInput').value) || "VIRGOSAGI";
   saveProfile(myName, code);
@@ -1318,7 +1219,7 @@ function openPermanentRoom() {
     document.getElementById('lobbyStatus').textContent = "";
     document.getElementById('setupPanel').style.display = 'none';
     document.getElementById('roomPanel').style.display = 'flex';
-    updateRoomShareUI(code);
+    updateRoomUI(code);
     document.getElementById('startGameBtn').style.display = 'flex';
     document.getElementById('addBotBtn').style.display = 'flex';
     document.getElementById('waitingHostText').style.display = 'none';
@@ -1328,17 +1229,13 @@ function openPermanentRoom() {
   peer.on('connection', (conn) => {
     conn.on('data', (data) => handleHostReceive(conn, data));
     conn.on('close', () => {
-      delete clientConns[conn.peer];
-      gameState.players = gameState.players.filter(p => p.id !== conn.peer);
-      if (gameState.turnIndex >= gameState.players.length) gameState.turnIndex = 0;
-      broadcastState();
-      renderLobbyPlayers();
+      handlePlayerDisconnectedOnHost(conn.peer, "terputus / keluar dari room");
     });
   });
 
   peer.on('error', (err) => {
     if (err.type === 'unavailable-id') {
-      document.getElementById('lobbyStatus').textContent = `Room ${code} sudah aktif! Otomatis bergabung sebagai tamu...`;
+      document.getElementById('lobbyStatus').textContent = `Room ${code} sudah aktif! Otomatis masuk sebagai pemain...`;
       document.getElementById('joinCodeInput').value = code;
       setTimeout(() => joinRoom(), 500);
     } else {
@@ -1347,13 +1244,47 @@ function openPermanentRoom() {
   });
 }
 
-function joinRoom() {
-  const nameInput = document.getElementById('playerNameInput').value.trim();
-  if (isInvitedViaLink && !nameInput) {
-    showFunnyToast("✍️ Tulis namamu dulu sebelum masuk orbit!");
-    document.getElementById('playerNameInput').focus();
-    return;
+function handlePlayerDisconnectedOnHost(peerId, reasonText = "keluar dari room") {
+  const leavingPlayer = gameState.players.find(p => p.id === peerId);
+  delete clientConns[peerId];
+  if (!leavingPlayer) return;
+
+  const removedIdx = gameState.players.findIndex(p => p.id === peerId);
+  gameState.players.splice(removedIdx, 1);
+
+  if (gameState.players.length > 0) {
+    if (removedIdx < gameState.turnIndex || gameState.turnIndex >= gameState.players.length) {
+      gameState.turnIndex = gameState.turnIndex % gameState.players.length;
+    }
+  } else {
+    gameState.turnIndex = 0;
   }
+
+  const notice = `🚪 ${leavingPlayer.avatar} ${leavingPlayer.name} ${reasonText}!`;
+  if (gameState.started) {
+    if (gameState.players.length < 2) {
+      gameState.started = false;
+      gameState.winner = null;
+      gameState.players.forEach(p => { p.hand = []; p.saidUno = false; });
+      broadcast({ type: 'RETURN_LOBBY', state: gameState, notice });
+      document.getElementById('gameScreen').classList.remove('active');
+      document.getElementById('lobbyScreen').classList.add('active');
+      renderLobbyPlayers();
+      showFunnyToast(notice);
+    } else {
+      broadcastState({ kind: 'FUNNY_MSG', text: notice });
+      checkBotTurn();
+    }
+  } else {
+    broadcastState({ kind: 'LOBBY_MSG', text: notice });
+    renderLobbyPlayers();
+    showFunnyToast(notice);
+  }
+}
+
+function joinRoom() {
+  intentionalExit = false;
+  const nameInput = document.getElementById('playerNameInput').value.trim();
   myName = nameInput || "Sagitarius ♐";
   const code = sanitizeRoomCode(document.getElementById('joinCodeInput').value) || "VIRGOSAGI";
   if (code.length < 3) {
@@ -1379,7 +1310,7 @@ function joinRoom() {
       document.getElementById('lobbyStatus').textContent = "";
       document.getElementById('setupPanel').style.display = 'none';
       document.getElementById('roomPanel').style.display = 'flex';
-      updateRoomShareUI(code);
+      updateRoomUI(code);
       document.getElementById('addBotBtn').style.display = 'none';
       document.getElementById('startGameBtn').style.display = 'none';
       document.getElementById('waitingHostText').style.display = 'block';
@@ -1388,12 +1319,14 @@ function joinRoom() {
 
     hostConn.on('data', (data) => handleClientReceive(data));
     hostConn.on('close', () => {
+      if (intentionalExit) return;
       showElegantDialog({
-        icon: '🌌',
-        title: 'Orbit Terputus',
-        desc: `Penjaga Room ${code} sedang offline. Kamu bisa langsung mengaktifkan ulang Room Permanen ini!`,
+        icon: '🚪',
+        title: 'Penjaga Room Keluar',
+        desc: `Penjaga Room ${code} telah keluar dari room. Kamu bisa langsung mengaktifkan ulang Room Permanen ini!`,
         buttons: [
-          { text: 'Aktifkan Ulang Room', cls: 'btn-yellow', onClick: () => backToLobbyKeepRoom(true) }
+          { text: 'Ke Menu Utama', cls: 'btn-dark', onClick: () => resetToInitialMenu() },
+          { text: 'Aktifkan Room', cls: 'btn-yellow', onClick: () => { resetToInitialMenu(); openPermanentRoom(); } }
         ]
       });
     });
@@ -1401,46 +1334,124 @@ function joinRoom() {
 
   peer.on('error', () => {
     document.getElementById('lobbyStatus').textContent = `Room "${code}" belum dibuka. Tekan "Buka / Aktifkan Room Permanen" untuk memulainya!`;
-    document.getElementById('hostCreateSection').style.display = 'block';
   });
 }
 
-/* Kembali ke Ruang Tunggu Room Permanen tanpa menghilangkan kode room */
-function backToLobbyKeepRoom(autoReopen = false) {
-  document.getElementById('gameScreen').classList.remove('active');
-  document.getElementById('lobbyScreen').classList.add('active');
+/* ================= EXIT FLOW (KELUAR GAME / KELUAR ROOM) ================= */
+function openExitOptions() {
+  showElegantDialog({
+    icon: '🚪',
+    title: 'Pilihan Keluar',
+    desc: 'Pilih keluar dari ronde permainan ke Ruang Room, atau keluar sepenuhnya dari Room Permanen.',
+    buttons: [
+      {
+        text: '🔙 Keluar Permainan (Ke Ruang Room)',
+        cls: 'btn-yellow',
+        onClick: () => exitGameToLobby()
+      },
+      {
+        text: '🚪 Keluar dari Room',
+        cls: 'btn-red',
+        onClick: () => leaveRoomCompletely()
+      },
+      {
+        text: 'Batal',
+        cls: 'btn-dark'
+      }
+    ]
+  });
+}
 
-  if (isHost && !autoReopen) {
+function confirmLeaveRoomFromLobby() {
+  showElegantDialog({
+    icon: '🚪',
+    title: 'Keluar dari Room?',
+    desc: 'Pemain lain di room akan diberitahu bahwa kamu meninggalkan room.',
+    horizontal: true,
+    buttons: [
+      { text: 'Batal', cls: 'btn-dark' },
+      { text: 'Keluar Room', cls: 'btn-red', onClick: () => leaveRoomCompletely() }
+    ]
+  });
+}
+
+function exitGameToLobby() {
+  if (isHost) {
     gameState.started = false;
     gameState.winner = null;
     gameState.players.forEach(p => {
       p.hand = [];
       p.saidUno = false;
     });
-    broadcast({ type: 'RETURN_LOBBY', state: gameState });
+    const notice = `🔙 ${myName} mengakhiri ronde & kembali ke Ruang Room.`;
+    broadcast({ type: 'RETURN_LOBBY', state: gameState, notice });
+    document.getElementById('gameScreen').classList.remove('active');
+    document.getElementById('lobbyScreen').classList.add('active');
     renderLobbyPlayers();
+    showFunnyToast(notice);
   } else {
-    document.getElementById('roomPanel').style.display = 'none';
-    document.getElementById('setupPanel').style.display = 'flex';
-    document.getElementById('hostCreateSection').style.display = 'block';
-    if (autoReopen) openPermanentRoom();
+    if (hostConn && hostConn.open) {
+      hostConn.send({ type: 'EXIT_GAME_TO_LOBBY', playerId: myId, name: myName });
+    }
+    document.getElementById('gameScreen').classList.remove('active');
+    document.getElementById('lobbyScreen').classList.add('active');
+    showFunnyToast("🔙 Kamu kembali ke Ruang Room.");
   }
 }
 
-function confirmExitGame() {
-  showElegantDialog({
-    icon: '✨',
-    title: 'Kembali ke Ruang Room?',
-    desc: isHost
-      ? 'Semua pemain akan kembali ke ruang tunggu Room Permanen untuk mengatur ulang pemain/bot.'
-      : 'Kamu akan kembali ke lobby Room Permanen.',
-    buttons: [
-      { text: 'Lanjut Main', cls: 'btn-dark' },
-      { text: 'Ke Ruang Room', cls: 'btn-yellow', onClick: () => backToLobbyKeepRoom(false) }
-    ]
-  });
+function leaveRoomCompletely() {
+  intentionalExit = true;
+  if (isHost) {
+    broadcast({
+      type: 'HOST_LEFT_ROOM',
+      text: `🚪 Penjaga Room (${myName}) telah keluar dari room!`
+    });
+    setTimeout(() => {
+      resetToInitialMenu();
+      showFunnyToast("🚪 Kamu telah keluar dari room.");
+    }, 150);
+  } else {
+    if (hostConn && hostConn.open) {
+      hostConn.send({ type: 'LEAVE_ROOM', playerId: myId, name: myName });
+    }
+    setTimeout(() => {
+      resetToInitialMenu();
+      showFunnyToast("🚪 Kamu telah keluar dari room.");
+    }, 150);
+  }
 }
 
+function resetToInitialMenu() {
+  if (hostConn) { try { hostConn.close(); } catch (e) {} hostConn = null; }
+  Object.values(clientConns).forEach(c => { try { c.close(); } catch (e) {} });
+  clientConns = {};
+  if (peer) { try { peer.destroy(); } catch (e) {} peer = null; }
+
+  isHost = false;
+  myId = "";
+  isAnimatingLock = false;
+  lastWinnerShown = null;
+  gameState = {
+    started: false,
+    players: [],
+    deck: [],
+    discardPile: [],
+    currentColor: "red",
+    turnIndex: 0,
+    direction: 1,
+    winner: null
+  };
+
+  document.getElementById('elegantDialogModal').classList.remove('active');
+  document.getElementById('wildModal').classList.remove('active');
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('lobbyScreen').classList.add('active');
+  document.getElementById('roomPanel').style.display = 'none';
+  document.getElementById('setupPanel').style.display = 'flex';
+  document.getElementById('lobbyStatus').textContent = "";
+}
+
+/* ================= LOBBY HELPERS ================= */
 function addBot() {
   if (!isHost || gameState.players.length >= 8) return;
   const botNames = ["Bot Virgo ♍", "Bot Sagi ♐", "Bot Lyra ✨", "Bot Orion 🌌", "Bot Vega ⭐"];
@@ -1464,7 +1475,7 @@ function renderLobbyPlayers() {
   list.innerHTML = gameState.players.map((p, i) => `
     <div class="player-item">
       <span>${p.avatar} <strong>${p.name}</strong> ${p.id === myId ? '(Kamu)' : ''}</span>
-      <span style="font-size:12px; color:#d7ceff;">${i === 0 ? '👑 Penjaga Room' : (p.isBot ? '✨ Bot Astral' : '📱 Tamu')}</span>
+      <span style="font-size:12px; color:#d7ceff;">${i === 0 ? '👑 Penjaga Room' : (p.isBot ? '✨ Bot Astral' : '📱 Pemain')}</span>
     </div>
   `).join('');
 }
@@ -1761,9 +1772,25 @@ function handleHostReceive(conn, data) {
       conn.send({ type: 'LATE_JOIN_GAME', state: gameState });
       broadcastState({ kind: 'FUNNY_MSG', text: `✨ ${data.name} bergabung ke orbit permainan!` });
     } else {
-      broadcastState();
+      broadcastState({ kind: 'LOBBY_MSG', text: `✨ ${data.name} masuk ke room!` });
       renderLobbyPlayers();
+      showFunnyToast(`✨ ${data.name} masuk ke room!`);
     }
+  } else if (data.type === 'LEAVE_ROOM') {
+    handlePlayerDisconnectedOnHost(conn.peer, "keluar dari room");
+    try { conn.close(); } catch (e) {}
+  } else if (data.type === 'EXIT_GAME_TO_LOBBY') {
+    const p = gameState.players.find(pl => pl.id === conn.peer);
+    const pName = p ? p.name : (data.name || "Pemain");
+    gameState.started = false;
+    gameState.winner = null;
+    gameState.players.forEach(pl => { pl.hand = []; pl.saidUno = false; });
+    const notice = `🔙 ${pName} keluar dari ronde & kembali ke Ruang Room.`;
+    broadcast({ type: 'RETURN_LOBBY', state: gameState, notice });
+    document.getElementById('gameScreen').classList.remove('active');
+    document.getElementById('lobbyScreen').classList.add('active');
+    renderLobbyPlayers();
+    showFunnyToast(notice);
   } else {
     processGameAction(data);
   }
@@ -1783,10 +1810,22 @@ function handleClientReceive(data) {
     document.getElementById('gameScreen').classList.remove('active');
     document.getElementById('lobbyScreen').classList.add('active');
     renderLobbyPlayers();
+    if (data.notice) showFunnyToast(data.notice);
+  } else if (data.type === 'HOST_LEFT_ROOM') {
+    intentionalExit = true;
+    showElegantDialog({
+      icon: '🚪',
+      title: 'Penjaga Room Keluar',
+      desc: data.text || 'Penjaga Room telah meninggalkan room.',
+      buttons: [
+        { text: 'Kembali ke Menu', cls: 'btn-yellow', onClick: () => resetToInitialMenu() }
+      ]
+    });
   } else if (data.type === 'SYNC_STATE') {
     if (!data.state.started) {
       gameState = data.state;
       renderLobbyPlayers();
+      if (data.animEvent && data.animEvent.text) showFunnyToast(data.animEvent.text);
     } else {
       applyStateWithAnimation(data.state, data.animEvent);
     }
@@ -2139,11 +2178,13 @@ function renderGame(state, skipWinnerAlert = false) {
           : `Ronde selesai! Tetap di Room Permanen "${activeRoomCode}" untuk ronde berikutnya.`,
         buttons: isHost
           ? [
-              { text: 'Ruang Room', cls: 'btn-dark', onClick: () => backToLobbyKeepRoom(false) },
-              { text: 'Ronde Baru ✨', cls: 'btn-green', onClick: () => startGame() }
+              { text: 'Ronde Baru ✨', cls: 'btn-green', onClick: () => startGame() },
+              { text: 'Ruang Room', cls: 'btn-dark', onClick: () => exitGameToLobby() },
+              { text: '🚪 Keluar Room', cls: 'btn-red', onClick: () => leaveRoomCompletely() }
             ]
           : [
-              { text: 'Tunggu Ronde Baru', cls: 'btn-yellow' }
+              { text: 'Tunggu Ronde Baru', cls: 'btn-yellow' },
+              { text: '🚪 Keluar Room', cls: 'btn-red', onClick: () => leaveRoomCompletely() }
             ]
       });
     }, 900);
