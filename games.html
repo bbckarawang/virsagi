@@ -343,6 +343,11 @@
       transform: scale(0.97);
     }
 
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
     .btn-primary {
       background: linear-gradient(135deg, #ffd166 0%, #f59e0b 100%);
       color: #111827;
@@ -566,8 +571,8 @@
       touch-action: none;
       cursor: crosshair;
       width: 100%;
-      max-width: 320px;
-      height: 260px;
+      max-width: 280px;
+      height: 230px;
     }
 
     .color-palette {
@@ -813,7 +818,6 @@
         </p>
       </div>
 
-      <!-- Tombol Pilih Peran & Koneksi Langsung -->
       <div id="roleSelectButtons" class="role-connect-grid">
         <button class="role-action-card role-virgo-btn" onclick="startAsVirgoHost()">
           <div class="role-avatar">♍</div>
@@ -836,7 +840,6 @@
         </button>
       </div>
 
-      <!-- Panel Status Menghubungkan (Muncul setelah klik salah satu peran) -->
       <div id="connectingPanel" class="connecting-panel hidden">
         <div class="spinner-ring"></div>
         <div id="connectingTitle" style="font-weight: 700; color: var(--gold); font-size: 0.95rem; margin-bottom: 4px;">
@@ -1309,10 +1312,8 @@
     /* =========================================================================
        5. KONEKSI P2P PERMANENT ROOM (STUN SERVERS + AUTO-RETRY)
        ========================================================================= */
-    // ID Permanen Khusus Virgo Boy (Host) & Sagittarius Girl (Guest)
     const PERMANENT_HOST_ID = 'VIRSAGI-LOVE-HOST-PERMANENT-2026';
 
-    // Konfigurasi ICE / STUN Server agar tembus jaringan seluler (4G/5G) & Wi-Fi berbeda
     const PEER_CONFIG = {
       debug: 1,
       config: {
@@ -1344,6 +1345,8 @@
       questions: [],
       myAnswer: null,
       partnerAnswer: null,
+      partnerAnswerRound: -1, // Melacak ronde jawaban pasangan agar tidak race condition
+      roundRevealed: false,
       clueGiver: 'Virgo',
       targetNumber: 5,
       clueWord: '',
@@ -1461,7 +1464,6 @@
 
       peer.on('open', () => {
         attemptConnectToHost();
-        // Auto-retry setiap 3 detik sampai terhubung
         retryTimer = setInterval(() => {
           if (!conn || !conn.open) {
             attemptConnectToHost();
@@ -1630,8 +1632,13 @@
           break;
 
         case 'SUBMIT_ANSWER':
-          gameState.partnerAnswer = data.answer;
-          checkRoundCompletion();
+          // Simpan jawaban beserta indeks rondenya agar tidak tertimpa saat transisi ronde
+          const incomingRound = typeof data.round === 'number' ? data.round : gameState.round;
+          if (incomingRound >= gameState.round) {
+            gameState.partnerAnswer = data.answer;
+            gameState.partnerAnswerRound = incomingRound;
+            checkRoundCompletion();
+          }
           break;
 
         case 'WAVELENGTH_CLUE':
@@ -1686,6 +1693,8 @@
         questions,
         myAnswer: null,
         partnerAnswer: null,
+        partnerAnswerRound: -1,
+        roundRevealed: false,
         clueGiver: 'Virgo',
         targetNumber,
         clueWord: '',
@@ -1717,9 +1726,16 @@
     }
 
     function renderCurrentRound() {
+      clearInterval(gameState.timerInterval);
       updateHUD();
       gameState.myAnswer = null;
-      gameState.partnerAnswer = null;
+      gameState.roundRevealed = false;
+
+      // Hanya hapus partnerAnswer jika bukan kiriman awal untuk ronde saat ini
+      if (gameState.partnerAnswerRound !== gameState.round) {
+        gameState.partnerAnswer = null;
+      }
+
       const area = document.getElementById('gamePlayArea');
       const q = gameState.questions[gameState.round];
 
@@ -1795,7 +1811,7 @@
             ⏱️ Sisa Waktu: <span id="drawTimer">30</span> detik
           </div>
           <div class="draw-wrapper">
-            <canvas id="drawCanvas" width="320" height="260"></canvas>
+            <canvas id="drawCanvas" width="240" height="200"></canvas>
             <div class="color-palette">
               <div class="color-dot active" style="background:#ffd166;" onclick="setBrushColor('#ffd166', this)"></div>
               <div class="color-dot" style="background:#6ee7b7;" onclick="setBrushColor('#6ee7b7', this)"></div>
@@ -1818,7 +1834,7 @@
       gameState.myAnswer = choice;
       document.getElementById('opt' + choice).classList.add('selected');
       document.getElementById('waitStatus').textContent = `Menunggu ${partnerZodiac} memilih... ⏳`;
-      sendData({ type: 'SUBMIT_ANSWER', answer: choice });
+      sendData({ type: 'SUBMIT_ANSWER', round: gameState.round, answer: choice });
       checkRoundCompletion();
     }
 
@@ -1833,7 +1849,7 @@
       document.getElementById('mindInput').disabled = true;
       document.getElementById('btnLockMind').disabled = true;
       document.getElementById('waitStatus').textContent = `Jawaban dikunci! Menunggu ${partnerZodiac}... 🔒`;
-      sendData({ type: 'SUBMIT_ANSWER', answer: val });
+      sendData({ type: 'SUBMIT_ANSWER', round: gameState.round, answer: val });
       checkRoundCompletion();
     }
 
@@ -1879,7 +1895,8 @@
       const guess = parseInt(document.getElementById('waveSlider').value, 10);
       gameState.myAnswer = guess;
       gameState.partnerAnswer = gameState.targetNumber;
-      sendData({ type: 'SUBMIT_ANSWER', answer: guess });
+      gameState.partnerAnswerRound = gameState.round;
+      sendData({ type: 'SUBMIT_ANSWER', round: gameState.round, answer: guess });
       revealWavelengthResult(guess, gameState.targetNumber);
     }
 
@@ -1894,11 +1911,11 @@
       document.getElementById('knowMeInput').disabled = true;
       document.getElementById('btnLockKnow').disabled = true;
       document.getElementById('waitStatus').textContent = `Terkirim! Menunggu ${partnerZodiac}... ⏳`;
-      sendData({ type: 'SUBMIT_ANSWER', answer: val });
+      sendData({ type: 'SUBMIT_ANSWER', round: gameState.round, answer: val });
       checkRoundCompletion();
     }
 
-    /* --- KANVAS GAMBAR --- */
+    /* --- KANVAS GAMBAR (KOMPRESI JPEG RINGAN UNTUK P2P) --- */
     let currentBrushColor = '#ffd166';
     let isDrawing = false;
 
@@ -1908,16 +1925,28 @@
       el.classList.add('active');
     }
 
+    function fillCanvasBackground(canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0d122b';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
     function clearDrawingCanvas() {
       const c = document.getElementById('drawCanvas');
-      if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height);
+      if (c) fillCanvasBackground(c);
     }
 
     function setupDrawingCanvas() {
       const canvas = document.getElementById('drawCanvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      ctx.lineWidth = 4;
+
+      // Isi background solid agar ekspor JPEG bersih dan ringan
+      fillCanvasBackground(canvas);
+      ctx.lineWidth = 3.5;
       ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      isDrawing = false;
 
       const getPos = (e) => {
         const rect = canvas.getBoundingClientRect();
@@ -1930,6 +1959,7 @@
       };
 
       const start = (e) => {
+        if (gameState.myAnswer) return;
         isDrawing = true;
         const pos = getPos(e);
         ctx.beginPath();
@@ -1937,8 +1967,8 @@
       };
 
       const move = (e) => {
-        if (!isDrawing) return;
-        e.preventDefault();
+        if (!isDrawing || gameState.myAnswer) return;
+        if (e.cancelable) e.preventDefault();
         const pos = getPos(e);
         ctx.strokeStyle = currentBrushColor;
         ctx.lineTo(pos.x, pos.y);
@@ -1947,15 +1977,17 @@
 
       const end = () => { isDrawing = false; };
 
-      canvas.addEventListener('mousedown', start);
-      canvas.addEventListener('mousemove', move);
-      window.addEventListener('mouseup', end);
+      canvas.onmousedown = start;
+      canvas.onmousemove = move;
+      canvas.onmouseup = end;
+      canvas.onmouseleave = end;
 
-      canvas.addEventListener('touchstart', start, { passive: false });
-      canvas.addEventListener('touchmove', move, { passive: false });
-      canvas.addEventListener('touchend', end);
+      canvas.ontouchstart = start;
+      canvas.ontouchmove = move;
+      canvas.ontouchend = end;
 
       let timeLeft = 30;
+      clearInterval(gameState.timerInterval);
       gameState.timerInterval = setInterval(() => {
         timeLeft--;
         const timerEl = document.getElementById('drawTimer');
@@ -1971,13 +2003,21 @@
       if (gameState.myAnswer) return;
       clearInterval(gameState.timerInterval);
       playSound('click');
+
       const canvas = document.getElementById('drawCanvas');
-      const dataUrl = canvas.toDataURL('image/png', 0.6);
+      // Gunakan JPEG kualitas 0.45 (~6-10 KB saja) agar langsung tembus WebRTC tanpa macet
+      const dataUrl = canvas ? canvas.toDataURL('image/jpeg', 0.45) : '';
       gameState.myAnswer = dataUrl;
+
       const btn = document.getElementById('btnFinishDraw');
       if (btn) btn.disabled = true;
-      document.getElementById('waitStatus').textContent = `Gambar terkirim! Menunggu karya ${partnerZodiac}... 🎨`;
-      sendData({ type: 'SUBMIT_ANSWER', answer: dataUrl });
+
+      const waitEl = document.getElementById('waitStatus');
+      if (waitEl) {
+        waitEl.textContent = `Gambar terkirim! Menunggu karya ${partnerZodiac}... 🎨`;
+      }
+
+      sendData({ type: 'SUBMIT_ANSWER', round: gameState.round, answer: dataUrl });
       checkRoundCompletion();
     }
 
@@ -1985,15 +2025,20 @@
        9. PENGECEKAN HASIL RONDE & REVEAL
        ========================================================================= */
     function checkRoundCompletion() {
+      if (gameState.roundRevealed) return;
+
       if (gameState.mode === 'wavelength') {
-        if (gameState.clueGiver === myZodiac && gameState.partnerAnswer !== null) {
+        if (gameState.clueGiver === myZodiac && gameState.partnerAnswer !== null && gameState.partnerAnswerRound === gameState.round) {
+          gameState.roundRevealed = true;
           revealWavelengthResult(gameState.partnerAnswer, gameState.targetNumber);
         }
         return;
       }
 
       if (gameState.myAnswer === null || gameState.partnerAnswer === null) return;
+      if (gameState.partnerAnswerRound !== gameState.round) return;
 
+      gameState.roundRevealed = true;
       const area = document.getElementById('gamePlayArea');
       const q = gameState.questions[gameState.round];
 
@@ -2169,6 +2214,7 @@
     }
 
     function advanceRound(nextTarget) {
+      clearInterval(gameState.timerInterval);
       gameState.round++;
       gameState.targetNumber = nextTarget;
       gameState.clueGiver = gameState.clueGiver === 'Virgo' ? 'Sagittarius' : 'Virgo';
