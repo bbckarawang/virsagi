@@ -169,6 +169,12 @@
       backdrop-filter: blur(10px);
     }
 
+    .icon-btn.danger-btn {
+      border-color: rgba(251, 113, 133, 0.45);
+      color: var(--danger);
+      background: rgba(251, 113, 133, 0.12);
+    }
+
     .icon-btn:active {
       transform: scale(0.92);
     }
@@ -364,6 +370,12 @@
       background: transparent;
       border: 1px solid var(--border-glass);
       color: var(--text-main);
+    }
+
+    .btn-danger-outline {
+      background: rgba(251, 113, 133, 0.12);
+      border: 1px solid rgba(251, 113, 133, 0.45);
+      color: var(--danger);
     }
 
     .btn-success {
@@ -776,6 +788,31 @@
       font-weight: 800;
       color: var(--gold);
     }
+
+    /* Exit Modal Overlay */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 6, 18, 0.82);
+      backdrop-filter: blur(8px);
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #121734;
+      border: 1px solid var(--gold);
+      border-radius: 22px;
+      padding: 22px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+      animation: fadeSlide 0.25s ease;
+    }
   </style>
 </head>
 <body>
@@ -786,6 +823,21 @@
   <!-- Container Notifikasi Kustom -->
   <div id="toast-container"></div>
 
+  <!-- Modal Konfirmasi Exit -->
+  <div id="exitModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">🚪✨</div>
+      <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 8px;">Keluar dari Room?</h3>
+      <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 18px;">
+        Pasanganmu akan langsung mendapat notifikasi bahwa kamu keluar, dan sesi room ini akan ditutup bersih agar bisa dimainkan lagi lain kali.
+      </p>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-outline" onclick="closeExitModal()">Batal</button>
+        <button class="btn btn-danger-outline" style="font-weight: 800;" onclick="confirmExitRoom()">Ya, Keluar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="app-wrapper">
     <!-- Header -->
     <header>
@@ -795,7 +847,8 @@
       </div>
       <div class="header-controls">
         <button class="icon-btn" id="btnSound" title="Suara On/Off">🔊</button>
-        <button class="icon-btn hidden" id="btnHome" title="Kembali ke Menu">🏠</button>
+        <button class="icon-btn hidden" id="btnHome" title="Kembali ke Menu Game">🏠</button>
+        <button class="icon-btn danger-btn hidden" id="btnExit" title="Keluar Room" onclick="openExitModal()">🚪</button>
       </div>
     </header>
 
@@ -850,7 +903,7 @@
         </div>
         <div style="display: flex; gap: 8px; justify-content: center;">
           <button class="btn btn-secondary btn-sm" onclick="retryConnection()">🔄 Coba Sambung Ulang</button>
-          <button class="btn btn-outline btn-sm" onclick="resetLobby()">⬅️ Ganti Peran</button>
+          <button class="btn btn-danger-outline btn-sm" onclick="resetLobby(true)">🚪 Keluar / Ganti Peran</button>
         </div>
       </div>
     </section>
@@ -860,7 +913,7 @@
       <div style="text-align: center; margin-bottom: 8px;">
         <h2 style="font-size: 1.2rem; color: var(--gold);">Pilih Misi Kecocokan ✨</h2>
         <p style="font-size: 0.82rem; color: var(--text-muted);">
-          30 pertanyaan acak siap menguji telepati Virgo & Sagittarius!
+          300 bank soal acak (60 per mode) siap menguji telepati kalian!
         </p>
       </div>
 
@@ -905,6 +958,10 @@
           </div>
         </div>
       </div>
+
+      <div style="margin-top: 16px;">
+        <button class="btn btn-danger-outline" onclick="openExitModal()">🚪 Keluar dari Room</button>
+      </div>
     </section>
 
     <!-- SCREEN 3: ARENA PERMAINAN -->
@@ -933,6 +990,7 @@
       </p>
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <button class="btn btn-primary" onclick="requestBackToMenu()">🎮 Main Game Lainnya</button>
+        <button class="btn btn-danger-outline" onclick="openExitModal()">🚪 Selesai & Keluar Room</button>
       </div>
     </section>
   </div>
@@ -978,7 +1036,7 @@
 
   <script>
     /* =========================================================================
-       1. BANK 30 PERTANYAAN KECOCOKAN RANDOM (VIRGO & SAGITTARIUS EDITION)
+       1. BANK 300 PERTANYAAN RANDOM (60 SOAL PER MODE • VIRGO & SAGITTARIUS)
        ========================================================================= */
     const QUESTION_BANK = {
       tot: [
@@ -1011,7 +1069,37 @@
         { a: "🎧 Lagu Galau", b: "💃 Lagu Semangat Upbeat" },
         { a: "🍩 Donat Gula", b: "🥐 Croissant Hangat" },
         { a: "🌌 Lihat Bintang Malam", b: "🌇 Lihat Sunset Sore" },
-        { a: "🏡 Tinggal di Pinggir Kota", b: "🏢 Apartemen Pusat Kota" }
+        { a: "🏡 Tinggal di Pinggir Kota", b: "🏢 Apartemen Pusat Kota" },
+        { a: "🥞 Pancake Sirup Maple", b: "🧇 Waffle Es Krim" },
+        { a: "🎥 Film Komedi Ngakak", b: "🕵️ Film Misteri Thriller" },
+        { a: "🍓 Jus Stroberi Segar", b: "🥭 Jus Mangga Kental" },
+        { a: "⛺ Camping di Alam", b: "🏨 Staycation Hotel Nyaman" },
+        { a: "🍫 Cokelat Hitam (Dark)", b: "🥛 Cokelat Susu Manis" },
+        { a: "🎤 Karaoke Seru", b: "🎳 Main Bowling / Arcade" },
+        { a: "🍚 Nasi Goreng Spesial", b: "🍲 Soto Ayam Hangat" },
+        { a: "📖 Baca Novel Fiksi", b: "📰 Baca Fakta & Sains" },
+        { a: "🧸 Boneka Lucu", b: "🪴 Tanaman Hias Mini" },
+        { a: "👟 Sneakers Santai", b: "👞 Sepatu Rapi Klasik" },
+        { a: "🍰 Kue Keju (Cheesecake)", b: "🍫 Brownies Cokelat Lumer" },
+        { a: "🌞 Liburan Musim Panas", b: "❄️ Liburan Cuaca Dingin" },
+        { a: "🛵 Naik Motor Keliling Kota", b: "🚘 Naik Mobil Santai" },
+        { a: "🥟 Dimsum Kukus", b: "🍤 Gorengan Renyah" },
+        { a: "🎨 Melukis / Kerajinan", b: "🍳 Masak Menu Baru" },
+        { a: "🌊 Berenang di Kolam", b: "🛁 Berendam Air Hangat" },
+        { a: "📱 Mode Gelap (Dark Mode)", b: "☀️ Mode Terang (Light Mode)" },
+        { a: "🍿 Popcorn Karamel Manis", b: "🧂 Popcorn Asin Mentega" },
+        { a: "🎶 Konser Musik Live", b: "🎪 Festival Kuliner Malam" },
+        { a: "🥗 Salad Segar", b: "🍛 Kari Gurih Berempah" },
+        { a: "💤 Tidur Siang Sebentar", b: "☕ Ngopi Sore Biar Melek" },
+        { a: "📷 Foto Candid Natural", b: "🤳 Selfie Gaya Bebas" },
+        { a: "🏝️ Pulau Tropis Sepi", b: "🗼 Kota Metropolitan Ramai" },
+        { a: "🍋 Es Teh Lemon", b: "🧋 Boba Brown Sugar" },
+        { a: "🕰️ Nostalgia Masa Lalu", b: "🚀 Rencana Masa Depan" },
+        { a: "🎭 Drama Korea Romantis", b: "🦸 Film Aksi Petualangan" },
+        { a: "🌮 Taco / Kebab", b: "🥪 Sandwich Panggang" },
+        { a: "🕯️ Lilin Aromaterapi", b: "🌸 Parfum Segar" },
+        { a: "🎲 Jujur Apa Adanya", b: "🤫 Kejutan Rahasia" },
+        { a: "❤️ Pelukan Hangat", b: "🤝 Gandengan Tangan" }
       ],
       mindsync: [
         "Satu kata untuk menggambarkan pasanganmu hari ini?",
@@ -1043,7 +1131,37 @@
         "Mainan masa kecil yang paling sering dimainkan?",
         "Makanan tradisional Indonesia paling juara?",
         "Kalau terdampar di pulau, 1 barang yang dibawa?",
-        "Emoji yang paling sering kamu pakai saat chat?"
+        "Emoji yang paling sering kamu pakai saat chat?",
+        "Bumbu dapur atau saus yang wajib ada pas makan?",
+        "Hari paling favorit dalam seminggu?",
+        "Kalau jadi karakter game, peran apa yang kamu pilih?",
+        "Minuman dingin paling segar pas siang terik?",
+        "Satu benda yang selalu ada di dekat tempat tidurmu?",
+        "Pelajaran sekolah yang dulu paling kamu sukai?",
+        "Kalau bisa pindah ke era mana pun, mau ke tahun berapa?",
+        "Kue ulang tahun rasa apa yang paling enak?",
+        "Hal pertama yang kamu cari pas masuk minimarket?",
+        "Aroma wangi yang paling bikin tenang?",
+        "Kalau punya hewan peliharaan bareng, mau dinamai siapa?",
+        "Transportasi umum yang paling seru dinaiki?",
+        "Satu kata untuk menggambarkan malam ini?",
+        "Lauk pendamping nasi putih paling nikmat?",
+        "Tempat duduk favorit kalau lagi di bioskop?",
+        "Aplikasi yang paling sering dibuka di HP?",
+        "Kalau menang tiket keliling dunia, destinasi pertama?",
+        "Sayuran yang paling kamu suka?",
+        "Gaya rambut atau outfit pasangan yang paling kamu suka?",
+        "Satu kebiasaan sebelum tidur yang nggak pernah lewat?",
+        "Cokelat atau permen masa kecil yang bikin kangen?",
+        "Kalau buka bisnis bareng, bisnis apa yang paling cocok?",
+        "Pemandangan alam yang paling bikin takjub?",
+        "Satu kata kalau lagi kangen berat?",
+        "Minuman hangat paling enak sebelum tidur?",
+        "Genre buku atau film yang paling bikin penasaran?",
+        "Alat musik yang suaranya paling merdu menurutmu?",
+        "Kalau lagi lapar tengah malam, biasanya masak/beli apa?",
+        "Hadiah sederhana yang paling berkesan buatmu?",
+        "Satu harapan paling dekat untuk kita berdua?"
       ],
       wavelength: [
         { left: "❄️ Dingin Membeku", right: "🔥 Panas Membara" },
@@ -1075,7 +1193,37 @@
         { left: "🛒 Lapar Mata", right: "🧾 Hemat Perhitungan" },
         { left: "🛸 Aneh Unik", right: "👔 Biasa Umum" },
         { left: "💤 Butuh Tidur", right: "☕ Kebanyakan Kafein" },
-        { left: "💔 Bikin Kesal", right: "🥰 Bikin Sayang" }
+        { left: "💔 Bikin Kesal", right: "🥰 Bikin Sayang" },
+        { left: "🪶 Ringan Melayang", right: "🪨 Berat Banget" },
+        { left: "🤏 Kecil Mungil", right: "🦕 Raksasa Besar" },
+        { left: "🌫️ Kabur Tidak Jelas", right: "🔍 Tajam Detail" },
+        { left: "🥀 Romantis Melankolis", right: "😄 Romantis Kocak" },
+        { left: "🚶 Jalan Kaki Santai", right: "🏎️ Balapan Ngebut" },
+        { left: "🧱 Kaku Formal", right: "🎈 Fleksibel Spontan" },
+        { left: "🌑 Gelap Gulita", right: "☀️ Silau Benderang" },
+        { left: "🧊 Kaku Cuek", right: "🤗 Hangat Perhatian" },
+        { left: "📉 Gampang Ditebak", right: "🌀 Penuh Kejutan" },
+        { left: "🥣 Makanan Berkuah", right: "🥨 Makanan Kering Renyah" },
+        { left: "🕰️ Sebentar Banget", right: "⏳ Lama Berjam-jam" },
+        { left: "🎭 Pura-pura Jaim", right: "🤪 Apa Adanya Banget" },
+        { left: "🌊 Dalam Penuh Makna", right: "🫧 Ringan Receh" },
+        { left: "🏜️ Kering Gersang", right: "🌧️ Basah Lembap" },
+        { left: "🧸 Lembut Empuk", right: "🛡️ Keras Kokoh" },
+        { left: "🤫 Bisik-bisik", right: "📣 Teriak Kencang" },
+        { left: "📚 Teori Buku", right: "🛠️ Praktik Langsung" },
+        { left: "🌱 Pemula Baru", right: "👑 Master Ahli" },
+        { left: "🧊 Sangat Sabar", right: "🌋 Cepat Emosi" },
+        { left: "🎨 Warna Pastel Lembut", right: "🌈 Warna Neon Mencolok" },
+        { left: "🏠 Dekat Banget", right: "🪐 Jauh di Ujung Dunia" },
+        { left: "🥱 Ngantuk Berat", right: "⚡ Segar Bugar" },
+        { left: "📦 Minimalis Simpel", right: "🎪 Ramai Dekorasi" },
+        { left: "🐱 Mandiri Cuek", right: "🐶 Nempel Terus" },
+        { left: "🥤 Minuman Tawar", right: "🍯 Manis Legit" },
+        { left: "🧭 Tersesat Tanpa Arah", right: "🗺️ Punya Peta Lengkap" },
+        { left: "🕰️ Terlambat", right: "⏱️ Tepat Waktu" },
+        { left: "🎈 Ringan Tanpa Beban", right: "🎒 Banyak Tanggung Jawab" },
+        { left: "🌙 Anak Malam", right: "🌅 Anak Pagi" },
+        { left: "🤝 Teman Biasa", right: "💍 Belahan Jiwa" }
       ],
       knowme: [
         "Apa makanan yang paling aku hindari atau nggak suka?",
@@ -1107,7 +1255,37 @@
         "Apa pelajaran atau topik obrolan yang paling aku kuasai?",
         "Bagaimana caraku nunjukin rasa sayang tanpa kata-kata?",
         "Apa cuaca favoritku buat jalan-jalan?",
-        "Satu hal yang nggak bisa aku tolak kalau ditawarin kamu?"
+        "Satu hal yang nggak bisa aku tolak kalau ditawarin kamu?",
+        "Kalau makan mie instan, aku lebih suka kuah atau goreng?",
+        "Apa benda kesayanganku yang paling sering aku pakai/bawa?",
+        "Kalau lagi sakit ringan, apa yang paling aku cari?",
+        "Aku lebih suka dikasih kado kejutan atau ditanya mau apa?",
+        "Apa kebiasaan unikku pas lagi fokus mikir sesuatu?",
+        "Kalau kita lagi jalan bareng, aku biasanya jalan di sebelah mana?",
+        "Apa minuman hangat favoritku pas cuaca dingin?",
+        "Hal apa yang paling cepat bikin aku ilfeel atau bad mood?",
+        "Kalau foto bareng, gaya pose andalanku seperti apa?",
+        "Apa makanan masa kecil yang paling aku kangenin?",
+        "Aku lebih suka liburan yang padat jadwal atau santai bebas?",
+        "Apa warna yang paling aku hindari?",
+        "Kalau lagi banyak pikiran, aku lebih suka cerita atau diam dulu?",
+        "Apa buah favoritku yang paling sering aku makan?",
+        "Seberapa tahan aku sama makanan pedas (skala 1-10)?",
+        "Apa aktivitas malam favoritku sebelum tidur?",
+        "Kalau beli minum di kafe, aku tim kopi atau non-kopi?",
+        "Hal apa dari sifatku yang menurutmu paling khas zodiakku?",
+        "Apa impian masa kecilku yang dulu sering aku ceritakan?",
+        "Kalau nonton YouTube atau TikTok, konten apa yang sering muncul?",
+        "Apa hal pertama yang aku perhatikan dari orang baru?",
+        "Kalau disuruh masak satu menu andalan, aku bakal masak apa?",
+        "Aku lebih suka bangun pagi atau tidur larut malam?",
+        "Apa bentuk apresiasi (love language) yang paling aku suka?",
+        "Kalau lagi bosan di rumah, apa yang biasanya aku lakukan?",
+        "Apa jenis sepatu atau sandal yang paling sering aku pakai?",
+        "Kalau hujan turun tiba-tiba, reaksi pertamaku biasanya gimana?",
+        "Apa nama panggilan masa kecilku di keluarga?",
+        "Hal kecil apa yang sering aku lupa naruhnya?",
+        "Satu kalimat yang paling sering aku ucapkan ke kamu?"
       ],
       draw: [
         "Gambar wajah pasanganmu versi imut! 🥰",
@@ -1139,7 +1317,37 @@
         "Gambar anjing lucu yang goyang ekor 🐶",
         "Gambar pelangi setelah hujan 🌈",
         "Gambar kamera untuk abadikan momen 📸",
-        "Gambar hati dengan sayap malaikat 💘"
+        "Gambar hati dengan sayap malaikat 💘",
+        "Gambar beruang panda lagi makan bambu 🐼",
+        "Gambar balon udara terbang di atas awan 🎈",
+        "Gambar kue ulang tahun dengan lilin menyala 🎂",
+        "Gambar gurita lucu pakai kacamata hitam 🐙🕶️",
+        "Gambar tenda camping di bawah langit bintang ⛺",
+        "Gambar UFO sedang menculik sapi 🛸🐄",
+        "Gambar semangkuk mie ayam lengkap dengan bakso 🍲",
+        "Gambar kelinci lompat di atas bulan 🐇🌕",
+        "Gambar payung warna-warni di tengah hujan ☔",
+        "Gambar ikan paus menyemburkan air mancur 🐳",
+        "Gambar kastil negeri dongeng di atas bukit 🏰",
+        "Gambar astronaut melambai di luar angkasa 👨‍🚀",
+        "Gambar lebah kecil hinggap di bunga 🐝🌸",
+        "Gambar kaktus imut di dalam pot senyum 🌵",
+        "Gambar sepeda tandem untuk berdua 🚲",
+        "Gambar burger raksasa dengan keju meleleh 🍔",
+        "Gambar rubah kecil dengan ekor mengembang 🦊",
+        "Gambar mercusuar di tepi laut malam hari 🗼",
+        "Gambar pasangan lagi pegangan tangan di jembatan 🌉",
+        "Gambar naga kecil menyemburkan api cinta 🐉❤️",
+        "Gambar donat tabur meses warna-warni 🍩",
+        "Gambar perahu layar di tengah ombak tenang ⛵",
+        "Gambar koalanya lagi peluk batang pohon 🐨",
+        "Gambar kacamata & topi detektif 🕵️",
+        "Gambar pohon natal / pohon lampu hias ✨",
+        "Gambar buah semangka segar terpotong 🍉",
+        "Gambar katak lucu duduk di atas daun teratai 🐸",
+        "Gambar surat cinta dengan segel hati 💌",
+        "Gambar pegunungan bersalju dengan matahari terbit 🏔️",
+        "Gambar kita berdua versi karakter chibi! 👫✨"
       ]
     };
 
@@ -1232,7 +1440,7 @@
       setTimeout(() => {
         el.classList.add('fade-out');
         setTimeout(() => el.remove(), 300);
-      }, 3200);
+      }, 3400);
     }
 
     function spawnFloatingEmoji(emoji) {
@@ -1310,7 +1518,7 @@
     animateStars();
 
     /* =========================================================================
-       5. KONEKSI P2P PERMANENT ROOM (STUN SERVERS + AUTO-RETRY)
+       5. KONEKSI P2P PERMANENT ROOM & CLEAN EXIT MANAGEMENT
        ========================================================================= */
     const PERMANENT_HOST_ID = 'VIRSAGI-LOVE-HOST-PERMANENT-2026';
 
@@ -1335,6 +1543,7 @@
     let retryTimer = null;
     let unreadChat = 0;
     let chatOpen = false;
+    let intentionalExit = false;
 
     let gameState = {
       mode: null,
@@ -1345,7 +1554,7 @@
       questions: [],
       myAnswer: null,
       partnerAnswer: null,
-      partnerAnswerRound: -1, // Melacak ronde jawaban pasangan agar tidak race condition
+      partnerAnswerRound: -1,
       roundRevealed: false,
       clueGiver: 'Virgo',
       targetNumber: 5,
@@ -1370,19 +1579,69 @@
       document.getElementById('connectingSub').textContent = sub;
     }
 
-    function resetLobby() {
+    function openExitModal() {
       playSound('click');
+      document.getElementById('exitModal').classList.remove('hidden');
+    }
+
+    function closeExitModal() {
+      playSound('click');
+      document.getElementById('exitModal').classList.add('hidden');
+    }
+
+    function confirmExitRoom() {
+      closeExitModal();
+      intentionalExit = true;
+      // Beri tahu pasangan bahwa kita keluar dari room
+      sendData({ type: 'PLAYER_EXIT', zodiac: myZodiac });
+      showToast('Kamu keluar dari room. Sesi ditutup bersih 👋', '🚪');
+
+      // Beri jeda singkat 250ms agar pesan PLAYER_EXIT terkirim sempurna sebelum peer dihancurkan
+      setTimeout(() => {
+        resetLobby(false);
+      }, 250);
+    }
+
+    function resetLobby(playClick = true) {
+      if (playClick) playSound('click');
+      intentionalExit = true;
       clearInterval(retryTimer);
+      clearInterval(gameState.timerInterval);
+
+      if (conn) {
+        try { conn.close(); } catch (e) {}
+        conn = null;
+      }
       if (peer) {
-        peer.destroy();
+        try { peer.destroy(); } catch (e) {}
         peer = null;
       }
-      conn = null;
+
+      if (chatOpen) {
+        chatOpen = false;
+        document.getElementById('chatDrawer').classList.add('hidden');
+      }
+
+      document.getElementById('btnHome').classList.add('hidden');
+      document.getElementById('btnExit').classList.add('hidden');
+      switchScreen('screenLobby');
       document.getElementById('roleSelectButtons').classList.remove('hidden');
       document.getElementById('connectingPanel').classList.add('hidden');
       document.getElementById('roleBadge').textContent = '✨ VirSagi';
-      updateConnectionUI('', 'Pilih peranmu untuk masuk');
+      updateConnectionUI('', 'Room kosong • Pilih peranmu');
     }
+
+    // Kirim sinyal keluar otomatis jika tab browser ditutup / di-refresh
+    window.addEventListener('beforeunload', () => {
+      if (conn && conn.open) {
+        try {
+          conn.send({ type: 'PLAYER_EXIT', zodiac: myZodiac });
+        } catch (e) {}
+      }
+      if (peer) {
+        try { peer.destroy(); } catch (e) {}
+      }
+    });
 
     function retryConnection() {
       playSound('click');
@@ -1396,13 +1655,17 @@
     /* --- VIRGO BOY: BUKA RUANG PERMANEN (HOST) --- */
     function startAsVirgoHost() {
       playSound('click');
+      intentionalExit = false;
       clearInterval(retryTimer);
-      if (peer) peer.destroy();
+      if (peer) {
+        try { peer.destroy(); } catch (e) {}
+      }
 
       isHost = true;
       myZodiac = 'Virgo';
       partnerZodiac = 'Sagittarius';
       document.getElementById('roleBadge').textContent = '♍ Virgo Boy';
+      document.getElementById('btnExit').classList.remove('hidden');
       updateConnectionUI('waiting', 'Membuka ruang permanen...');
       showConnectingUI(
         '♍ Ruang Virgo Boy Sedang Dibuka...',
@@ -1430,13 +1693,14 @@
       });
 
       peer.on('error', (err) => {
+        if (intentionalExit) return;
         if (err.type === 'unavailable-id') {
           showConnectingUI(
             '⚠️ Sesi Lama Masih Aktif',
             'Ruang sebelumnya belum tertutup sepenuhnya. Mencoba mengambil alih dalam 3 detik...'
           );
           setTimeout(() => {
-            if (isHost && (!conn || !conn.open)) startAsVirgoHost();
+            if (isHost && !intentionalExit && (!conn || !conn.open)) startAsVirgoHost();
           }, 3000);
         } else {
           showToast('Sinyal terganggu (' + err.type + '), klik Coba Sambung Ulang', '⚠️');
@@ -1447,13 +1711,17 @@
     /* --- SAGITTARIUS GIRL: LANGSUNG GABUNG (GUEST) --- */
     function joinAsSagittariusGuest() {
       playSound('click');
+      intentionalExit = false;
       clearInterval(retryTimer);
-      if (peer) peer.destroy();
+      if (peer) {
+        try { peer.destroy(); } catch (e) {}
+      }
 
       isHost = false;
       myZodiac = 'Sagittarius';
       partnerZodiac = 'Virgo';
       document.getElementById('roleBadge').textContent = '♐ Sagittarius Girl';
+      document.getElementById('btnExit').classList.remove('hidden');
       updateConnectionUI('waiting', 'Mencari ruang Virgo Boy...');
       showConnectingUI(
         '♐ Menghubungkan ke Virgo Boy...',
@@ -1465,6 +1733,10 @@
       peer.on('open', () => {
         attemptConnectToHost();
         retryTimer = setInterval(() => {
+          if (intentionalExit) {
+            clearInterval(retryTimer);
+            return;
+          }
           if (!conn || !conn.open) {
             attemptConnectToHost();
           } else {
@@ -1474,6 +1746,7 @@
       });
 
       peer.on('error', (err) => {
+        if (intentionalExit) return;
         if (err.type === 'peer-unavailable') {
           document.getElementById('connectingTitle').textContent = '⏳ Menunggu Virgo Boy Membuka Ruang...';
           document.getElementById('connectingSub').textContent = 'Pastikan pacarmu sudah klik "Aku Virgo Boy (Host)". Sistem otomatis mencoba masuk setiap 3 detik.';
@@ -1484,6 +1757,7 @@
     }
 
     function attemptConnectToHost() {
+      if (intentionalExit || !peer) return;
       if (conn) {
         try { conn.close(); } catch (e) {}
       }
@@ -1503,6 +1777,7 @@
         sendData({ type: 'HANDSHAKE', zodiac: myZodiac });
         switchScreen('screenMenu');
         document.getElementById('btnHome').classList.remove('hidden');
+        document.getElementById('btnExit').classList.remove('hidden');
       });
 
       conn.on('data', (data) => {
@@ -1510,13 +1785,23 @@
       });
 
       conn.on('close', () => {
-        updateConnectionUI('waiting', 'Koneksi terputus, menyambungkan ulang...');
-        showToast('Sinyal terputus! Mencoba menyambung kembali... 🔄', '📡');
-        if (!isHost) {
-          retryTimer = setInterval(() => {
-            if (!conn || !conn.open) attemptConnectToHost();
-            else clearInterval(retryTimer);
-          }, 3000);
+        if (intentionalExit) return;
+        clearInterval(gameState.timerInterval);
+
+        if (isHost) {
+          // Jika Sagittarius Girl keluar, Virgo Boy kembali ke ruang tunggu atau bisa ikut Exit
+          updateConnectionUI('waiting', 'Sagittarius keluar • Menunggu masuk...');
+          showToast('Sagittarius Girl telah keluar dari room 👋', '🚪');
+          document.getElementById('btnHome').classList.add('hidden');
+          switchScreen('screenLobby');
+          showConnectingUI(
+            '♍ Sagittarius Keluar dari Room',
+            'Ruang masih terbuka jika ingin masuk lagi, atau klik Keluar untuk mengosongkan room.'
+          );
+        } else {
+          // Jika Virgo Boy (Host) keluar, room otomatis kosong & Guest kembali ke lobi awal
+          showToast('Virgo Boy telah keluar & menutup room 👋', '🚪');
+          resetLobby(false);
         }
       });
     }
@@ -1612,6 +1897,15 @@
           updateConnectionUI('online', `Terhubung: Virgo ♍ ❤️ ♐ Sagittarius`);
           break;
 
+        case 'PLAYER_EXIT':
+          playSound('miss');
+          clearInterval(gameState.timerInterval);
+          showToast(`${data.zodiac || partnerZodiac} keluar dari room! 👋`, '🚪');
+          if (conn) {
+            try { conn.close(); } catch (e) {}
+          }
+          break;
+
         case 'CHAT':
           playSound('chat');
           appendChatMessage(data.text, false);
@@ -1632,7 +1926,6 @@
           break;
 
         case 'SUBMIT_ANSWER':
-          // Simpan jawaban beserta indeks rondenya agar tidak tertimpa saat transisi ronde
           const incomingRound = typeof data.round === 'number' ? data.round : gameState.round;
           if (incomingRound >= gameState.round) {
             gameState.partnerAnswer = data.answer;
@@ -1731,7 +2024,6 @@
       gameState.myAnswer = null;
       gameState.roundRevealed = false;
 
-      // Hanya hapus partnerAnswer jika bukan kiriman awal untuk ronde saat ini
       if (gameState.partnerAnswerRound !== gameState.round) {
         gameState.partnerAnswer = null;
       }
@@ -1941,7 +2233,6 @@
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
 
-      // Isi background solid agar ekspor JPEG bersih dan ringan
       fillCanvasBackground(canvas);
       ctx.lineWidth = 3.5;
       ctx.lineCap = 'round';
@@ -2005,7 +2296,6 @@
       playSound('click');
 
       const canvas = document.getElementById('drawCanvas');
-      // Gunakan JPEG kualitas 0.45 (~6-10 KB saja) agar langsung tembus WebRTC tanpa macet
       const dataUrl = canvas ? canvas.toDataURL('image/jpeg', 0.45) : '';
       gameState.myAnswer = dataUrl;
 
