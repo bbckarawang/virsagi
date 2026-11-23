@@ -1,0 +1,2700 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cosmic Snakes & Ladders — Virgo ♍ & Sagitarius ♐</title>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-space: #060814;
+    --panel-bg: rgba(14, 19, 42, 0.88);
+    --virgo-gold: #f5d061;
+    --virgo-emerald: #34d399;
+    --sagi-purple: #a855f7;
+    --sagi-cyan: #38bdf8;
+    --danger: #fb7185;
+    --border: rgba(245, 208, 97, 0.22);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'Fredoka', sans-serif;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 18% 22%, rgba(52, 211, 153, 0.14) 0%, transparent 42%),
+      radial-gradient(circle at 82% 18%, rgba(168, 85, 247, 0.22) 0%, transparent 48%),
+      radial-gradient(circle at 50% 85%, rgba(56, 189, 248, 0.14) 0%, transparent 50%),
+      linear-gradient(180deg, #050711 0%, #0b1026 55%, #070917 100%);
+    color: #f8fafc;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* Latar Bintang & Simbol Rasi Virgo / Sagitarius */
+  .cosmic-backdrop {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star-layer {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent),
+      radial-gradient(2px 2px at 28% 74%, #fde68a, transparent),
+      radial-gradient(1.5px 1.5px at 44% 32%, #bae6fd, transparent),
+      radial-gradient(2px 2px at 67% 14%, #e9d5ff, transparent),
+      radial-gradient(1.5px 1.5px at 84% 58%, #fff, transparent),
+      radial-gradient(2px 2px at 91% 86%, #6ee7b7, transparent),
+      radial-gradient(1px 1px at 55% 65%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 19% 49%, #fcd34d, transparent);
+    background-size: 260px 260px;
+    opacity: 0.72;
+  }
+  .zodiac-watermark {
+    position: absolute;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    opacity: 0.08;
+    filter: drop-shadow(0 0 18px currentColor);
+  }
+  .wm-virgo {
+    left: 2%;
+    bottom: 2%;
+    font-size: clamp(110px, 18vw, 220px);
+    color: var(--virgo-emerald);
+  }
+  .wm-sagi {
+    right: 2%;
+    top: 2%;
+    font-size: clamp(110px, 18vw, 220px);
+    color: var(--sagi-purple);
+  }
+
+  /* ================= LOADING ================= */
+  #loadingScreen {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #13193b 0%, #050711 100%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  #loadingScreen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .cosmic-orb {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--virgo-emerald), var(--virgo-gold), var(--sagi-purple), var(--sagi-cyan), var(--virgo-emerald));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    box-shadow: 0 0 36px rgba(168, 85, 247, 0.5);
+    animation: orbFloat 1.6s infinite ease-in-out;
+  }
+  @keyframes orbFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+    50% { transform: translateY(-8px) rotate(15deg) scale(1.07); }
+  }
+  .load-caption {
+    font-size: 15px;
+    color: #e2e8f0;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border);
+    padding: 9px 20px;
+    border-radius: 999px;
+    text-align: center;
+    max-width: 90vw;
+  }
+
+  /* ================= SCREENS ================= */
+  .screen {
+    position: relative;
+    z-index: 2;
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    padding: 12px;
+    max-width: 1180px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .screen.active { display: flex; }
+
+  #lobbyScreen {
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+
+  .brand-header {
+    text-align: center;
+  }
+  .brand-sub {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--virgo-gold);
+    margin-bottom: 2px;
+  }
+  .brand-header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(24px, 4.6vw, 38px);
+    background: linear-gradient(90deg, var(--virgo-emerald), var(--virgo-gold), var(--sagi-purple), var(--sagi-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 16px rgba(168, 85, 247, 0.35));
+  }
+  .brand-header p {
+    font-size: 13px;
+    color: rgba(226, 232, 240, 0.78);
+    margin-top: 3px;
+  }
+
+  .glass-panel {
+    background: var(--panel-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 20px;
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  .field-label {
+    font-size: 12px;
+    color: var(--virgo-gold);
+    margin-bottom: 5px;
+    display: block;
+    font-weight: 600;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(245, 208, 97, 0.25);
+    background: rgba(5, 8, 20, 0.72);
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input[type="text"]:focus {
+    border-color: var(--virgo-gold);
+    box-shadow: 0 0 0 3px rgba(245, 208, 97, 0.18);
+  }
+
+  .btn {
+    padding: 12px 15px;
+    border: none;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.45);
+    transition: transform 0.12s ease, filter 0.15s ease, opacity 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+  .btn:hover:not(:disabled) { filter: brightness(1.08); }
+  .btn:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.45);
+  }
+  .btn:disabled { opacity: 0.42; cursor: not-allowed; }
+
+  .btn-virgo { background: linear-gradient(135deg, #10b981, #047857); color: #ecfdf5; }
+  .btn-sagi  { background: linear-gradient(135deg, #9333ea, #4f46e5); color: #f5f3ff; }
+  .btn-gold  { background: linear-gradient(135deg, #f5d061, #d97706); color: #1c1002; }
+  .btn-coral { background: linear-gradient(135deg, #f43f5e, #be123c); }
+  .btn-slate { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16); }
+
+  .row { display: flex; gap: 10px; }
+
+  .perm-room-badge {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(147, 51, 234, 0.18));
+    border: 1.5px solid rgba(245, 208, 97, 0.45);
+    border-radius: 16px;
+    padding: 12px;
+    text-align: center;
+  }
+  .perm-room-badge .r-sub {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #cbd5e1;
+    text-transform: uppercase;
+  }
+  .perm-room-badge .r-name {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--virgo-gold);
+    letter-spacing: 3px;
+    margin-top: 2px;
+  }
+
+  /* Toggle Switch Power-Up */
+  .toggle-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(245, 208, 97, 0.25);
+    border-radius: 14px;
+    padding: 10px 13px;
+  }
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #334155;
+    transition: .3s;
+    border-radius: 999px;
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background: linear-gradient(135deg, var(--virgo-emerald), var(--sagi-purple));
+  }
+  input:checked + .slider:before {
+    transform: translateX(22px);
+  }
+
+  .lobby-players {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    max-height: 190px;
+    overflow-y: auto;
+  }
+  .lobby-player-row {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 9px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  .color-dot {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  /* ================= GAME LAYOUT ================= */
+  #gameScreen {
+    gap: 10px;
+    padding-bottom: 16px;
+  }
+
+  .top-hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 8px 14px;
+    backdrop-filter: blur(12px);
+  }
+
+  .room-chip {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--virgo-gold);
+    background: rgba(245, 208, 97, 0.12);
+    border: 1px solid rgba(245, 208, 97, 0.35);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+
+  .turn-status {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 13px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .turn-status.is-my-turn {
+    background: linear-gradient(90deg, var(--virgo-gold), #fbbf24);
+    color: #161002;
+    animation: pulseTurn 1s infinite alternate;
+  }
+  @keyframes pulseTurn {
+    from { transform: scale(1); }
+    to { transform: scale(1.03); }
+  }
+
+  .game-main-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) 340px;
+    gap: 12px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .game-main-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ================= PAPAN KOSMIK 10x10 ================= */
+  .board-frame {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    border-radius: 22px;
+    padding: 8px;
+    background: linear-gradient(145deg, #1e1b4b, #090d1f, #064e3b);
+    border: 2px solid rgba(245, 208, 97, 0.42);
+    box-shadow: 0 24px 55px rgba(0, 0, 0, 0.72), 0 0 30px rgba(168, 85, 247, 0.22);
+  }
+
+  .board-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    background: #080c1d;
+  }
+
+  .tile {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 3px 4px;
+    font-size: clamp(9px, 1.45vw, 12px);
+    font-weight: 700;
+    color: rgba(226, 232, 240, 0.82);
+    border: 0.5px solid rgba(148, 163, 184, 0.12);
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  /* Zona Virgo (bawah 1-50) vs Zona Sagitarius (atas 51-100) */
+  .tile.t-virgo-a { background: rgba(16, 185, 129, 0.11); }
+  .tile.t-virgo-b { background: rgba(15, 23, 42, 0.85); }
+  .tile.t-sagi-a  { background: rgba(147, 51, 234, 0.15); }
+  .tile.t-sagi-b  { background: rgba(17, 24, 39, 0.88); }
+
+  .tile.t-start {
+    background: linear-gradient(135deg, rgba(52, 211, 153, 0.42), rgba(56, 189, 248, 0.28));
+    color: #6ee7b7;
+  }
+  .tile.t-finish {
+    background: linear-gradient(135deg, rgba(245, 208, 97, 0.48), rgba(168, 85, 247, 0.45));
+    color: var(--virgo-gold);
+  }
+  .tile.ladder-start { box-shadow: inset 0 0 0 1.5px rgba(52, 211, 153, 0.55); }
+  .tile.snake-head   { box-shadow: inset 0 0 0 1.5px rgba(244, 63, 94, 0.65); }
+
+  /* Mode Pemilihan Petak untuk Power-Up */
+  .tile.selectable-tile {
+    cursor: pointer;
+    box-shadow: inset 0 0 0 2px #f5d061, 0 0 12px rgba(245, 208, 97, 0.6);
+    background: rgba(245, 208, 97, 0.26) !important;
+    z-index: 9;
+  }
+  .tile.selectable-tile:hover {
+    background: rgba(245, 208, 97, 0.48) !important;
+  }
+
+  .tile-marker {
+    position: absolute;
+    right: 2px;
+    bottom: 1px;
+    font-size: clamp(10px, 1.6vw, 15px);
+    line-height: 1;
+    filter: drop-shadow(0 1px 3px #000);
+    pointer-events: none;
+  }
+
+  #boardOverlaySvg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 6;
+  }
+
+  #tokensLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 12;
+  }
+
+  .player-token {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2.5px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.65);
+    transform: translate(-50%, -50%);
+    transition: left 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+                top 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.22s ease;
+    z-index: 14;
+  }
+  .player-token.ghost-mode {
+    opacity: 0.58;
+    box-shadow: 0 0 16px #38bdf8, 0 0 28px #a855f7;
+    border-style: dashed;
+  }
+  .player-token.shield-mode {
+    box-shadow: 0 0 0 3px #34d399, 0 0 18px #34d399;
+  }
+  .player-token.hop {
+    transform: translate(-50%, -74%) scale(1.22);
+  }
+  .player-token.sliding {
+    transition: left 0.85s cubic-bezier(0.45, 0.05, 0.55, 0.95),
+                top 0.85s cubic-bezier(0.45, 0.05, 0.55, 0.95),
+                transform 0.85s ease;
+  }
+  .player-token.climbing {
+    transition: left 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                top 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.8s ease;
+  }
+  .player-token.ko-anim {
+    animation: koSpinShrink 0.65s ease forwards;
+  }
+  @keyframes koSpinShrink {
+    0% { transform: translate(-50%, -50%) scale(1.45) rotate(0deg); filter: brightness(2.2); }
+    100% { transform: translate(-50%, -50%) scale(0.35) rotate(540deg); opacity: 0.35; }
+  }
+
+  /* ================= PANEL SAMPING: DADU, POWER-UP & PEMAIN ================= */
+  .side-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .dice-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(12px);
+  }
+
+  .dice-scene {
+    width: 84px;
+    height: 84px;
+    perspective: 460px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dice-cube {
+    width: 64px;
+    height: 64px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.95s cubic-bezier(0.18, 0.89, 0.32, 1.18);
+  }
+  .dice-cube.rolling {
+    animation: diceTumble3D 0.42s infinite linear;
+  }
+  @keyframes diceTumble3D {
+    0%   { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1.08); }
+    25%  { transform: rotateX(180deg) rotateY(90deg) rotateZ(45deg) scale(1.16); }
+    50%  { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg) scale(1.12); }
+    75%  { transform: rotateX(540deg) rotateY(270deg) rotateZ(135deg) scale(1.16); }
+    100% { transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg) scale(1.08); }
+  }
+
+  .dice-face {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #1e1b4b, #0f172a);
+    border: 2px solid var(--virgo-gold);
+    box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.35);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    padding: 8px;
+    place-items: center;
+    backface-visibility: hidden;
+  }
+
+  .pip {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f8fafc;
+    box-shadow: 0 0 6px #fff;
+  }
+  .face-1 .pip { background: var(--virgo-gold); width: 14px; height: 14px; box-shadow: 0 0 10px var(--virgo-gold); }
+  .face-6 .pip { background: var(--virgo-emerald); box-shadow: 0 0 8px var(--virgo-emerald); }
+
+  .face-1 { transform: rotateY(0deg) translateZ(32px); }
+  .face-2 { transform: rotateY(90deg) translateZ(32px); }
+  .face-3 { transform: rotateX(90deg) translateZ(32px); }
+  .face-4 { transform: rotateX(-90deg) translateZ(32px); }
+  .face-5 { transform: rotateY(-90deg) translateZ(32px); }
+  .face-6 { transform: rotateY(180deg) translateZ(32px); }
+
+  .p-tl { grid-area: 1 / 1; }
+  .p-tm { grid-area: 1 / 2; }
+  .p-tr { grid-area: 1 / 3; }
+  .p-ml { grid-area: 2 / 1; }
+  .p-mm { grid-area: 2 / 2; }
+  .p-mr { grid-area: 2 / 3; }
+  .p-bl { grid-area: 3 / 1; }
+  .p-bm { grid-area: 3 / 2; }
+  .p-br { grid-area: 3 / 3; }
+
+  .dice-result-badge {
+    font-size: 13px;
+    color: var(--virgo-gold);
+    min-height: 18px;
+    text-align: center;
+  }
+
+  /* KARTU POWER-UP HAND */
+  .powerup-card-box {
+    background: var(--panel-bg);
+    border: 1px solid rgba(168, 85, 247, 0.42);
+    border-radius: 22px;
+    padding: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    backdrop-filter: blur(12px);
+  }
+  .pu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #e9d5ff;
+  }
+  .pu-hand-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+  }
+  .pu-item {
+    background: linear-gradient(145deg, rgba(30, 27, 75, 0.9), rgba(15, 23, 42, 0.95));
+    border: 1.5px solid rgba(245, 208, 97, 0.35);
+    border-radius: 13px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .pu-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--virgo-gold);
+    box-shadow: 0 6px 16px rgba(245, 208, 97, 0.2);
+  }
+  .pu-item .pu-top {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--virgo-gold);
+  }
+  .pu-item .pu-cat {
+    font-size: 10px;
+    color: #94a3b8;
+  }
+  .pu-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(203, 213, 225, 0.65);
+    padding: 10px 4px;
+    border: 1px dashed rgba(255,255,255,0.15);
+    border-radius: 12px;
+  }
+
+  .active-buffs-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    font-size: 11px;
+  }
+  .buff-pill {
+    background: rgba(52, 211, 153, 0.18);
+    border: 1px solid rgba(52, 211, 153, 0.5);
+    color: #6ee7b7;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  /* Daftar Pemain di Meja */
+  .roster-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    backdrop-filter: blur(12px);
+  }
+  .roster-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.88);
+    display: flex;
+    justify-content: space-between;
+  }
+  .roster-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+  }
+  .roster-item {
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 13px;
+    padding: 7px 9px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    font-size: 12px;
+  }
+  .roster-item.active {
+    border-color: var(--virgo-gold);
+    background: rgba(245, 208, 97, 0.14);
+  }
+  .roster-left {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+  }
+  .roster-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 72px;
+    font-weight: 600;
+  }
+  .roster-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .roster-pos {
+    background: rgba(0,0,0,0.45);
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-weight: 700;
+    color: var(--virgo-emerald);
+  }
+
+  /* Emoji Reactions */
+  .emoji-dock {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+  }
+  .emo-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.07);
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.14s;
+  }
+  .emo-btn:active { transform: scale(1.25); }
+
+  .float-emo {
+    position: fixed;
+    font-size: 40px;
+    pointer-events: none;
+    z-index: 450;
+    animation: riseEmo 1.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes riseEmo {
+    0%   { transform: translateY(0) scale(0.5); opacity: 0; }
+    20%  { transform: translateY(-25px) scale(1.2); opacity: 1; }
+    100% { transform: translateY(-190px) scale(0.95); opacity: 0; }
+  }
+
+  /* BANNER PEMILIHAN TARGET PAPAN */
+  .board-select-banner {
+    display: none;
+    background: linear-gradient(90deg, #9333ea, #d97706);
+    color: #fff;
+    padding: 9px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 700;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    box-shadow: 0 8px 24px rgba(147, 51, 234, 0.45);
+  }
+  .board-select-banner.active { display: flex; }
+
+  /* TOAST */
+  .toast-layer {
+    position: fixed;
+    top: 13%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 700;
+    pointer-events: none;
+    max-width: 92vw;
+  }
+  .toast-box {
+    background: rgba(11, 15, 34, 0.95);
+    backdrop-filter: blur(14px);
+    color: #fff;
+    border: 1.5px solid var(--virgo-gold);
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.65);
+    opacity: 0;
+    transform: translateY(-12px) scale(0.95);
+    transition: opacity 0.25s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .toast-box.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* MODAL */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 6, 16, 0.8);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 800;
+  }
+  .modal-backdrop.active { display: flex; }
+
+  .modal-card {
+    background: rgba(17, 23, 48, 0.98);
+    border: 1.5px solid var(--border);
+    border-radius: 24px;
+    padding: 22px 18px;
+    width: 100%;
+    max-width: 390px;
+    max-height: 86dvh;
+    overflow-y: auto;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.75);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: modalPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes modalPop {
+    0% { transform: scale(0.86); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .modal-card .m-icon { font-size: 40px; }
+  .modal-card .m-title { font-size: 20px; font-weight: 700; color: var(--virgo-gold); }
+  .modal-card .m-desc { font-size: 13.5px; color: rgba(226, 232, 240, 0.88); line-height: 1.45; }
+  .modal-card .m-extra { display: flex; flex-direction: column; gap: 7px; text-align: left; }
+  .modal-card .m-btns { display: flex; gap: 9px; margin-top: 4px; flex-wrap: wrap; }
+  .modal-card .m-btns .btn { flex: 1; padding: 11px 12px; font-size: 13.5px; }
+
+  .guide-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    max-height: 52dvh;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .guide-row {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 12px;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .guide-row strong { color: var(--virgo-gold); }
+</style>
+</head>
+<body>
+
+<div class="cosmic-backdrop">
+  <div class="star-layer"></div>
+  <div class="zodiac-watermark wm-virgo">♍</div>
+  <div class="zodiac-watermark wm-sagi">♐</div>
+</div>
+
+<!-- LOADING SCREEN -->
+<div id="loadingScreen">
+  <div class="cosmic-orb">♍♐</div>
+  <div class="load-caption" id="loadCaption">Menyelaraskan rasi bintang Virgo & Sagitarius...</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-layer">
+  <div class="toast-box" id="toastBox"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-card">
+    <div class="m-icon" id="mIcon">✨</div>
+    <div class="m-title" id="mTitle">Judul</div>
+    <div class="m-desc" id="mDesc">Deskripsi</div>
+    <div class="m-extra" id="mExtra"></div>
+    <div class="m-btns" id="mBtns"></div>
+  </div>
+</div>
+
+<!-- LOBBY SCREEN -->
+<div id="lobbyScreen" class="screen active">
+  <div class="brand-header">
+    <div class="brand-sub">♍ CELESTIAL ZODIAC EDITION ♐</div>
+    <h1>COSMIC SNAKES & LADDERS</h1>
+    <p>Room Permanen • Terinjak Langsung Mati (Kembali ke 0) • 16 Kartu Power-Up</p>
+  </div>
+
+  <div class="glass-panel" id="entryPanel">
+    <div>
+      <label class="field-label">Nama Penjelajah Kosmik</label>
+      <input type="text" id="nameInput" placeholder="Contoh: VirgoStar / SagiArrow" maxlength="12">
+    </div>
+
+    <div>
+      <label class="field-label">Nama Room Permanen (Tanpa Share Tautan)</label>
+      <input type="text" id="permRoomInput" placeholder="Ketik Nama Room (misal: VIRGOSAGI)" maxlength="16" style="text-transform:uppercase; font-weight:700; letter-spacing:2px;">
+    </div>
+
+    <div class="toggle-card">
+      <div>
+        <div style="font-size:13.5px; font-weight:700; color:var(--virgo-gold);">🃏 Mode Kartu Power-Up (16 Kartu)</div>
+        <div style="font-size:11.5px; color:#cbd5e1;">1 kartu awal + 1 kartu tiap dadu 6 (Maks 4)</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="powerUpToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="row">
+      <button class="btn btn-virgo" style="flex:1;" onclick="createPermanentRoom()">👑 Buka Room (Host)</button>
+      <button class="btn btn-sagi" style="flex:1;" onclick="joinPermanentRoom()">🚀 Masuk Room</button>
+    </div>
+
+    <button class="btn btn-slate" style="padding:9px; font-size:12.5px;" onclick="openCardCatalogModal()">📜 Lihat Daftar 16 Kartu Power-Up</button>
+
+    <div id="lobbyHint" style="text-align:center; font-size:13px; color:var(--virgo-gold); min-height:18px;"></div>
+  </div>
+
+  <div class="glass-panel" id="roomPanel" style="display:none;">
+    <div class="perm-room-badge">
+      <div class="r-sub">ROOM PERMANEN AKTIF</div>
+      <div class="r-name" id="roomNameDisplay">-</div>
+      <div style="font-size:11.5px; color:#94a3b8; margin-top:3px;" id="roomModeLabel">Mode: Power-Up Aktif</div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <strong id="playerSlotLabel">Penjelajah (1/8)</strong>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-slate" id="addBotBtn" style="padding:7px 10px; font-size:12px;" onclick="addBot()">🤖 + Bot</button>
+        <button class="btn btn-coral" style="padding:7px 10px; font-size:12px;" onclick="exitRoomRealTime()">🚪 Exit</button>
+      </div>
+    </div>
+
+    <div class="lobby-players" id="lobbyPlayerList"></div>
+
+    <button class="btn btn-gold" id="startBtn" onclick="startGame()" style="display:none;">✨ Mulai Perjalanan Kosmik!</button>
+    <div id="waitHostLabel" style="text-align:center; font-size:13px; opacity:0.8; display:none;">Menunggu Host memulai permainan...</div>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <div class="top-hud">
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <span class="room-chip" id="hudRoomTag">♍♐ ROOM</span>
+      <div class="turn-status" id="turnStatusBadge">Menunggu giliran...</div>
+    </div>
+    <div style="display:flex; gap:6px;">
+      <button class="btn btn-slate" style="padding:7px 10px; font-size:12px;" onclick="openCardCatalogModal()">📜 16 Kartu</button>
+      <button class="btn btn-slate" style="padding:7px 10px; font-size:12px;" id="soundToggleBtn" onclick="toggleMute()">🔊 Suara</button>
+      <button class="btn btn-coral" style="padding:7px 11px; font-size:12px;" onclick="confirmExit()">🚪 Exit</button>
+    </div>
+  </div>
+
+  <div class="board-select-banner" id="boardSelectBanner">
+    <span id="boardSelectPrompt">Pilih petak di papan!</span>
+    <button class="btn btn-slate" style="padding:5px 10px; font-size:12px;" onclick="cancelBoardSelection()">Batal</button>
+  </div>
+
+  <div class="game-main-grid">
+    <!-- PAPAN KOSMIK -->
+    <div class="board-frame">
+      <div class="board-inner" id="boardGrid"></div>
+      <svg id="boardOverlaySvg" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+      <div id="tokensLayer"></div>
+    </div>
+
+    <!-- PANEL KANAN -->
+    <div class="side-column">
+      <div class="dice-card">
+        <div class="dice-scene">
+          <div class="dice-cube" id="diceCube">
+            <div class="dice-face face-1"><span class="pip p-mm"></span></div>
+            <div class="dice-face face-2"><span class="pip p-tr"></span><span class="pip p-bl"></span></div>
+            <div class="dice-face face-3"><span class="pip p-tr"></span><span class="pip p-mm"></span><span class="pip p-bl"></span></div>
+            <div class="dice-face face-4"><span class="pip p-tl"></span><span class="pip p-tr"></span><span class="pip p-bl"></span><span class="pip p-br"></span></div>
+            <div class="dice-face face-5"><span class="pip p-tl"></span><span class="pip p-tr"></span><span class="pip p-mm"></span><span class="pip p-bl"></span><span class="pip p-br"></span></div>
+            <div class="dice-face face-6"><span class="pip p-tl"></span><span class="pip p-ml"></span><span class="pip p-bl"></span><span class="pip p-tr"></span><span class="pip p-mr"></span><span class="pip p-br"></span></div>
+          </div>
+        </div>
+
+        <button class="btn btn-gold" id="rollDiceBtn" style="width:100%;" onclick="requestRollDice()">🎲 Kocok Dadu Kosmik</button>
+        <div class="dice-result-badge" id="diceResultText">Siap menjelajah Virgo & Sagitarius!</div>
+
+        <div class="emoji-dock">
+          <button class="emo-btn" onclick="sendEmo('♍')">♍</button>
+          <button class="emo-btn" onclick="sendEmo('♐')">♐</button>
+          <button class="emo-btn" onclick="sendEmo('💥')">💥</button>
+          <button class="emo-btn" onclick="sendEmo('🕳️')">🕳️</button>
+          <button class="emo-btn" onclick="sendEmo('😈')">😈</button>
+        </div>
+      </div>
+
+      <!-- KARTU POWER-UP DI TANGAN -->
+      <div class="powerup-card-box" id="powerUpPanel">
+        <div class="pu-header">
+          <span>🃏 Kartu Power-Up Kamu</span>
+          <span id="handCountBadge">0 / 4</span>
+        </div>
+        <div class="active-buffs-strip" id="myBuffsStrip"></div>
+        <div class="pu-hand-grid" id="myHandGrid"></div>
+      </div>
+
+      <!-- DAFTAR PEMAIN -->
+      <div class="roster-card">
+        <div class="roster-title">
+          <span>Penjelajah Aktif</span>
+          <span id="rosterCount">0/8</span>
+        </div>
+        <div class="roster-grid" id="rosterGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= AUDIO kosmik (WEB AUDIO API) ================= */
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+let muted = false;
+
+function toggleMute() {
+  muted = !muted;
+  document.getElementById('soundToggleBtn').textContent = muted ? '🔇 Bisukan' : '🔊 Suara';
+  if (!muted) playSfx('pop');
+}
+
+function playSfx(kind) {
+  if (muted) return;
+  try {
+    if (!actx) actx = new AudioContextClass();
+    if (actx.state === 'suspended') actx.resume();
+    const now = actx.currentTime;
+    const osc = actx.createOscillator();
+    const gain = actx.createGain();
+    osc.connect(gain);
+    gain.connect(actx.destination);
+
+    if (kind === 'diceTick') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(280 + Math.random() * 280, now);
+      gain.gain.setValueAtTime(0.11, now);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.055);
+      osc.start(now); osc.stop(now + 0.055);
+    } else if (kind === 'hop') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(380, now);
+      osc.frequency.exponentialRampToValueAtTime(680, now + 0.11);
+      gain.gain.setValueAtTime(0.17, now);
+      gain.gain.exponentialRampToValueAtTime(0.008, now + 0.11);
+      osc.start(now); osc.stop(now + 0.11);
+    } else if (kind === 'ladder') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(360, now);
+      osc.frequency.exponentialRampToValueAtTime(1040, now + 0.55);
+      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.56);
+      osc.start(now); osc.stop(now + 0.56);
+    } else if (kind === 'snake') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(840, now);
+      osc.frequency.exponentialRampToValueAtTime(130, now + 0.68);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+      osc.start(now); osc.stop(now + 0.7);
+    } else if (kind === 'ko') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.setValueAtTime(175, now + 0.1);
+      osc.frequency.exponentialRampToValueAtTime(65, now + 0.38);
+      gain.gain.setValueAtTime(0.24, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+      osc.start(now); osc.stop(now + 0.4);
+    } else if (kind === 'card') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.exponentialRampToValueAtTime(920, now + 0.24);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+      osc.start(now); osc.stop(now + 0.25);
+    } else if (kind === 'win') {
+      osc.type = 'triangle';
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+        osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+      });
+      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
+      osc.start(now); osc.stop(now + 0.65);
+    } else {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(480, now);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.005, now + 0.08);
+      osc.start(now); osc.stop(now + 0.08);
+    }
+  } catch (e) {}
+}
+
+/* ================= TOAST & MODAL ================= */
+function showToast(msg, ms = 2600) {
+  const box = document.getElementById('toastBox');
+  box.textContent = msg;
+  box.classList.add('show');
+  clearTimeout(box._timer);
+  box._timer = setTimeout(() => box.classList.remove('show'), ms);
+}
+
+function showModal({ icon = '✨', title = '', desc = '', extraHtml = '', buttons = [] }) {
+  document.getElementById('mIcon').textContent = icon;
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mDesc').textContent = desc;
+  const extraEl = document.getElementById('mExtra');
+  extraEl.innerHTML = extraHtml;
+
+  const wrap = document.getElementById('mBtns');
+  wrap.innerHTML = '';
+  buttons.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = `btn ${b.cls || 'btn-sagi'}`;
+    btn.textContent = b.text;
+    btn.onclick = () => {
+      if (!b.keepOpen) document.getElementById('modalBackdrop').classList.remove('active');
+      if (typeof b.onClick === 'function') b.onClick();
+    };
+    wrap.appendChild(btn);
+  });
+  document.getElementById('modalBackdrop').classList.add('active');
+}
+
+/* ================= LOADING ================= */
+const loadPhrases = [
+  "Menyelaraskan rasi bintang Virgo & Sagitarius...",
+  "Membuka portal lubang hitam & jembatan cahaya...",
+  "Menyiapkan 16 kartu kekuatan kosmik...",
+  "Menghubungkan jalur P2P room permanen..."
+];
+let lIdx = 0;
+const lInterval = setInterval(() => {
+  lIdx = (lIdx + 1) % loadPhrases.length;
+  const el = document.getElementById('loadCaption');
+  if (el) el.textContent = loadPhrases[lIdx];
+}, 850);
+
+/* ================= 16 KARTU POWER-UP ================= */
+const POWER_CARDS = [
+  { id: 1,  icon: '🛡️', name: 'Anti Ular',      cat: 'Pertahanan', desc: 'Kebal dan tidak turun saat mendarat di kepala ular / lubang hitam.' },
+  { id: 2,  icon: '🪞', name: 'Reflect',        cat: 'Pertahanan', desc: 'Memantulkan efek kartu serangan lawan kembali ke penggunanya.' },
+  { id: 3,  icon: '👻', name: 'Bayangan',       cat: 'Pertahanan', desc: 'Kebal dari aturan "mati" jika diinjak lawan selama 1 putaran (dan tidak bisa menginjak lawan).' },
+  { id: 4,  icon: '🎯', name: 'Tembak (Sniper)',cat: 'Serangan',   desc: 'Menembak 1 pemain di baris/kolom/diagonal yang sama hingga mati (kembali ke 0).' },
+  { id: 5,  icon: '💣', name: 'Bom Ranjau',     cat: 'Serangan',   desc: 'Menanam bom di 1 kotak; pemain pertama yang melewatinya akan meledak dan kembali ke 0.' },
+  { id: 6,  icon: '💨', name: 'Dorong (Push)',  cat: 'Serangan',   desc: 'Mendorong 1 pemain di dekatmu maju 1 kotak ke depan (bisa memicu ular, bom, atau tabrakan).' },
+  { id: 7,  icon: '🪜', name: 'Tangga Instan',  cat: 'Manipulasi', desc: 'Setelah mengocok dadu, buat tangga sementara dari kotakmu ke baris tepat di atasnya.' },
+  { id: 8,  icon: '🔄', name: 'Swap',           cat: 'Manipulasi', desc: 'Menukar posisi pionmu dengan 1 pemain lain.' },
+  { id: 9,  icon: '🧲', name: 'Magnet',         cat: 'Manipulasi', desc: 'Menarik 1 pemain di depanmu agar mundur tepat ke 1 kotak di belakang/bawahmu.' },
+  { id: 10, icon: '🌀', name: 'Pintu Portal',   cat: 'Manipulasi', desc: 'Menghubungkan 2 kotak pilihanmu selama 2 putaran.' },
+  { id: 11, icon: '🐍', name: 'Ular Bayangan',  cat: 'Manipulasi', desc: 'Membuat jalur ular sementara di kotak pilihanmu selama 1 putaran.' },
+  { id: 12, icon: '🍯', name: 'Lem Super',      cat: 'Kontrol',    desc: 'Memasang jebakan di kotakmu; pemain berikutnya yang lewat wajib berhenti dan kehilangan 1 giliran.' },
+  { id: 13, icon: '🎲', name: 'Double Dadu',    cat: 'Kontrol',    desc: 'Kocok dadu 2 kali, pilih salah satu angka atau gabungkan keduanya.' },
+  { id: 14, icon: '⏪', name: 'Reverse',        cat: 'Kontrol',    desc: 'Berjalan mundur sesuai angka dadu yang keluar di giliran ini.' },
+  { id: 15, icon: '⏭️', name: 'Skip',           cat: 'Kontrol',    desc: 'Membuat 1 pemain target kehilangan 1 giliran berikutnya.' },
+  { id: 16, icon: '🦝', name: 'Steal',          cat: 'Utilitas',   desc: 'Mencuri 1 kartu acak dari tangan pemain lawan.' }
+];
+
+function getCardMeta(cardId) {
+  return POWER_CARDS.find(c => c.id === cardId) || POWER_CARDS[0];
+}
+
+function drawRandomCard() {
+  const c = POWER_CARDS[Math.floor(Math.random() * POWER_CARDS.length)];
+  return c.id;
+}
+
+function openCardCatalogModal() {
+  const html = `<div class="guide-list">` + POWER_CARDS.map(c => `
+    <div class="guide-row">
+      <div><strong>${c.id}. ${c.icon} ${c.name}</strong> <span style="opacity:0.65;">(${c.cat})</span></div>
+      <div style="color:#cbd5e1; margin-top:2px;">${c.desc}</div>
+    </div>
+  `).join('') + `</div>`;
+
+  showModal({
+    icon: '🃏',
+    title: 'Daftar 16 Kartu Power-Up',
+    desc: 'Semua pemain mendapat 1 kartu acak di awal & +1 kartu saat dadu 6 (Maksimal 4 kartu).',
+    extraHtml: html,
+    buttons: [{ text: 'Tutup', cls: 'btn-gold' }]
+  });
+}
+
+/* ================= PAPAN KOSMIK VIRGO & SAGITARIUS ================= */
+// Jembatan Cahaya Rasi (Tangga Kosmik)
+const LADDERS = {
+  4: 25,
+  13: 46,
+  33: 49,
+  42: 63,
+  50: 69,
+  62: 81,
+  74: 92
+};
+
+// Lubang Hitam & Ekor Komet (Ular Kosmik)
+const SNAKES = {
+  27: 5,
+  40: 3,
+  43: 18,
+  54: 31,
+  66: 45,
+  89: 53,
+  99: 41
+};
+
+function getTileGridRC(pos) {
+  if (pos <= 0) return { row: 9, col: -0.6 };
+  const clamped = Math.min(pos, 100);
+  const zeroBased = clamped - 1;
+  const rowFromBottom = Math.floor(zeroBased / 10);
+  const inRow = zeroBased % 10;
+  const col = (rowFromBottom % 2 === 0) ? inRow : (9 - inRow);
+  const row = 9 - rowFromBottom;
+  return { row, col };
+}
+
+function getTilePercentXY(pos, slotOffset = { dx: 0, dy: 0 }) {
+  if (pos <= 0) {
+    return { x: 4 + slotOffset.dx * 0.4, y: 95 + slotOffset.dy * 0.4 };
+  }
+  const { row, col } = getTileGridRC(pos);
+  return {
+    x: (col + 0.5) * 10 + slotOffset.dx,
+    y: (row + 0.5) * 10 + slotOffset.dy
+  };
+}
+
+function buildBoardUI() {
+  const grid = document.getElementById('boardGrid');
+  grid.innerHTML = '';
+
+  for (let r = 0; r < 10; r++) {
+    const rowFromBottom = 9 - r;
+    for (let c = 0; c < 10; c++) {
+      const inRow = (rowFromBottom % 2 === 0) ? c : (9 - c);
+      const tileNum = rowFromBottom * 10 + inRow + 1;
+
+      const div = document.createElement('div');
+      div.dataset.tile = tileNum;
+      const isSagiZone = tileNum > 50;
+      let cls = 'tile ' + (isSagiZone
+        ? ((rowFromBottom + c) % 2 === 0 ? 't-sagi-a' : 't-sagi-b')
+        : ((rowFromBottom + c) % 2 === 0 ? 't-virgo-a' : 't-virgo-b'));
+
+      if (tileNum === 1) cls += ' t-start';
+      if (tileNum === 100) cls += ' t-finish';
+      if (LADDERS[tileNum]) cls += ' ladder-start';
+      if (SNAKES[tileNum]) cls += ' snake-head';
+
+      div.className = cls;
+      div.innerHTML = `<span>${tileNum === 100 ? '♐100' : (tileNum === 1 ? '♍1' : tileNum)}</span><span class="tile-marker" id="tm_${tileNum}"></span>`;
+      div.onclick = () => onTileClicked(tileNum);
+      grid.appendChild(div);
+    }
+  }
+
+  drawCosmicOverlaySVG();
+}
+
+function drawCosmicOverlaySVG() {
+  const svg = document.getElementById('boardOverlaySvg');
+  svg.innerHTML = '';
+
+  // Jembatan Cahaya Rasi (Tangga Kosmik)
+  Object.entries(LADDERS).forEach(([fromStr, toStr]) => {
+    const p1 = getTileGridRC(Number(fromStr));
+    const p2 = getTileGridRC(Number(toStr));
+    const x1 = (p1.col + 0.5) * 100, y1 = (p1.row + 0.5) * 100;
+    const x2 = (p2.col + 0.5) * 100, y2 = (p2.row + 0.5) * 100;
+
+    const dx = x2 - x1, dy = y2 - y1;
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = (-dy / len) * 15, ny = (dx / len) * 15;
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const r1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    r1.setAttribute('x1', x1 + nx); r1.setAttribute('y1', y1 + ny);
+    r1.setAttribute('x2', x2 + nx); r1.setAttribute('y2', y2 + ny);
+    r1.setAttribute('stroke', '#34d399'); r1.setAttribute('stroke-width', '7');
+    r1.setAttribute('stroke-linecap', 'round'); r1.setAttribute('opacity', '0.88');
+
+    const r2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    r2.setAttribute('x1', x1 - nx); r2.setAttribute('y1', y1 - ny);
+    r2.setAttribute('x2', x2 - nx); r2.setAttribute('y2', y2 - ny);
+    r2.setAttribute('stroke', '#38bdf8'); r2.setAttribute('stroke-width', '7');
+    r2.setAttribute('stroke-linecap', 'round'); r2.setAttribute('opacity', '0.88');
+
+    g.appendChild(r1); g.appendChild(r2);
+
+    const steps = Math.max(3, Math.floor(len / 42));
+    for (let s = 1; s < steps; s++) {
+      const t = s / steps;
+      const sx = x1 + dx * t, sy = y1 + dy * t;
+      const rung = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      rung.setAttribute('x1', sx + nx * 0.92); rung.setAttribute('y1', sy + ny * 0.92);
+      rung.setAttribute('x2', sx - nx * 0.92); rung.setAttribute('y2', sy - ny * 0.92);
+      rung.setAttribute('stroke', '#f5d061'); rung.setAttribute('stroke-width', '5');
+      rung.setAttribute('stroke-linecap', 'round');
+      g.appendChild(rung);
+    }
+    svg.appendChild(g);
+  });
+
+  // Ular Nebula & Lubang Hitam
+  const snakePalette = ['#f43f5e', '#c084fc', '#fb923c', '#e879f9', '#fb7185', '#a855f7', '#f97316'];
+  Object.entries(SNAKES).forEach(([headStr, tailStr], idx) => {
+    const pHead = getTileGridRC(Number(headStr));
+    const pTail = getTileGridRC(Number(tailStr));
+    const x0 = (pHead.col + 0.5) * 100, y0 = (pHead.row + 0.5) * 100;
+    const x3 = (pTail.col + 0.5) * 100, y3 = (pTail.row + 0.5) * 100;
+
+    const dx = x3 - x0, dy = y3 - y0;
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = (-dy / len) * 40, ny = (dx / len) * 40;
+
+    const c1x = x0 + dx * 0.33 + nx, c1y = y0 + dy * 0.33 + ny;
+    const c2x = x0 + dx * 0.66 - nx, c2y = y0 + dy * 0.66 - ny;
+    const color = snakePalette[idx % snakePalette.length];
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x0} ${y0} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x3} ${y3}`);
+    path.setAttribute('fill', 'none'); path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '12'); path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('opacity', '0.85');
+
+    const stripe = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    stripe.setAttribute('d', `M ${x0} ${y0} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x3} ${y3}`);
+    stripe.setAttribute('fill', 'none'); stripe.setAttribute('stroke', 'rgba(255,255,255,0.45)');
+    stripe.setAttribute('stroke-width', '3.5'); stripe.setAttribute('stroke-dasharray', '9 13');
+
+    const headCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    headCircle.setAttribute('cx', x0); headCircle.setAttribute('cy', y0);
+    headCircle.setAttribute('r', '13'); headCircle.setAttribute('fill', '#090d1f');
+    headCircle.setAttribute('stroke', color); headCircle.setAttribute('stroke-width', '4');
+
+    svg.appendChild(path); svg.appendChild(stripe); svg.appendChild(headCircle);
+  });
+
+  // Gambar Dinamis: Tangga Instan, Ular Bayangan, dan Pintu Portal
+  if (gameState.boardEffects) {
+    // Tangga Instan
+    (gameState.boardEffects.tempLadders || []).forEach(tl => {
+      const p1 = getTileGridRC(tl.from), p2 = getTileGridRC(tl.to);
+      const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      l.setAttribute('x1', (p1.col + 0.5) * 100); l.setAttribute('y1', (p1.row + 0.5) * 100);
+      l.setAttribute('x2', (p2.col + 0.5) * 100); l.setAttribute('y2', (p2.row + 0.5) * 100);
+      l.setAttribute('stroke', '#f5d061'); l.setAttribute('stroke-width', '10');
+      l.setAttribute('stroke-dasharray', '12 8'); l.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(l);
+    });
+
+    // Ular Bayangan
+    (gameState.boardEffects.shadowSnakes || []).forEach(ss => {
+      const p1 = getTileGridRC(ss.from), p2 = getTileGridRC(ss.to);
+      const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      l.setAttribute('x1', (p1.col + 0.5) * 100); l.setAttribute('y1', (p1.row + 0.5) * 100);
+      l.setAttribute('x2', (p2.col + 0.5) * 100); l.setAttribute('y2', (p2.row + 0.5) * 100);
+      l.setAttribute('stroke', '#e879f9'); l.setAttribute('stroke-width', '10');
+      l.setAttribute('stroke-dasharray', '10 10'); l.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(l);
+    });
+
+    // Pintu Portal
+    (gameState.boardEffects.portals || []).forEach(pt => {
+      const p1 = getTileGridRC(pt.a), p2 = getTileGridRC(pt.b);
+      const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      l.setAttribute('x1', (p1.col + 0.5) * 100); l.setAttribute('y1', (p1.row + 0.5) * 100);
+      l.setAttribute('x2', (p2.col + 0.5) * 100); l.setAttribute('y2', (p2.row + 0.5) * 100);
+      l.setAttribute('stroke', '#38bdf8'); l.setAttribute('stroke-width', '8');
+      l.setAttribute('stroke-dasharray', '6 10'); l.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(l);
+    });
+  }
+}
+
+/* ================= DADU 3D ================= */
+const DICE_ROTATIONS = {
+  1: 'rotateX(0deg) rotateY(0deg)',
+  2: 'rotateX(0deg) rotateY(-90deg)',
+  3: 'rotateX(-90deg) rotateY(0deg)',
+  4: 'rotateX(90deg) rotateY(0deg)',
+  5: 'rotateX(0deg) rotateY(90deg)',
+  6: 'rotateX(0deg) rotateY(180deg)'
+};
+
+function setDiceFaceImmediate(val) {
+  const cube = document.getElementById('diceCube');
+  cube.classList.remove('rolling');
+  cube.style.transform = DICE_ROTATIONS[val] || DICE_ROTATIONS[1];
+}
+
+/* ================= PEERJS ROOM PERMANEN (TANPA SHARE LINK) ================= */
+const PEER_PREFIX = "COSMIC_VS_PERM_";
+const COSMIC_THEMES = [
+  { avatar: "♍", color: "#10b981" },
+  { avatar: "♐", color: "#9333ea" },
+  { avatar: "🌟", color: "#f59e0b" },
+  { avatar: "☄️", color: "#0284c7" },
+  { avatar: "🛸", color: "#db2777" },
+  { avatar: "🌙", color: "#4f46e5" },
+  { avatar: "🪐", color: "#ea580c" },
+  { avatar: "👾", color: "#059669" }
+];
+
+let peer = null;
+let isHost = false;
+let myId = "";
+let myName = "";
+let permRoomName = "";
+let hostConn = null;
+let clientConns = {};
+let isTurnAnimating = false;
+let lastWinnerHandled = null;
+let visualPositions = {};
+let pendingTileSelection = null; // { cardId, step, firstTile }
+
+function createEmptyBoardEffects() {
+  return {
+    bombs: [],        // [{ tile, ownerId }]
+    glues: [],        // [{ tile, ownerId }]
+    portals: [],      // [{ a, b, roundsLeft, ownerId }]
+    shadowSnakes: [], // [{ from, to, roundsLeft, ownerId }]
+    tempLadders: []   // [{ from, to, roundsLeft, ownerId }]
+  };
+}
+
+let gameState = {
+  roomName: "",
+  powerUpsEnabled: true,
+  started: false,
+  players: [], // { id, name, avatar, color, isBot, pos, cards: [], buffs: { antiSnake, reflect, ghostRounds, reverse, skipTurns, doubleDiceReady, instantLadderReady } }
+  turnIndex: 0,
+  lastDice: 1,
+  winner: null,
+  boardEffects: createEmptyBoardEffects()
+};
+
+function normalizeRoomName(raw) {
+  return raw.trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 16);
+}
+
+window.addEventListener('load', () => {
+  buildBoardUI();
+  setTimeout(() => {
+    clearInterval(lInterval);
+    document.getElementById('loadingScreen').classList.add('hidden');
+  }, 1350);
+});
+
+function createPermanentRoom() {
+  myName = document.getElementById('nameInput').value.trim() || "VirgoHost";
+  const rName = normalizeRoomName(document.getElementById('permRoomInput').value);
+  if (rName.length < 3) {
+    showToast("✍️ Tulis nama room permanen (min. 3 huruf/angka)!");
+    document.getElementById('permRoomInput').focus();
+    return;
+  }
+
+  permRoomName = rName;
+  const puEnabled = document.getElementById('powerUpToggle').checked;
+  document.getElementById('lobbyHint').textContent = `Membuka room permanen "${permRoomName}"...`;
+
+  if (peer) { try { peer.destroy(); } catch(e) {} }
+  peer = new Peer(PEER_PREFIX + permRoomName, {
+    config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
+  });
+
+  peer.on('open', (id) => {
+    isHost = true;
+    myId = id;
+    gameState = {
+      roomName: permRoomName,
+      powerUpsEnabled: puEnabled,
+      started: false,
+      players: [{
+        id: myId,
+        name: myName,
+        avatar: COSMIC_THEMES[0].avatar,
+        color: COSMIC_THEMES[0].color,
+        isBot: false,
+        pos: 0,
+        cards: [],
+        buffs: freshBuffs()
+      }],
+      turnIndex: 0,
+      lastDice: 1,
+      winner: null,
+      boardEffects: createEmptyBoardEffects()
+    };
+
+    document.getElementById('lobbyHint').textContent = "";
+    enterLobbyPanel();
+  });
+
+  peer.on('connection', (conn) => {
+    conn.on('data', (data) => handleHostData(conn, data));
+    conn.on('close', () => {
+      handlePlayerDisconnected(conn.peer, "terputus / keluar dari room");
+    });
+  });
+
+  peer.on('error', (err) => {
+    if (err.type === 'unavailable-id') {
+      document.getElementById('lobbyHint').textContent = `Room "${permRoomName}" sedang aktif! Klik "Masuk Room" untuk bergabung.`;
+    } else {
+      document.getElementById('lobbyHint').textContent = "Gagal membuka room: " + err.type;
+    }
+  });
+}
+
+function joinPermanentRoom() {
+  myName = document.getElementById('nameInput').value.trim() || "SagiExplorer";
+  const rName = normalizeRoomName(document.getElementById('permRoomInput').value);
+  if (rName.length < 3) {
+    showToast("✍️ Masukkan nama room permanen yang ingin dimasuki!");
+    document.getElementById('permRoomInput').focus();
+    return;
+  }
+
+  permRoomName = rName;
+  document.getElementById('lobbyHint').textContent = `Menghubungkan ke room permanen "${permRoomName}"...`;
+
+  if (peer) { try { peer.destroy(); } catch(e) {} }
+  peer = new Peer({
+    config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
+  });
+
+  peer.on('open', (id) => {
+    myId = id;
+    hostConn = peer.connect(PEER_PREFIX + permRoomName, { reliable: true });
+
+    hostConn.on('open', () => {
+      hostConn.send({ type: 'JOIN', name: myName });
+      document.getElementById('lobbyHint').textContent = "";
+      enterLobbyPanel();
+    });
+
+    hostConn.on('data', (data) => handleClientData(data));
+    hostConn.on('close', () => {
+      showModal({
+        icon: '🌌',
+        title: 'Room Ditutup Host',
+        desc: `Host telah keluar dari room permanen "${permRoomName}". Kamu bisa membuka kembali room ini kapan saja.`,
+        buttons: [{ text: 'Kembali ke Lobi', cls: 'btn-sagi', onClick: () => cleanupAndReturnLobby() }]
+      });
+    });
+  });
+
+  peer.on('error', () => {
+    document.getElementById('lobbyHint').textContent = `Room "${permRoomName}" belum dibuka Host! Klik "Buka Room (Host)" jika kamu Host-nya.`;
+  });
+}
+
+function enterLobbyPanel() {
+  document.getElementById('entryPanel').style.display = 'none';
+  document.getElementById('roomPanel').style.display = 'flex';
+  document.getElementById('roomNameDisplay').textContent = permRoomName;
+  document.getElementById('roomModeLabel').textContent = gameState.powerUpsEnabled
+    ? "Mode: 🃏 16 Kartu Power-Up Aktif"
+    : "Mode: 🎲 Klasik Kosmik (Tanpa Kartu)";
+  document.getElementById('startBtn').style.display = isHost ? 'inline-flex' : 'none';
+  document.getElementById('addBotBtn').style.display = isHost ? 'inline-flex' : 'none';
+  document.getElementById('waitHostLabel').style.display = isHost ? 'none' : 'block';
+  renderLobbyList();
+}
+
+function freshBuffs() {
+  return {
+    antiSnake: false,
+    reflect: false,
+    ghostRounds: 0,
+    reverse: false,
+    skipTurns: 0,
+    doubleDiceReady: false,
+    instantLadderReady: false
+  };
+}
+
+function addBot() {
+  if (!isHost || gameState.players.length >= 8) return;
+  const botNames = ["Bot Virgo", "Bot Sagi", "Bot Spica", "Bot Antares", "Bot Nebula", "Bot Nova", "Bot Orion"];
+  const idx = gameState.players.length;
+  const theme = COSMIC_THEMES[idx % COSMIC_THEMES.length];
+  gameState.players.push({
+    id: "BOT_" + Date.now() + "_" + idx,
+    name: botNames[idx % botNames.length],
+    avatar: theme.avatar,
+    color: theme.color,
+    isBot: true,
+    pos: 0,
+    cards: [],
+    buffs: freshBuffs()
+  });
+  playSfx('pop');
+  broadcastState();
+  renderLobbyList();
+}
+
+function renderLobbyList() {
+  document.getElementById('roomModeLabel').textContent = gameState.powerUpsEnabled
+    ? "Mode: 🃏 16 Kartu Power-Up Aktif"
+    : "Mode: 🎲 Klasik Kosmik (Tanpa Kartu)";
+  document.getElementById('playerSlotLabel').textContent = `Penjelajah (${gameState.players.length}/8)`;
+  document.getElementById('lobbyPlayerList').innerHTML = gameState.players.map((p, i) => `
+    <div class="lobby-player-row">
+      <span><span class="color-dot" style="background:${p.color};"></span>${p.avatar} <strong>${p.name}</strong> ${p.id === myId ? '(Kamu)' : ''}</span>
+      <span style="font-size:12px; opacity:0.78;">${i === 0 ? '👑 Host' : (p.isBot ? '🤖 AI' : '📱 Aktif')}</span>
+    </div>
+  `).join('');
+}
+
+/* ================= EXIT REAL-TIME KE SEMUA PEMAIN ================= */
+function confirmExit() {
+  showModal({
+    icon: '🚪',
+    title: 'Exit dari Room?',
+    desc: 'Semua pemain lain akan langsung melihat secara real-time bahwa kamu keluar dari permainan.',
+    buttons: [
+      { text: 'Batal', cls: 'btn-slate' },
+      { text: 'Ya, Exit', cls: 'btn-coral', onClick: () => exitRoomRealTime() }
+    ]
+  });
+}
+
+function exitRoomRealTime() {
+  if (isHost) {
+    broadcast({ type: 'PLAYER_EXIT_NOTICE', playerName: myName, isHostExit: true });
+    setTimeout(() => cleanupAndReturnLobby(), 120);
+  } else {
+    if (hostConn && hostConn.open) {
+      hostConn.send({ type: 'LEAVE_ROOM', playerId: myId, playerName: myName });
+    }
+    setTimeout(() => cleanupAndReturnLobby(), 150);
+  }
+}
+
+function cleanupAndReturnLobby() {
+  pendingTileSelection = null;
+  document.getElementById('boardSelectBanner').classList.remove('active');
+  if (peer) {
+    try { peer.destroy(); } catch (e) {}
+    peer = null;
+  }
+  hostConn = null;
+  clientConns = {};
+  isHost = false;
+  isTurnAnimating = false;
+
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('lobbyScreen').classList.add('active');
+  document.getElementById('roomPanel').style.display = 'none';
+  document.getElementById('entryPanel').style.display = 'flex';
+  showToast("🚪 Kamu keluar dari room.");
+}
+
+function handlePlayerDisconnected(peerId, reasonText = "keluar dari room") {
+  if (!isHost) return;
+  const leavingPlayer = gameState.players.find(p => p.id === peerId);
+  delete clientConns[peerId];
+  if (!leavingPlayer) return;
+
+  const wasCurrentTurn = gameState.players[gameState.turnIndex]?.id === peerId;
+  gameState.players = gameState.players.filter(p => p.id !== peerId);
+  delete visualPositions[peerId];
+
+  if (gameState.players.length === 0) return;
+  if (gameState.turnIndex >= gameState.players.length) {
+    gameState.turnIndex = 0;
+  }
+
+  broadcast({
+    type: 'PLAYER_EXIT_NOTICE',
+    playerId: peerId,
+    playerName: leavingPlayer.name,
+    playerAvatar: leavingPlayer.avatar,
+    reason: reasonText
+  });
+
+  showToast(`🚪 ${leavingPlayer.avatar} ${leavingPlayer.name} ${reasonText}!`, 3000);
+  broadcastState();
+  if (!gameState.started) renderLobbyList();
+  else if (wasCurrentTurn) scheduleBotIfNeeded();
+}
+
+/* ================= NETWORK SYNC ================= */
+function sendToHost(payload) {
+  if (isHost) {
+    processHostAction(payload);
+  } else if (hostConn && hostConn.open) {
+    hostConn.send(payload);
+  }
+}
+
+function broadcast(msg) {
+  Object.values(clientConns).forEach(c => {
+    if (c.open) c.send(msg);
+  });
+}
+
+function broadcastState(turnAnimData = null) {
+  broadcast({ type: 'STATE_UPDATE', state: gameState, turnAnimData });
+  applyTurnUpdate(gameState, turnAnimData);
+}
+
+function handleHostData(conn, data) {
+  if (data.type === 'JOIN') {
+    if (gameState.players.length >= 8) {
+      conn.close();
+      return;
+    }
+    // Dukung rejoin jika room permanen sedang berjalan atau di lobi
+    clientConns[conn.peer] = conn;
+    const idx = gameState.players.length;
+    const theme = COSMIC_THEMES[idx % COSMIC_THEMES.length];
+    const initialCards = (gameState.started && gameState.powerUpsEnabled) ? [drawRandomCard()] : [];
+
+    gameState.players.push({
+      id: conn.peer,
+      name: data.name,
+      avatar: theme.avatar,
+      color: theme.color,
+      isBot: false,
+      pos: 0,
+      cards: initialCards,
+      buffs: freshBuffs()
+    });
+
+    showToast(`✨ ${theme.avatar} ${data.name} masuk ke room!`);
+    if (gameState.started) {
+      conn.send({ type: 'GAME_START', state: gameState });
+    }
+    broadcastState();
+    renderLobbyList();
+  } else if (data.type === 'LEAVE_ROOM') {
+    handlePlayerDisconnected(data.playerId || conn.peer, "keluar dari room (Exit)");
+  } else {
+    processHostAction(data);
+  }
+}
+
+function handleClientData(data) {
+  if (data.type === 'GAME_START') {
+    enterGameBoard(data.state);
+  } else if (data.type === 'PLAYER_EXIT_NOTICE') {
+    if (data.isHostExit) {
+      showModal({
+        icon: '🚪',
+        title: 'Host Keluar (Exit)',
+        desc: `Host (${data.playerName}) telah keluar dari room permanen "${permRoomName}".`,
+        buttons: [{ text: 'OK', cls: 'btn-sagi', onClick: () => cleanupAndReturnLobby() }]
+      });
+    } else {
+      if (data.playerId) delete visualPositions[data.playerId];
+      showToast(`🚪 ${data.playerAvatar || '👤'} ${data.playerName} keluar dari room!`, 3000);
+    }
+  } else if (data.type === 'STATE_UPDATE') {
+    if (!data.state.started) {
+      gameState = data.state;
+      renderLobbyList();
+    } else {
+      applyTurnUpdate(data.state, data.turnAnimData);
+    }
+  }
+}
+
+/* ================= MULAI GAME & PAPAN ================= */
+function startGame() {
+  if (!isHost) return;
+  lastWinnerHandled = null;
+  gameState.started = true;
+  gameState.winner = null;
+  gameState.turnIndex = 0;
+  gameState.lastDice = 1;
+  gameState.boardEffects = createEmptyBoardEffects();
+
+  gameState.players.forEach(p => {
+    p.pos = 0;
+    p.buffs = freshBuffs();
+    // Semua pemain mendapat 1 kartu power up random di awal permainan (jika aktif)
+    p.cards = gameState.powerUpsEnabled ? [drawRandomCard()] : [];
+  });
+
+  broadcast({ type: 'GAME_START', state: gameState });
+  enterGameBoard(gameState);
+}
+
+function enterGameBoard(state) {
+  gameState = state;
+  visualPositions = {};
+  state.players.forEach(p => { visualPositions[p.id] = p.pos || 0; });
+
+  document.getElementById('modalBackdrop').classList.remove('active');
+  document.getElementById('lobbyScreen').classList.remove('active');
+  document.getElementById('gameScreen').classList.add('active');
+  document.getElementById('hudRoomTag').textContent = `♍♐ ${state.roomName}`;
+  document.getElementById('powerUpPanel').style.display = state.powerUpsEnabled ? 'flex' : 'none';
+
+  setDiceFaceImmediate(state.lastDice || 1);
+  renderAllGameUI(state);
+  showToast(state.powerUpsEnabled
+    ? "🃏 Setiap pemain mendapat 1 Kartu Power-Up kosmik!"
+    : "✨ Perjalanan kosmik Virgo & Sagitarius dimulai!");
+
+  if (isHost) scheduleBotIfNeeded();
+}
+
+function requestRollDice() {
+  if (isTurnAnimating || gameState.winner) return;
+  const active = gameState.players[gameState.turnIndex];
+  if (!active || active.id !== myId) {
+    showToast("⏳ Sabar, belum giliranmu!");
+    return;
+  }
+
+  // Jika aktif kartu Double Dadu (13)
+  if (active.buffs && active.buffs.doubleDiceReady) {
+    const d1 = Math.floor(Math.random() * 6) + 1;
+    const d2 = Math.floor(Math.random() * 6) + 1;
+    showModal({
+      icon: '🎲🎲',
+      title: 'Double Dadu Kosmik!',
+      desc: `Hasil kocokan ganda: [ ${d1} ] dan [ ${d2} ]. Pilih angka jalanmu:`,
+      buttons: [
+        { text: `Pilih ${d1}`, cls: 'btn-virgo', onClick: () => sendToHost({ type: 'ROLL_DICE', playerId: myId, customSteps: d1, rawDiceList: [d1, d2] }) },
+        { text: `Pilih ${d2}`, cls: 'btn-sagi',  onClick: () => sendToHost({ type: 'ROLL_DICE', playerId: myId, customSteps: d2, rawDiceList: [d1, d2] }) },
+        { text: `Gabung (${d1 + d2})`, cls: 'btn-gold', onClick: () => sendToHost({ type: 'ROLL_DICE', playerId: myId, customSteps: d1 + d2, rawDiceList: [d1, d2] }) }
+      ]
+    });
+    return;
+  }
+
+  sendToHost({ type: 'ROLL_DICE', playerId: myId });
+}
+
+function sendEmo(emo) {
+  sendToHost({ type: 'EMOJI', senderId: myId, emo });
+}
+
+/* ================= PENGGUNAAN 16 KARTU POWER-UP ================= */
+function onHandCardClick(cardIndex) {
+  if (isTurnAnimating || gameState.winner || !gameState.powerUpsEnabled) return;
+  const me = gameState.players.find(p => p.id === myId);
+  if (!me) return;
+
+  const active = gameState.players[gameState.turnIndex];
+  if (!active || active.id !== myId) {
+    showToast("⏳ Kartu Power-Up hanya bisa dipakai saat giliranmu!");
+    return;
+  }
+
+  const cardId = me.cards[cardIndex];
+  const meta = getCardMeta(cardId);
+  const opponents = gameState.players.filter(p => p.id !== myId);
+
+  // Kartu tanpa target (langsung aktif)
+  if ([1, 2, 3, 7, 12, 13, 14].includes(cardId)) {
+    showModal({
+      icon: meta.icon,
+      title: `Gunakan ${meta.name}?`,
+      desc: meta.desc,
+      buttons: [
+        { text: 'Batal', cls: 'btn-slate' },
+        { text: 'Aktifkan!', cls: 'btn-gold', onClick: () => sendToHost({ type: 'USE_CARD', playerId: myId, cardIndex, cardId }) }
+      ]
+    });
+    return;
+  }
+
+  // Kartu yang butuh target pemain lawan (4: Sniper, 6: Dorong, 8: Swap, 9: Magnet, 15: Skip, 16: Steal)
+  if ([4, 6, 8, 9, 15, 16].includes(cardId)) {
+    let validTargets = opponents;
+    if (cardId === 4) {
+      // Sniper: baris, kolom, atau diagonal yang sama (dan posisi > 0)
+      const myRC = getTileGridRC(me.pos);
+      validTargets = opponents.filter(op => {
+        if (op.pos <= 0 || me.pos <= 0) return false;
+        const opRC = getTileGridRC(op.pos);
+        return opRC.row === myRC.row || opRC.col === myRC.col || Math.abs(opRC.row - myRC.row) === Math.abs(opRC.col - myRC.col);
+      });
+    } else if (cardId === 9) {
+      // Magnet: pemain di depanmu
+      validTargets = opponents.filter(op => op.pos > me.pos);
+    } else if (cardId === 6) {
+      // Dorong: pemain di dekatmu (jarak <= 5 petak atau > 0)
+      validTargets = opponents.filter(op => op.pos > 0 && Math.abs(op.pos - me.pos) <= 6);
+    } else if (cardId === 16) {
+      // Steal: pemain yang punya kartu
+      validTargets = opponents.filter(op => op.cards && op.cards.length > 0);
+    }
+
+    if (validTargets.length === 0) {
+      showToast(`⚠️ Tidak ada target yang memenuhi syarat untuk ${meta.name}!`);
+      return;
+    }
+
+    const targetBtns = validTargets.map(t => ({
+      text: `${t.avatar} ${t.name} (Petak ${t.pos})`,
+      cls: 'btn-sagi',
+      onClick: () => sendToHost({ type: 'USE_CARD', playerId: myId, cardIndex, cardId, targetPlayerId: t.id })
+    }));
+    targetBtns.push({ text: 'Batal', cls: 'btn-slate' });
+
+    showModal({
+      icon: meta.icon,
+      title: `Pilih Target: ${meta.name}`,
+      desc: meta.desc,
+      buttons: targetBtns
+    });
+    return;
+  }
+
+  // Kartu yang memilih petak di papan (5: Bom Ranjau, 10: Pintu Portal, 11: Ular Bayangan)
+  if ([5, 10, 11].includes(cardId)) {
+    pendingTileSelection = { cardIndex, cardId, step: 1, firstTile: null };
+    const banner = document.getElementById('boardSelectBanner');
+    banner.classList.add('active');
+    document.getElementById('boardSelectPrompt').textContent = cardId === 10
+      ? `🌀 Pilih kotak Pintu Portal KE-1 di papan!`
+      : `${meta.icon} Klik 1 kotak di papan untuk memasang ${meta.name}!`;
+    highlightSelectableTiles(true);
+  }
+}
+
+function highlightSelectableTiles(enable) {
+  document.querySelectorAll('.tile').forEach(el => {
+    const t = Number(el.dataset.tile);
+    if (enable && t > 1 && t < 100) el.classList.add('selectable-tile');
+    else el.classList.remove('selectable-tile');
+  });
+}
+
+function cancelBoardSelection() {
+  pendingTileSelection = null;
+  document.getElementById('boardSelectBanner').classList.remove('active');
+  highlightSelectableTiles(false);
+}
+
+function onTileClicked(tileNum) {
+  if (!pendingTileSelection || tileNum <= 1 || tileNum >= 100) return;
+  const sel = pendingTileSelection;
+
+  if (sel.cardId === 10 && sel.step === 1) {
+    sel.step = 2;
+    sel.firstTile = tileNum;
+    document.getElementById('boardSelectPrompt').textContent = `🌀 Kotak #${tileNum} dipilih! Sekarang pilih kotak Pintu Portal KE-2!`;
+    playSfx('pop');
+    return;
+  }
+
+  const payload = {
+    type: 'USE_CARD',
+    playerId: myId,
+    cardIndex: sel.cardIndex,
+    cardId: sel.cardId,
+    tileA: sel.cardId === 10 ? sel.firstTile : tileNum,
+    tileB: sel.cardId === 10 ? tileNum : null
+  };
+
+  cancelBoardSelection();
+  sendToHost(payload);
+}
+
+/* ================= LOGIKA HOST (PROSES AKSI & EFEK KARTU) ================= */
+function processHostAction(action) {
+  if (!isHost) return;
+
+  if (action.type === 'EMOJI') {
+    broadcastState({ kind: 'EMOJI', senderId: action.senderId, emo: action.emo });
+    return;
+  }
+
+  if (action.type === 'USE_CARD') {
+    const user = gameState.players.find(p => p.id === action.playerId);
+    if (!user || !user.cards || action.cardIndex < 0 || action.cardIndex >= user.cards.length) return;
+    const cardId = user.cards[action.cardIndex];
+    if (cardId !== action.cardId) return;
+
+    // Buang kartu dari tangan
+    user.cards.splice(action.cardIndex, 1);
+    const meta = getCardMeta(cardId);
+    let logMsg = `${user.avatar} ${user.name} memakai ${meta.icon} ${meta.name}!`;
+
+    // Cek apakah kartu serangan ditargetkan ke lawan yang punya Reflect (2)
+    const isAttackCard = [4, 6, 8, 9, 15, 16].includes(cardId);
+    let attacker = user;
+    let victim = action.targetPlayerId ? gameState.players.find(p => p.id === action.targetPlayerId) : null;
+
+    if (isAttackCard && victim && victim.buffs && victim.buffs.reflect) {
+      victim.buffs.reflect = false;
+      logMsg = `🪞 REFLECT! ${victim.name} memantulkan ${meta.name} kembali ke ${user.name}!`;
+      const temp = attacker;
+      attacker = victim;
+      victim = temp;
+    }
+
+    switch (cardId) {
+      case 1: // Anti Ular
+        user.buffs.antiSnake = true;
+        logMsg = `🛡️ ${user.name} mengaktifkan Anti Ular! Kebal kepala ular berikutnya.`;
+        break;
+      case 2: // Reflect
+        user.buffs.reflect = true;
+        logMsg = `🪞 ${user.name} memasang perisai Reflect pemantul serangan!`;
+        break;
+      case 3: // Bayangan (Ghost)
+        user.buffs.ghostRounds = 1;
+        logMsg = `👻 ${user.name} menjadi Bayangan selama 1 putaran! Kebal & tidak bisa menginjak.`;
+        break;
+      case 4: // Tembak (Sniper)
+        if (victim) {
+          victim.pos = 0;
+          logMsg = `🎯 SNIPER! ${attacker.name} menembak ${victim.name} kembali ke 0!`;
+        }
+        break;
+      case 5: // Bom Ranjau
+        if (action.tileA) {
+          gameState.boardEffects.bombs.push({ tile: action.tileA, ownerId: user.id });
+          logMsg = `💣 ${user.name} menanam Bom Ranjau di petak ${action.tileA}!`;
+        }
+        break;
+      case 6: // Dorong (Push)
+        if (victim && victim.pos > 0) {
+          let pushedPos = Math.min(99, victim.pos + 1);
+          const resolved = resolveLandingHazards(victim, pushedPos, true);
+          victim.pos = resolved.finalPos;
+          logMsg = `💨 ${attacker.name} mendorong ${victim.name} maju ke petak ${victim.pos}! ${resolved.note}`;
+        }
+        break;
+      case 7: // Tangga Instan
+        if (user.pos > 0 && user.pos <= 90) {
+          const targetUp = Math.min(99, user.pos + 10);
+          gameState.boardEffects.tempLadders.push({ from: user.pos, to: targetUp, roundsLeft: 2, ownerId: user.id });
+          logMsg = `🪜 ${user.name} membuka Tangga Instan (${user.pos} ➔ ${targetUp})!`;
+        } else {
+          user.buffs.instantLadderReady = true;
+          logMsg = `🪜 ${user.name} menyiapkan Tangga Instan setelah kocok dadu!`;
+        }
+        break;
+      case 8: // Swap
+        if (victim) {
+          const oldA = attacker.pos;
+          attacker.pos = victim.pos;
+          victim.pos = oldA;
+          logMsg = `🔄 SWAP! ${attacker.name} bertukar posisi dengan ${victim.name}!`;
+        }
+        break;
+      case 9: // Magnet
+        if (victim) {
+          const pullTo = Math.max(0, attacker.pos - 1);
+          victim.pos = pullTo;
+          logMsg = `🧲 MAGNET! ${attacker.name} menarik ${victim.name} mundur ke petak ${pullTo}!`;
+        }
+        break;
+      case 10: // Pintu Portal
+        if (action.tileA && action.tileB && action.tileA !== action.tileB) {
+          gameState.boardEffects.portals.push({ a: action.tileA, b: action.tileB, roundsLeft: 2, ownerId: user.id });
+          logMsg = `🌀 ${user.name} membuka Pintu Portal (${action.tileA} ↔ ${action.tileB}) selama 2 putaran!`;
+        }
+        break;
+      case 11: // Ular Bayangan
+        if (action.tileA) {
+          const dropTo = Math.max(1, action.tileA - 14);
+          gameState.boardEffects.shadowSnakes.push({ from: action.tileA, to: dropTo, roundsLeft: 1, ownerId: user.id });
+          logMsg = `🐍 ${user.name} memanggil Ular Bayangan di petak ${action.tileA} ➔ ${dropTo}!`;
+        }
+        break;
+      case 12: // Lem Super
+        if (user.pos > 0) {
+          gameState.boardEffects.glues.push({ tile: user.pos, ownerId: user.id });
+          logMsg = `🍯 ${user.name} menumpahkan Lem Super di petak ${user.pos}!`;
+        }
+        break;
+      case 13: // Double Dadu
+        user.buffs.doubleDiceReady = true;
+        logMsg = `🎲🎲 ${user.name} mengaktifkan Double Dadu! Kocok dadu 2 kali sekarang.`;
+        break;
+      case 14: // Reverse
+        user.buffs.reverse = true;
+        logMsg = `⏪ ${user.name} mengaktifkan Reverse! Akan berjalan mundur di giliran ini.`;
+        break;
+      case 15: // Skip
+        if (victim) {
+          victim.buffs.skipTurns = (victim.buffs.skipTurns || 0) + 1;
+          logMsg = `⏭️ SKIP! ${victim.name} kehilangan 1 giliran berikutnya!`;
+        }
+        break;
+      case 16: // Steal
+        if (victim && victim.cards && victim.cards.length > 0) {
+          const rIdx = Math.floor(Math.random() * victim.cards.length);
+          const stolenId = victim.cards.splice(rIdx, 1)[0];
+          if (attacker.cards.length < 4) attacker.cards.push(stolenId);
+          logMsg = `🦝 STEAL! ${attacker.name} mencuri kartu ${getCardMeta(stolenId).name} milik ${victim.name}!`;
+        }
+        break;
+    }
+
+    broadcastState({ kind: 'CARD_EFFECT', message: logMsg });
+    return;
+  }
+
+  if (action.type === 'ROLL_DICE') {
+    if (gameState.winner) return;
+    const player = gameState.players[gameState.turnIndex];
+    if (!player || player.id !== action.playerId) return;
+
+    // Cek apakah terkena Skip / Lem Super
+    if (player.buffs.skipTurns > 0) {
+      player.buffs.skipTurns -= 1;
+      advanceTurnAndTickEffects();
+      broadcastState({ kind: 'CARD_EFFECT', message: `⏭️ ${player.avatar} ${player.name} melewati giliran karena efek Skip/Lem!` });
+      scheduleBotIfNeeded();
+      return;
+    }
+
+    const rawDice = action.rawDiceList ? action.rawDiceList[0] : (Math.floor(Math.random() * 6) + 1);
+    const moveSteps = action.customSteps || rawDice;
+    const gotSix = action.rawDiceList ? action.rawDiceList.includes(6) : (rawDice === 6);
+    player.buffs.doubleDiceReady = false;
+    gameState.lastDice = rawDice;
+
+    // Dapat kartu tambahan saat dadu 6 (maksimal 4 kartu)
+    let gainedCardName = null;
+    if (gameState.powerUpsEnabled && gotSix && player.cards.length < 4) {
+      const newCardId = drawRandomCard();
+      player.cards.push(newCardId);
+      gainedCardName = `${getCardMeta(newCardId).icon} ${getCardMeta(newCardId).name}`;
+    }
+
+    const startPos = player.pos;
+    const isReverse = Boolean(player.buffs.reverse);
+    player.buffs.reverse = false;
+
+    // Simulasikan langkah satu per satu (cek Bom Ranjau & Lem Super di jalur)
+    let cur = startPos;
+    let bouncedBack = false;
+    const stepPath = [];
+    let hitBombTile = null;
+    let hitGlueTile = null;
+
+    for (let s = 1; s <= moveSteps; s++) {
+      if (isReverse) {
+        cur = Math.max(0, cur - 1);
+      } else {
+        if (!bouncedBack) {
+          cur += 1;
+          if (cur > 100) {
+            cur = 99;
+            bouncedBack = true;
+          }
+        } else {
+          cur -= 1;
+        }
+      }
+      stepPath.push(cur);
+
+      // Cek Bom Ranjau di kotak yang dilewati/diinjak
+      const bombIdx = gameState.boardEffects.bombs.findIndex(b => b.tile === cur && b.ownerId !== player.id);
+      if (bombIdx !== -1) {
+        gameState.boardEffects.bombs.splice(bombIdx, 1);
+        hitBombTile = cur;
+        break;
+      }
+
+      // Cek Lem Super di kotak yang dilewati/diinjak
+      const glueIdx = gameState.boardEffects.glues.findIndex(g => g.tile === cur && g.ownerId !== player.id);
+      if (glueIdx !== -1) {
+        gameState.boardEffects.glues.splice(glueIdx, 1);
+        hitGlueTile = cur;
+        player.buffs.skipTurns = (player.buffs.skipTurns || 0) + 1;
+        break;
+      }
+    }
+
+    let intermediatePos = stepPath.length > 0 ? stepPath[stepPath.length - 1] : startPos;
+    let finalPos = intermediatePos;
+    let specialEvent = null;
+
+    if (hitBombTile !== null) {
+      specialEvent = { type: 'bomb', from: hitBombTile, to: 0 };
+      finalPos = 0;
+    } else if (hitGlueTile === null) {
+      // Jika kartu Tangga Instan disiapkan sebelum kocok dadu
+      if (player.buffs.instantLadderReady && finalPos > 0 && finalPos <= 90) {
+        player.buffs.instantLadderReady = false;
+        const upTile = Math.min(99, finalPos + 10);
+        gameState.boardEffects.tempLadders.push({ from: finalPos, to: upTile, roundsLeft: 2, ownerId: player.id });
+      }
+
+      const resolved = resolveLandingHazards(player, finalPos, false);
+      finalPos = resolved.finalPos;
+      specialEvent = resolved.specialEvent;
+    }
+
+    // Aturan Terinjak Langsung Mati dan Kembali ke Awal (0) — kecuali Ghost Mode
+    const koVictims = [];
+    if (finalPos > 0 && finalPos < 100 && (!player.buffs.ghostRounds || player.buffs.ghostRounds <= 0)) {
+      gameState.players.forEach(other => {
+        if (other.id !== player.id && other.pos === finalPos) {
+          if (other.buffs && other.buffs.ghostRounds > 0) {
+            // Kebal karena mode Bayangan (Ghost)
+          } else {
+            other.pos = 0;
+            koVictims.push({ id: other.id, name: other.name, avatar: other.avatar });
+          }
+        }
+      });
+    }
+
+    player.pos = finalPos;
+
+    let winnerName = null;
+    if (finalPos === 100) {
+      gameState.winner = player.name;
+      winnerName = player.name;
+    } else {
+      advanceTurnAndTickEffects();
+    }
+
+    broadcastState({
+      kind: 'DICE_TURN',
+      playerId: player.id,
+      playerName: player.name,
+      playerAvatar: player.avatar,
+      dice: rawDice,
+      stepPath,
+      specialEvent,
+      finalPos,
+      koVictims,
+      gainedCardName,
+      hitGlueTile,
+      winnerName
+    });
+
+    if (!winnerName) scheduleBotIfNeeded();
+  }
+}
+
+function resolveLandingHazards(player, pos, allowStomp) {
+  let finalPos = pos;
+  let specialEvent = null;
+  let note = "";
+
+  // 1. Cek Pintu Portal
+  const portal = gameState.boardEffects.portals.find(pt => pt.a === finalPos || pt.b === finalPos);
+  if (portal) {
+    const dest = portal.a === finalPos ? portal.b : portal.a;
+    specialEvent = { type: 'portal', from: finalPos, to: dest };
+    finalPos = dest;
+    note = `Masuk Portal ke ${dest}!`;
+  }
+  // 2. Cek Tangga Instan
+  else {
+    const tLadder = gameState.boardEffects.tempLadders.find(tl => tl.from === finalPos);
+    if (tLadder) {
+      specialEvent = { type: 'ladder', from: finalPos, to: tLadder.to };
+      finalPos = tLadder.to;
+      note = `Naik Tangga Instan ke ${finalPos}!`;
+    }
+    // 3. Cek Tangga Kosmik Permanen
+    else if (LADDERS[finalPos]) {
+      specialEvent = { type: 'ladder', from: finalPos, to: LADDERS[finalPos] };
+      finalPos = LADDERS[finalPos];
+      note = `Naik Jembatan Rasi ke ${finalPos}!`;
+    }
+    // 4. Cek Ular Bayangan
+    else {
+      const sSnake = gameState.boardEffects.shadowSnakes.find(ss => ss.from === finalPos);
+      if (sSnake) {
+        if (player.buffs && player.buffs.antiSnake) {
+          player.buffs.antiSnake = false;
+          note = `🛡️ Anti Ular menahan Ular Bayangan!`;
+        } else {
+          specialEvent = { type: 'snake', from: finalPos, to: sSnake.to };
+          finalPos = sSnake.to;
+          note = `Digigit Ular Bayangan ke ${finalPos}!`;
+        }
+      }
+      // 5. Cek Ular Kosmik / Lubang Hitam Permanen
+      else if (SNAKES[finalPos]) {
+        if (player.buffs && player.buffs.antiSnake) {
+          player.buffs.antiSnake = false;
+          note = `🛡️ Anti Ular kebal Lubang Hitam!`;
+        } else {
+          specialEvent = { type: 'snake', from: finalPos, to: SNAKES[finalPos] };
+          finalPos = SNAKES[finalPos];
+          note = `Tersedot Lubang Hitam ke ${finalPos}!`;
+        }
+      }
+    }
+  }
+
+  // Cek tabrakan jika didorong (Push)
+  if (allowStomp && finalPos > 0 && finalPos < 100 && (!player.buffs.ghostRounds || player.buffs.ghostRounds <= 0)) {
+    gameState.players.forEach(other => {
+      if (other.id !== player.id && other.pos === finalPos && (!other.buffs.ghostRounds || other.buffs.ghostRounds <= 0)) {
+        other.pos = 0;
+        note += ` 💥 Menginjak ${other.name} hingga mati (ke 0)!`;
+      }
+    });
+  }
+
+  return { finalPos, specialEvent, note };
+}
+
+function advanceTurnAndTickEffects() {
+  if (gameState.players.length === 0) return;
+  const prevIndex = gameState.turnIndex;
+  gameState.turnIndex = (gameState.turnIndex + 1) % gameState.players.length;
+
+  // Setiap 1 putaran penuh (kembali ke indeks 0), kurangi durasi efek putaran
+  if (gameState.turnIndex === 0 && prevIndex >= 0) {
+    gameState.players.forEach(p => {
+      if (p.buffs && p.buffs.ghostRounds > 0) p.buffs.ghostRounds -= 1;
+    });
+    gameState.boardEffects.portals.forEach(pt => pt.roundsLeft -= 1);
+    gameState.boardEffects.portals = gameState.boardEffects.portals.filter(pt => pt.roundsLeft > 0);
+
+    gameState.boardEffects.shadowSnakes.forEach(ss => ss.roundsLeft -= 1);
+    gameState.boardEffects.shadowSnakes = gameState.boardEffects.shadowSnakes.filter(ss => ss.roundsLeft > 0);
+
+    gameState.boardEffects.tempLadders.forEach(tl => tl.roundsLeft -= 1);
+    gameState.boardEffects.tempLadders = gameState.boardEffects.tempLadders.filter(tl => tl.roundsLeft > 0);
+  }
+}
+
+function scheduleBotIfNeeded() {
+  if (!isHost || gameState.winner) return;
+  const curr = gameState.players[gameState.turnIndex];
+  if (!curr || !curr.isBot) return;
+
+  setTimeout(() => {
+    if (gameState.winner || isTurnAnimating) return;
+    const bot = gameState.players[gameState.turnIndex];
+    if (bot && bot.isBot) {
+      // Bot sesekali memakai kartu pertahanan jika punya
+      if (gameState.powerUpsEnabled && bot.cards && bot.cards.length > 0 && Math.random() < 0.35) {
+        const safeIdx = bot.cards.findIndex(cid => [1, 2, 3, 14].includes(cid));
+        if (safeIdx !== -1) {
+          processHostAction({ type: 'USE_CARD', playerId: bot.id, cardIndex: safeIdx, cardId: bot.cards[safeIdx] });
+        }
+      }
+      processHostAction({ type: 'ROLL_DICE', playerId: bot.id });
+    }
+  }, 1350);
+}
+
+function sleep(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+/* ================= ANIMASI CLIENT & HOST ================= */
+async function applyTurnUpdate(newState, animData) {
+  if (!animData) {
+    gameState = newState;
+    gameState.players.forEach(p => {
+      if (visualPositions[p.id] === undefined) visualPositions[p.id] = p.pos;
+    });
+    renderAllGameUI(gameState);
+    return;
+  }
+
+  if (animData.kind === 'EMOJI') {
+    spawnFloatingEmoji(animData.senderId, animData.emo);
+    return;
+  }
+
+  if (animData.kind === 'CARD_EFFECT') {
+    gameState = newState;
+    gameState.players.forEach(p => { visualPositions[p.id] = p.pos; });
+    playSfx('card');
+    showToast(animData.message, 3200);
+    renderAllGameUI(gameState);
+    return;
+  }
+
+  if (animData.kind === 'DICE_TURN') {
+    isTurnAnimating = true;
+    updateRollButtonState(newState);
+
+    const cube = document.getElementById('diceCube');
+    const resultLabel = document.getElementById('diceResultText');
+
+    cube.style.transform = '';
+    cube.classList.add('rolling');
+    resultLabel.textContent = `${animData.playerAvatar} ${animData.playerName} mengocok dadu...`;
+
+    const tickTimer = setInterval(() => playSfx('diceTick'), 95);
+    await sleep(980);
+    clearInterval(tickTimer);
+
+    cube.classList.remove('rolling');
+    cube.style.transform = DICE_ROTATIONS[animData.dice] || DICE_ROTATIONS[1];
+    resultLabel.textContent = `Hasil dadu: ${animData.dice}!`;
+    await sleep(340);
+
+    if (animData.gainedCardName) {
+      showToast(`🎲6! ${animData.playerName} mendapat kartu ${animData.gainedCardName}!`, 2800);
+    }
+
+    // Langkah satu per satu
+    for (const nextTile of (animData.stepPath || [])) {
+      visualPositions[animData.playerId] = nextTile;
+      playSfx('hop');
+      renderAllGameUI(gameState, { hoppingId: animData.playerId });
+      await sleep(220);
+    }
+
+    if (animData.hitGlueTile !== null && animData.hitGlueTile !== undefined) {
+      showToast(`🍯 Terjebak Lem Super di petak ${animData.hitGlueTile}! Kehilangan 1 giliran.`);
+    }
+
+    // Animasi event khusus (Tangga, Ular, Portal, Bom)
+    if (animData.specialEvent) {
+      const ev = animData.specialEvent;
+      if (ev.type === 'ladder') {
+        showToast(`🪜 Jembatan Rasi! ${animData.playerName} melesat ke ${ev.to}!`);
+        playSfx('ladder');
+      } else if (ev.type === 'portal') {
+        showToast(`🌀 Pintu Portal! ${animData.playerName} berteleportasi ke ${ev.to}!`);
+        playSfx('ladder');
+      } else if (ev.type === 'bomb') {
+        showToast(`💣 DUAR! ${animData.playerName} menginjak Bom Ranjau & kembali ke 0!`);
+        playSfx('ko');
+      } else {
+        showToast(`🕳️ Tersedot Lubang Hitam! ${animData.playerName} turun ke ${ev.to}!`);
+        playSfx('snake');
+      }
+      visualPositions[animData.playerId] = ev.to;
+      renderAllGameUI(gameState, {
+        specialId: animData.playerId,
+        specialMode: (ev.type === 'ladder' || ev.type === 'portal') ? 'climbing' : 'sliding'
+      });
+      await sleep(850);
+    }
+
+    // Animasi Terinjak Langsung Mati (KO kembali ke 0)
+    if (animData.koVictims && animData.koVictims.length > 0) {
+      playSfx('ko');
+      const names = animData.koVictims.map(v => `${v.avatar}${v.name}`).join(', ');
+      showToast(`💥 TERINJAK MATI! ${animData.playerName} menginjak ${names} kembali ke AWAL (0)!`, 3200);
+      renderAllGameUI(gameState, { koIds: animData.koVictims.map(v => v.id) });
+      await sleep(380);
+
+      animData.koVictims.forEach(v => { visualPositions[v.id] = 0; });
+      renderAllGameUI(gameState);
+      await sleep(420);
+    }
+
+    gameState = newState;
+    gameState.players.forEach(p => { visualPositions[p.id] = p.pos; });
+    isTurnAnimating = false;
+    renderAllGameUI(gameState);
+
+    if (animData.winnerName && lastWinnerHandled !== animData.winnerName) {
+      lastWinnerHandled = animData.winnerName;
+      playSfx('win');
+      setTimeout(() => {
+        showModal({
+          icon: '♍♐',
+          title: `${animData.winnerName} Penguasa Kosmik!`,
+          desc: isHost
+            ? 'Berhasil mencapai petak 100! Mulai ronde baru di room permanen ini?'
+            : 'Permainan selesai! Menunggu Host memulai ronde baru.',
+          buttons: isHost
+            ? [
+                { text: 'Exit Room', cls: 'btn-coral', onClick: () => exitRoomRealTime() },
+                { text: 'Main Lagi', cls: 'btn-virgo', onClick: () => startGame() }
+              ]
+            : [
+                { text: 'Exit Room', cls: 'btn-coral', onClick: () => exitRoomRealTime() }
+              ]
+        });
+      }, 650);
+    } else if (isHost) {
+      scheduleBotIfNeeded();
+    }
+  }
+}
+
+function spawnFloatingEmoji(senderId, emo) {
+  const posVal = visualPositions[senderId] ?? 0;
+  const xy = getTilePercentXY(posVal);
+  const boardRect = document.querySelector('.board-frame').getBoundingClientRect();
+
+  const el = document.createElement('div');
+  el.className = 'float-emo';
+  el.textContent = emo;
+  el.style.left = (boardRect.left + (xy.x / 100) * boardRect.width - 18) + 'px';
+  el.style.top = (boardRect.top + (xy.y / 100) * boardRect.height - 18) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1700);
+}
+
+function updateRollButtonState(state) {
+  const active = state.players[state.turnIndex];
+  const isMyTurn = !isTurnAnimating && !state.winner && active && active.id === myId;
+  document.getElementById('rollDiceBtn').disabled = !isMyTurn;
+
+  const badge = document.getElementById('turnStatusBadge');
+  if (state.winner) {
+    badge.textContent = `🏆 Juara: ${state.winner}`;
+    badge.classList.remove('is-my-turn');
+  } else if (active && active.id === myId) {
+    badge.textContent = "🎲 Giliran Kamu Kocok Dadu!";
+    badge.classList.add('is-my-turn');
+  } else if (active) {
+    badge.textContent = `⏳ Giliran ${active.avatar} ${active.name}`;
+    badge.classList.remove('is-my-turn');
+  }
+}
+
+function renderAllGameUI(state, animFlags = {}) {
+  updateRollButtonState(state);
+  drawCosmicOverlaySVG();
+
+  // Render marker jebakan di petak (Bom, Lem Super, Portal, Ular Bayangan)
+  document.querySelectorAll('.tile-marker').forEach(el => { el.textContent = ''; });
+  if (state.boardEffects) {
+    (state.boardEffects.bombs || []).forEach(b => {
+      const el = document.getElementById('tm_' + b.tile);
+      if (el) el.textContent = '💣';
+    });
+    (state.boardEffects.glues || []).forEach(g => {
+      const el = document.getElementById('tm_' + g.tile);
+      if (el) el.textContent = '🍯';
+    });
+    (state.boardEffects.portals || []).forEach(pt => {
+      const elA = document.getElementById('tm_' + pt.a);
+      const elB = document.getElementById('tm_' + pt.b);
+      if (elA) elA.textContent = '🌀';
+      if (elB) elB.textContent = '🌀';
+    });
+    (state.boardEffects.shadowSnakes || []).forEach(ss => {
+      const el = document.getElementById('tm_' + ss.from);
+      if (el) el.textContent = '🐍';
+    });
+  }
+
+  // Render Kartu Power-Up di tangan pemain lokal
+  const me = state.players.find(p => p.id === myId);
+  if (me && state.powerUpsEnabled) {
+    const cards = me.cards || [];
+    document.getElementById('handCountBadge').textContent = `${cards.length} / 4`;
+
+    const buffs = me.buffs || {};
+    const buffPills = [];
+    if (buffs.antiSnake) buffPills.push('🛡️ Anti Ular Aktif');
+    if (buffs.reflect) buffPills.push('🪞 Reflect Aktif');
+    if (buffs.ghostRounds > 0) buffPills.push(`👻 Ghost (${buffs.ghostRounds} putaran)`);
+    if (buffs.reverse) buffPills.push('⏪ Reverse Aktif');
+    if (buffs.doubleDiceReady) buffPills.push('🎲🎲 Double Dadu Siap');
+    if (buffs.instantLadderReady) buffPills.push('🪜 Tangga Instan Siap');
+    document.getElementById('myBuffsStrip').innerHTML = buffPills.map(t => `<span class="buff-pill">${t}</span>`).join('');
+
+    const handGrid = document.getElementById('myHandGrid');
+    if (cards.length === 0) {
+      handGrid.innerHTML = `<div class="pu-empty">Belum ada kartu. Dapatkan +1 kartu saat dadu keluar angka 6!</div>`;
+    } else {
+      handGrid.innerHTML = cards.map((cid, idx) => {
+        const m = getCardMeta(cid);
+        return `
+          <div class="pu-item" onclick="onHandCardClick(${idx})" title="${m.desc}">
+            <div class="pu-top"><span>${m.icon}</span><span>${m.name}</span></div>
+            <div class="pu-cat">${m.cat} • Klik Pakai</div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // Render Bidak Pemain
+  const active = state.players[state.turnIndex];
+  document.getElementById('rosterCount').textContent = `${state.players.length}/8`;
+
+  const byPos = {};
+  state.players.forEach(p => {
+    const vPos = visualPositions[p.id] ?? p.pos ?? 0;
+    if (!byPos[vPos]) byPos[vPos] = [];
+    byPos[vPos].push(p.id);
+  });
+
+  const offsets = [
+    { dx: -1.8, dy: -1.8 }, { dx: 1.8, dy: -1.8 },
+    { dx: -1.8, dy:  1.8 }, { dx: 1.8, dy:  1.8 },
+    { dx:  0.0, dy: -2.2 }, { dx: 0.0, dy:  2.2 },
+    { dx: -2.2, dy:  0.0 }, { dx: 2.2, dy:  0.0 }
+  ];
+
+  const tokensLayer = document.getElementById('tokensLayer');
+  tokensLayer.innerHTML = state.players.map(p => {
+    const vPos = visualPositions[p.id] ?? p.pos ?? 0;
+    const group = byPos[vPos] || [p.id];
+    const slotIdx = group.indexOf(p.id) % offsets.length;
+    const xy = getTilePercentXY(vPos, group.length > 1 ? offsets[slotIdx] : { dx: 0, dy: 0 });
+
+    let extraCls = '';
+    if (p.buffs && p.buffs.ghostRounds > 0) extraCls += ' ghost-mode';
+    if (p.buffs && (p.buffs.antiSnake || p.buffs.reflect)) extraCls += ' shield-mode';
+    if (animFlags.hoppingId === p.id) extraCls += ' hop';
+    if (animFlags.specialId === p.id && animFlags.specialMode) extraCls += ` ${animFlags.specialMode}`;
+    if (animFlags.koIds && animFlags.koIds.includes(p.id)) extraCls += ' ko-anim';
+
+    return `
+      <div class="player-token ${extraCls}"
+           style="left:${xy.x}%; top:${xy.y}%; background:${p.color};">
+        ${p.avatar}
+      </div>
+    `;
+  }).join('');
+
+  // Render Roster Pemain
+  document.getElementById('rosterGrid').innerHTML = state.players.map(p => {
+    const isAct = !state.winner && active && active.id === p.id;
+    const vPos = visualPositions[p.id] ?? p.pos ?? 0;
+    const cardBadge = state.powerUpsEnabled ? `<span style="font-size:10px; color:#e9d5ff;">🃏${(p.cards || []).length}</span>` : '';
+    return `
+      <div class="roster-item ${isAct ? 'active' : ''}">
+        <div class="roster-left">
+          <span>${p.avatar}</span>
+          <span class="roster-name">${p.name}</span>
+        </div>
+        <div class="roster-meta">
+          ${cardBadge}
+          <span class="roster-pos">${vPos === 0 ? '0' : vPos}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+</script>
+</body>
+</html>
