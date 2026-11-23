@@ -1,0 +1,2199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>VirSagi Game ✨ Virgo & Sagittarius Cosmic Match</title>
+  <!-- PeerJS untuk koneksi P2P tanpa database/Firebase -->
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #070919;
+      --bg-card: rgba(18, 23, 52, 0.72);
+      --border-glass: rgba(255, 215, 130, 0.22);
+      --gold: #ffd166;
+      --gold-glow: rgba(255, 209, 102, 0.45);
+      --virgo-color: #6ee7b7;
+      --sagi-color: #f472b6;
+      --purple-accent: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #fb7185;
+      --success: #34d399;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #161b40 0%, #070919 75%);
+      color: var(--text-main);
+      min-height: 100dvh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Starfield Canvas */
+    #starCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Custom Toast Notification (Pengganti alert bawaan) */
+    #toast-container {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 90%;
+      max-width: 380px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(20, 25, 58, 0.92);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--gold);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px var(--gold-glow);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: toastIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .toast.fade-out {
+      animation: toastOut 0.3s ease forwards;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(-15px) scale(0.95); }
+    }
+
+    /* Floating Emoji Burst */
+    .floating-emoji {
+      position: fixed;
+      bottom: 80px;
+      font-size: 2.2rem;
+      pointer-events: none;
+      z-index: 900;
+      animation: floatUp 2.4s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.6) rotate(-10deg); opacity: 0; }
+      20% { opacity: 1; transform: translateY(-30px) scale(1.15) rotate(8deg); }
+      100% { transform: translateY(-360px) scale(0.9) rotate(-12deg); opacity: 0; }
+    }
+
+    /* Main Container */
+    .app-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 480px;
+      min-height: 100dvh;
+      padding: 16px 16px 90px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 4px 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand h1 {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.35rem;
+      background: linear-gradient(135deg, #fff6d6 0%, var(--gold) 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.5px;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      color: var(--gold);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Connection Status Pill */
+    .status-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      background: #64748b;
+    }
+
+    .status-dot.online {
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    .status-dot.waiting {
+      background: var(--gold);
+      animation: pulse 1.4s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    /* Glass Card */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      border-radius: 22px;
+      padding: 20px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      animation: fadeSlide 0.35s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Zodiac Selector */
+    .zodiac-badges {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .zodiac-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .zodiac-card.active.virgo {
+      border-color: var(--virgo-color);
+      background: rgba(110, 231, 183, 0.12);
+      box-shadow: 0 0 20px rgba(110, 231, 183, 0.2);
+    }
+
+    .zodiac-card.active.sagi {
+      border-color: var(--sagi-color);
+      background: rgba(244, 114, 182, 0.12);
+      box-shadow: 0 0 20px rgba(244, 114, 182, 0.2);
+    }
+
+    .zodiac-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      width: 100%;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffd166 0%, #f59e0b 100%);
+      color: #111827;
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(139, 92, 246, 0.22);
+      border: 1px solid rgba(139, 92, 246, 0.5);
+      color: #ede9fe;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-glass);
+      color: var(--text-main);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+      color: #06281e;
+    }
+
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      border-radius: 10px;
+      width: auto;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: rgba(10, 14, 35, 0.8);
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--gold);
+    }
+
+    .divider {
+      text-align: center;
+      margin: 16px 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      position: relative;
+    }
+
+    .divider::before, .divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 35%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+
+    /* Room Code Box */
+    .invite-box {
+      background: rgba(255, 209, 102, 0.08);
+      border: 1px dashed var(--gold);
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .room-code-text {
+      font-family: monospace;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin: 6px 0;
+    }
+
+    /* Game Menu Grid */
+    .game-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .game-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .game-item:hover {
+      border-color: var(--gold);
+      background: rgba(255, 209, 102, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .game-item-icon {
+      font-size: 1.9rem;
+      background: rgba(255, 255, 255, 0.06);
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .game-item-info h3 {
+      font-size: 1rem;
+      color: var(--gold);
+      margin-bottom: 3px;
+    }
+
+    .game-item-info p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* Gameplay HUD */
+    .hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .badge-round {
+      background: rgba(139, 92, 246, 0.25);
+      color: #ddd6fe;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .score-pill {
+      background: rgba(255, 209, 102, 0.15);
+      border: 1px solid rgba(255, 209, 102, 0.4);
+      color: var(--gold);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .question-box {
+      text-align: center;
+      padding: 16px 8px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: #fff;
+    }
+
+    /* This or That Options */
+    .tot-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .tot-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 18px 16px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .tot-btn.selected {
+      border-color: var(--gold);
+      background: rgba(255, 209, 102, 0.2);
+      box-shadow: 0 0 18px var(--gold-glow);
+    }
+
+    /* Wavelength Slider */
+    .spectrum-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 12px 0 8px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold);
+      height: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .scale-numbers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Reveal Comparison Box */
+    .reveal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .reveal-card {
+      background: rgba(10, 14, 35, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .reveal-card span.who {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .reveal-card strong {
+      font-size: 0.98rem;
+      color: #fff;
+      word-break: break-word;
+    }
+
+    /* Drawing Canvas */
+    .draw-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #drawCanvas {
+      background: #0d122b;
+      border: 1.5px solid var(--gold);
+      border-radius: 16px;
+      touch-action: none;
+      cursor: crosshair;
+      width: 100%;
+      max-width: 320px;
+      height: 260px;
+    }
+
+    .color-palette {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .color-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .color-dot.active {
+      border-color: #fff;
+      transform: scale(1.15);
+    }
+
+    /* Floating Chat & Emoji Bar */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: rgba(12, 16, 40, 0.92);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border-glass);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .emoji-quick {
+      display: flex;
+      gap: 6px;
+    }
+
+    .emoji-btn {
+      background: rgba(255, 255, 255, 0.07);
+      border: none;
+      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+      font-size: 1.15rem;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .emoji-btn:active {
+      transform: scale(1.25);
+    }
+
+    .chat-toggle-btn {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .unread-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger);
+      color: #fff;
+      font-size: 0.7rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    /* Chat Drawer */
+    .chat-drawer {
+      position: fixed;
+      bottom: 62px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 94%;
+      max-width: 450px;
+      height: 320px;
+      background: rgba(15, 20, 48, 0.96);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--gold);
+      border-radius: 20px;
+      z-index: 150;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .msg-bubble {
+      max-width: 78%;
+      padding: 8px 12px;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      line-height: 1.35;
+      word-wrap: break-word;
+    }
+
+    .msg-me {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #ffd166 0%, #f59e0b 100%);
+      color: #111827;
+      border-bottom-right-radius: 4px;
+      font-weight: 600;
+    }
+
+    .msg-partner {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-quick-replies {
+      display: flex;
+      gap: 6px;
+      padding: 6px 10px;
+      overflow-x: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .quick-chip {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Final Summary */
+    .meter-circle {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 4px solid var(--gold);
+      margin: 14px auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle, rgba(255,209,102,0.18) 0%, transparent 70%);
+      box-shadow: 0 0 30px var(--gold-glow);
+    }
+
+    .meter-circle span.pct {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--gold);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Latar Langit Berbintang -->
+  <canvas id="starCanvas"></canvas>
+
+  <!-- Container Notifikasi Kustom -->
+  <div id="toast-container"></div>
+
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <span style="font-size: 1.5rem;">♍✨♐</span>
+        <h1>VirSagi Game</h1>
+      </div>
+      <div class="header-controls">
+        <button class="icon-btn" id="btnSound" title="Suara On/Off">🔊</button>
+        <button class="icon-btn hidden" id="btnHome" title="Kembali ke Menu">🏠</button>
+      </div>
+    </header>
+
+    <!-- Status Koneksi P2P -->
+    <div class="status-bar">
+      <div>
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Belum terhubung ke semesta</span>
+      </div>
+      <div id="roleBadge" style="font-weight: 700; color: var(--gold);">♍ Virgo</div>
+    </div>
+
+    <!-- SCREEN 1: LOBBY & KONEKSI P2P -->
+    <section id="screenLobby" class="card">
+      <div style="text-align: center;">
+        <h2 style="font-size: 1.2rem; color: var(--gold); margin-bottom: 6px;">Koneksi Bintang Tanpa Server</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+          Pilih zodiakmu, buat ruang rasi bintang, dan kirimkan tautan undangan ke pasanganmu.
+        </p>
+      </div>
+
+      <!-- Pilih Peran Virgo / Sagittarius -->
+      <div class="zodiac-badges">
+        <div class="zodiac-card virgo active" id="pickVirgo" onclick="selectZodiac('Virgo')">
+          <span class="zodiac-icon">♍</span>
+          <strong style="color: var(--virgo-color);">Virgo Boy</strong>
+          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Analitis & Perhatian</div>
+        </div>
+        <div class="zodiac-card sagi" id="pickSagi" onclick="selectZodiac('Sagittarius')">
+          <span class="zodiac-icon">♐</span>
+          <strong style="color: var(--sagi-color);">Sagittarius Girl</strong>
+          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Petualang & Ceria</div>
+        </div>
+      </div>
+
+      <!-- Buat Ruang (Host) -->
+      <button class="btn btn-primary" id="btnCreateRoom" onclick="createRoom()">
+        ✨ Buat Ruang Bintang (Host)
+      </button>
+
+      <!-- Kotak Kode & Link Undangan (Muncul setelah buat ruang) -->
+      <div id="inviteSection" class="invite-box hidden">
+        <div style="font-size: 0.78rem; color: var(--text-muted);">Kode Ruang Bintang:</div>
+        <div class="room-code-text" id="displayRoomCode">----</div>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 8px;">
+          <button class="btn btn-secondary btn-sm" onclick="copyInviteLink()">🔗 Salin Link Undangan</button>
+          <button class="btn btn-outline btn-sm" onclick="copyRoomCode()">📋 Salin Kode</button>
+        </div>
+        <div style="font-size: 0.75rem; color: var(--gold); margin-top: 8px;">
+          Menunggu pasangan bergabung... 🌠
+        </div>
+      </div>
+
+      <div class="divider">ATAU GABUNG RUANG</div>
+
+      <!-- Gabung Ruang (Guest) -->
+      <div class="input-group">
+        <input type="text" id="inputJoinCode" placeholder="Masukkan kode ruang..." maxlength="15" />
+        <button class="btn btn-secondary" style="width: auto; padding: 0 18px;" onclick="joinRoom()">
+          Gabung 🚀
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: PILIHAN GAME KECOCOKAN -->
+    <section id="screenMenu" class="card hidden">
+      <div style="text-align: center; margin-bottom: 8px;">
+        <h2 style="font-size: 1.2rem; color: var(--gold);">Pilih Misi Kecocokan ✨</h2>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">
+          30 pertanyaan acak siap menguji telepati Virgo & Sagittarius!
+        </p>
+      </div>
+
+      <div class="game-grid">
+        <div class="game-item" onclick="startGame('tot')">
+          <div class="game-item-icon">⚡</div>
+          <div class="game-item-info">
+            <h3>1. This or That</h3>
+            <p>Pilih 1 dari 2 opsi secara cepat! Lihat seberapa sering kalian memilih hal yang sama.</p>
+          </div>
+        </div>
+
+        <div class="game-item" onclick="startGame('mindsync')">
+          <div class="game-item-icon">🔮</div>
+          <div class="game-item-info">
+            <h3>2. Mind Sync (Telepati)</h3>
+            <p>Ketik jawaban bebas secara rahasia, lalu buka bersamaan. Ada tombol "Sah!" kalau mirip.</p>
+          </div>
+        </div>
+
+        <div class="game-item" onclick="startGame('wavelength')">
+          <div class="game-item-icon">🎚️</div>
+          <div class="game-item-info">
+            <h3>3. Wavelength (Skala 1–10)</h3>
+            <p>Satu memberi 1 kata petunjuk, pasangan menebak posisi angka rahasia di spektrum.</p>
+          </div>
+        </div>
+
+        <div class="game-item" onclick="startGame('knowme')">
+          <div class="game-item-icon">💌</div>
+          <div class="game-item-info">
+            <h3>4. Seberapa Kenal Aku?</h3>
+            <p>Jawab pertanyaan tentang dirimu sendiri, lalu tebak apa jawaban pasanganmu!</p>
+          </div>
+        </div>
+
+        <div class="game-item" onclick="startGame('draw')">
+          <div class="game-item-icon">🎨</div>
+          <div class="game-item-info">
+            <h3>5. Draw & Match</h3>
+            <p>Gambar tema yang sama dalam 30 detik, lalu bandingkan hasil karya kalian!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: ARENA PERMAINAN -->
+    <section id="screenGame" class="card hidden">
+      <div class="hud-top">
+        <span class="badge-round" id="hudRound">Ronde 1 / 5</span>
+        <span id="hudTitle" style="font-weight: 700; font-size: 0.9rem; color: var(--gold);">Game</span>
+        <span class="score-pill" id="hudScore">✨ 0 Poin</span>
+      </div>
+
+      <!-- Konten Dinamis Game -->
+      <div id="gamePlayArea"></div>
+    </section>
+
+    <!-- SCREEN 4: HASIL AKHIR KECOCOKAN -->
+    <section id="screenResult" class="card hidden" style="text-align: center;">
+      <h2 style="font-family: 'Cinzel Decorative', cursive; color: var(--gold); font-size: 1.3rem;">
+        Ramalan Bintang Selesai!
+      </h2>
+      <div class="meter-circle">
+        <span class="pct" id="finalPercent">100%</span>
+        <span style="font-size: 0.72rem; color: var(--text-muted);">KECOCOKAN</span>
+      </div>
+      <h3 id="finalRankTitle" style="color: var(--virgo-color); margin-bottom: 8px;">Belahan Jiwa Kosmik!</h3>
+      <p id="finalRankDesc" style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 18px;">
+        Virgo yang detail dan Sagittarius yang bebas ternyata punya frekuensi telepati yang luar biasa!
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn btn-primary" onclick="requestBackToMenu()">🎮 Main Game Lainnya</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- CHAT DRAWER -->
+  <div id="chatDrawer" class="chat-drawer hidden">
+    <div class="chat-header">
+      <span>💬 Obrolan Rasi Bintang</span>
+      <button onclick="toggleChat()" style="background:none; border:none; color:#fff; font-size:1.1rem; cursor:pointer;">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin: auto;">
+        Kirim pesan atau stiker lucu ke pasanganmu ✨
+      </div>
+    </div>
+    <div class="chat-quick-replies">
+      <button class="quick-chip" onclick="sendQuickChat('Curang nih! 😜')">Curang nih! 😜</button>
+      <button class="quick-chip" onclick="sendQuickChat('Kok bisa sama?! 🤯')">Kok bisa sama?! 🤯</button>
+      <button class="quick-chip" onclick="sendQuickChat('Aku hafal kamu banget 😌')">Aku hafal kamu banget 😌</button>
+      <button class="quick-chip" onclick="sendQuickChat('Wkwkwk ngakak 😂')">Wkwkwk ngakak 😂</button>
+      <button class="quick-chip" onclick="sendQuickChat('Lanjut gas! 🚀')">Lanjut gas! 🚀</button>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Ketik pesan lucu..." onkeypress="if(event.key==='Enter') sendChat()" />
+      <button class="btn btn-primary btn-sm" onclick="sendChat()">Kirim</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM EMOJI & CHAT BAR -->
+  <div class="bottom-bar">
+    <div class="emoji-quick">
+      <button class="emoji-btn" onclick="sendReaction('❤️')">❤️</button>
+      <button class="emoji-btn" onclick="sendReaction('😂')">😂</button>
+      <button class="emoji-btn" onclick="sendReaction('🥺')">🥺</button>
+      <button class="emoji-btn" onclick="sendReaction('🔥')">🔥</button>
+      <button class="emoji-btn" onclick="sendReaction('✨')">✨</button>
+    </div>
+    <button class="chat-toggle-btn" onclick="toggleChat()">
+      💬 Chat
+      <span class="unread-badge hidden" id="unreadBadge">0</span>
+    </button>
+  </div>
+
+  <script>
+    /* =========================================================================
+       1. BANK 30+ PERTANYAAN KECOCOKAN RANDOM (VIRGO & SAGITTARIUS EDITION)
+       ========================================================================= */
+    const QUESTION_BANK = {
+      tot: [
+        { a: "☕ Kopi Pagi", b: "🍵 Teh Hangat" },
+        { a: "🏔️ Liburan ke Gunung", b: "🏖️ Liburan ke Pantai" },
+        { a: "🎬 Nonton di Bioskop", b: "🛋️ Maraton Film di Rumah" },
+        { a: "🍜 Mie Kuah Pedas", b: "🍝 Mie Goreng Spesial" },
+        { a: "🌅 Tim Bangun Pagi", b: "🦉 Tim Begadang Malam" },
+        { a: "📱 Chatting Panjang", b: "📞 Telepon / Voice Note" },
+        { a: "🐱 Tim Kucing", b: "🐶 Tim Anjing" },
+        { a: "🌧️ Hujan Deras", b: "☀️ Cerah Berawan" },
+        { a: "🍦 Es Krim Cokelat", b: "🍨 Es Krim Vanila" },
+        { a: "🚗 Roadtrip Spontan", b: "📋 Itinerary Terencana" },
+        { a: "🍔 Burger & Kentang", b: "🍕 Pizza Keju Lumer" },
+        { a: "🎵 Dengar Musik", b: "🎙️ Dengar Podcast" },
+        { a: "💸 Ditabung Dulu", b: "🛍️ Self-Reward Sekarang" },
+        { a: "🏙️ Jalan-jalan ke Mall", b: "🌳 Piknik di Taman" },
+        { a: "🍫 Cokelat Manis", b: "🍟 Keripik Asin Gurih" },
+        { a: "📸 Foto Estetik", b: "🎥 Rekam Video Vlog" },
+        { a: "🕰️ Datang Lebih Awal", b: "🏃 Pas Banget Jamnya" },
+        { a: "🍣 Sushi & Ramen", b: "🥩 Steak & Barbeque" },
+        { a: "📚 Baca Buku / Komik", b: "🎮 Main Game Bareng" },
+        { a: "🌙 Deep Talk Tengah Malam", b: "☀️ Bercanda Sepanjang Hari" },
+        { a: "✈️ Traveling Luar Negeri", b: "🏝️ Eksplor Pulau Lokal" },
+        { a: "👕 Gaya Kasual Santai", b: "👔 Gaya Rapi & Formal" },
+        { a: "🌶️ Makanan Super Pedas", b: "🍯 Makanan Manis Gurih" },
+        { a: "🎁 Kado Barang Kejutan", b: "🍽️ Makan Malam Romantis" },
+        { a: "🚲 Sepeda Sore", b: "🚶 Jalan Kaki Santai" },
+        { a: "🧩 Main Teka-Teki", b: "🎲 Main Board Game" },
+        { a: "🎧 Lagu Galau", b: "💃 Lagu Semangat Upbeat" },
+        { a: "🍩 Donat Gula", b: "🥐 Croissant Hangat" },
+        { a: "🌌 Lihat Bintang Malam", b: "🌇 Lihat Sunset Sore" },
+        { a: "🏡 Tinggal di Pinggir Kota", b: "🏢 Apartemen Pusat Kota" }
+      ],
+      mindsync: [
+        "Satu kata untuk menggambarkan pasanganmu hari ini?",
+        "Makanan yang paling enak dimakan pas hujan deras?",
+        "Negara atau kota impian untuk liburan berdua?",
+        "Warna yang paling melambangkan hubungan kita?",
+        "Hewan apa yang paling mirip sama sifat pasanganmu?",
+        "Minuman wajib kalau lagi nongkrong berdua?",
+        "Satu hal kecil yang langsung bikin mood naik?",
+        "Film atau kartun masa kecil yang paling diingat?",
+        "Kalau dapat uang kaget 100 juta, hal pertama yang dibeli?",
+        "Bulan favorit dalam satu tahun?",
+        "Buah yang paling enak dibuat jus?",
+        "Kebiasaan lucu pasangan yang paling kamu hafal?",
+        "Menu sarapan paling ideal menurutmu?",
+        "Superpower apa yang paling pengen kamu miliki?",
+        "Benda yang nggak boleh ketinggalan saat pergi keluar?",
+        "Lagu atau musisi yang sering diputar akhir-akhir ini?",
+        "Tempat kencan pertama atau impian yang paling berkesan?",
+        "Cemilan favorit pas lagi nonton film?",
+        "Satu kata tentang sifat Virgo?",
+        "Satu kata tentang sifat Sagittarius?",
+        "Olahraga atau aktivitas fisik yang paling seru?",
+        "Musim atau cuaca favoritmu?",
+        "Es krim rasa apa yang nggak pernah gagal?",
+        "Kalau punya kafe bareng, mau dikasih nama apa?",
+        "Jam berapa biasanya kamu mulai ngantuk?",
+        "Bunga atau tanaman yang paling cantik?",
+        "Mainan masa kecil yang paling sering dimainkan?",
+        "Makanan tradisional Indonesia paling juara?",
+        "Kalau terdampar di pulau, 1 barang yang dibawa?",
+        "Emoji yang paling sering kamu pakai saat chat?"
+      ],
+      wavelength: [
+        { left: "❄️ Dingin Membeku", right: "🔥 Panas Membara" },
+        { left: "😴 Membosankan", right: "🎢 Sangat Seru" },
+        { left: "💸 Murah Meriah", right: "💎 Mewah Sultan" },
+        { left: "😇 Sangat Polos", right: "😈 Jahil Banget" },
+        { left: "🐢 Lambat Santai", right: "⚡ Super Cepat" },
+        { left: "🥗 Makanan Sehat", right: "🍔 Junk Food Nikmat" },
+        { left: "🤫 Sangat Rahasia", right: "📢 Semua Orang Tahu" },
+        { left: "🧸 Lucu Menggemaskan", right: "🦁 Gagah Menyeramkan" },
+        { left: "🧠 Logika Banget (Virgo)", right: "💖 Perasaan Banget" },
+        { left: "🏠 Anak Rumahan", right: "🌍 Petualang Sejati (Sagi)" },
+        { left: "😢 Bikin Nangis", right: "😂 Bikin Ngakak" },
+        { left: "🧂 Hambar Tanpa Rasa", right: "🌶️ Pedas Nampol" },
+        { left: "🕰️ Jadul Klasik", right: "🚀 Futuristik Modern" },
+        { left: "📉 Tidak Penting", right: "🚨 Darurat Banget" },
+        { left: "🛌 Malas Gerak", right: "🏃 Produktif Maksimal" },
+        { left: "🎨 Berantakan Estetik", right: "📐 Rapi Perfeksionis" },
+        { left: "🌧️ Suasana Galau", right: "🎉 Suasana Pesta" },
+        { left: "👶 Kekanak-kanakan", right: "🧓 Bijaksana Dewasa" },
+        { left: "🍬 Manis Banget", right: "🍋 Asam Segar" },
+        { left: "👻 Seram Horor", right: "🦄 Fantasi Indah" },
+        { left: "📱 Kecanduan HP", right: "🌲 Menyatu dengan Alam" },
+        { left: "🎤 Pemalu Pendiam", right: "🌟 Pusat Perhatian" },
+        { left: "🥀 Gampang Layu", right: "🌵 Tahan Banting" },
+        { left: "🎲 Untung-untungan", right: "♟️ Strategi Matang" },
+        { left: "🌌 Misterius", right: "☀️ Terbuka Apa Adanya" },
+        { left: "🎧 Tenang Damai", right: "🎸 Berisik Meriah" },
+        { left: "🛒 Lapar Mata", right: "🧾 Hemat Perhitungan" },
+        { left: "🛸 Aneh Unik", right: "👔 Biasa Umum" },
+        { left: "💤 Butuh Tidur", right: "☕ Kebanyakan Kafein" },
+        { left: "💔 Bikin Kesal", right: "🥰 Bikin Sayang" }
+      ],
+      knowme: [
+        "Apa makanan yang paling aku hindari atau nggak suka?",
+        "Kalau lagi capek banget, apa yang paling aku butuhin?",
+        "Apa ketakutan terbesar atau hal yang bikin aku geli?",
+        "Minuman apa yang selalu aku pesan kalau bingung?",
+        "Hal kecil apa dari kamu yang paling bikin aku senyum?",
+        "Kalau lagi marah atau bad mood, biasanya aku ngapain?",
+        "Apa hobi atau kegiatan yang bikin aku lupa waktu?",
+        "Bagian tubuh atau penampilanmu yang paling aku suka?",
+        "Apa impian terbesar yang pengen aku wujudkan tahun ini?",
+        "Kalau dikasih waktu libur seharian penuh, aku bakal ngapain?",
+        "Apa rasa es krim atau kue kesukaanku?",
+        "Siapa tokoh, artis, atau karakter favoritku?",
+        "Apa kebiasaan burukku yang paling sering kamu ingatkan?",
+        "Kalau makan bubur ayam, aku tim diaduk atau nggak diaduk?",
+        "Apa hal pertama yang aku lakuin pas bangun tidur?",
+        "Warna baju apa yang paling sering aku pakai?",
+        "Apa lagu atau genre musik andalanku?",
+        "Kalau lagi sedih, hiburan apa yang paling ampuh buatku?",
+        "Tempat mana yang pengen banget aku kunjungi bareng kamu?",
+        "Apa hal paling romantis menurut versiku?",
+        "Berapa lama waktu yang aku butuhin buat siap-siap pergi?",
+        "Apa cemilan tengah malam favoritku?",
+        "Kalau nonton film, genre apa yang paling aku pilih?",
+        "Apa julukan sayang favoritku?",
+        "Hal apa yang paling bikin aku bangga sama diriku sendiri?",
+        "Kalau punya hewan peliharaan, aku mau pelihara apa?",
+        "Apa pelajaran atau topik obrolan yang paling aku kuasai?",
+        "Bagaimana caraku nunjukin rasa sayang tanpa kata-kata?",
+        "Apa cuaca favoritku buat jalan-jalan?",
+        "Satu hal yang nggak bisa aku tolak kalau ditawarin kamu?"
+      ],
+      draw: [
+        "Gambar wajah pasanganmu versi imut! 🥰",
+        "Gambar kucing lagi pakai mahkota 👑🐱",
+        "Gambar rumah impian kita berdua 🏡✨",
+        "Gambar rasi bintang Virgo & Sagittarius 🌌",
+        "Gambar makanan favorit pasanganmu 🍜",
+        "Gambar ekspresi pas lagi kangen berat 🥺",
+        "Gambar pemandangan pantai saat sunset 🌅",
+        "Gambar roket meluncur ke bulan 🚀🌕",
+        "Gambar hadiah impian di dalam kotak 🎁",
+        "Gambar monster lucu yang ramah 👾",
+        "Gambar secangkir kopi hangat di pagi hari ☕",
+        "Gambar dinosaurus lagi naik sepeda 🦖🚲",
+        "Gambar suasana kencan ideal kita 💑",
+        "Gambar pohon rindang dengan ayunan 🌳",
+        "Gambar hantu imut yang nggak seram 👻",
+        "Gambar es krim tumpuk 3 rasa 🍦",
+        "Gambar mobil untuk roadtrip berdua 🚗",
+        "Gambar penguin pakai syal musim dingin 🐧",
+        "Gambar bunga matahari yang cerah 🌻",
+        "Gambar karakter kartun favoritmu 🎨",
+        "Gambar bulan sabit dengan bintang jatuh 🌙",
+        "Gambar robot asisten rumah tangga 🤖",
+        "Gambar pizza dengan topping melimpah 🍕",
+        "Gambar burung hantu bijaksana 🦉",
+        "Gambar pulau kecil dengan satu pohon kelapa 🏝️",
+        "Gambar piala kemenangan untuk kita 🏆",
+        "Gambar anjing lucu yang goyang ekor 🐶",
+        "Gambar pelangi setelah hujan 🌈",
+        "Gambar kamera untuk abadikan momen 📸",
+        "Gambar hati dengan sayap malaikat 💘"
+      ]
+    };
+
+    /* =========================================================================
+       2. WEB AUDIO API (EFEK SUARA SINTESIS TANPA FILE EKSTERNAL)
+       ========================================================================= */
+    let soundEnabled = true;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(520, now);
+        osc.frequency.exponentialRampToValueAtTime(780, now + 0.08);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'match') {
+        // Arpeggio kosmik saat cocok
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(freq, now + idx * 0.08);
+          g.gain.setValueAtTime(0.15, now + idx * 0.08);
+          g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(now + idx * 0.08);
+          o.stop(now + idx * 0.08 + 0.35);
+        });
+      } else if (type === 'miss') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.linearRampToValueAtTime(170, now + 0.25);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'chat') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(680, now);
+        osc.frequency.setValueAtTime(920, now + 0.06);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+        osc.start(now);
+        osc.stop(now + 0.16);
+      } else if (type === 'win') {
+        const fanfare = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+        fanfare.forEach((freq, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(freq, now + i * 0.11);
+          g.gain.setValueAtTime(0.16, now + i * 0.11);
+          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.11 + 0.4);
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.start(now + i * 0.11);
+          o.stop(now + i * 0.11 + 0.4);
+        });
+      }
+    }
+
+    document.getElementById('btnSound').onclick = () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById('btnSound').textContent = soundEnabled ? '🔊' : '🔇';
+      showToast(soundEnabled ? 'Efek suara diaktifkan ✨' : 'Efek suara dimatikan 🔇');
+    };
+
+    /* =========================================================================
+       3. NOTIFIKASI KUSTOM & ANIMASI EMOJI
+       ========================================================================= */
+    function showToast(msg, icon = '✨') {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.innerHTML = `<span style="font-size:1.2rem;">${icon}</span><span>${msg}</span>`;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.classList.add('fade-out');
+        setTimeout(() => el.remove(), 300);
+      }, 3000);
+    }
+
+    function spawnFloatingEmoji(emoji) {
+      for (let i = 0; i < 4; i++) {
+        setTimeout(() => {
+          const el = document.createElement('div');
+          el.className = 'floating-emoji';
+          el.textContent = emoji;
+          el.style.left = (15 + Math.random() * 70) + '%';
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 2400);
+        }, i * 140);
+      }
+    }
+
+    /* =========================================================================
+       4. LATAR BELAKANG LANGIT BERBINTANG (HTML5 CANVAS)
+       ========================================================================= */
+    const starCanvas = document.getElementById('starCanvas');
+    const sCtx = starCanvas.getContext('2d');
+    let stars = [];
+    let shootingStars = [];
+
+    function resizeStarCanvas() {
+      starCanvas.width = window.innerWidth;
+      starCanvas.height = window.innerHeight;
+      stars = Array.from({ length: 110 }, () => ({
+        x: Math.random() * starCanvas.width,
+        y: Math.random() * starCanvas.height,
+        r: Math.random() * 1.6 + 0.3,
+        alpha: Math.random(),
+        speed: Math.random() * 0.015 + 0.004
+      }));
+    }
+    window.addEventListener('resize', resizeStarCanvas);
+    resizeStarCanvas();
+
+    function animateStars() {
+      sCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+
+      // Bintang berkelip
+      stars.forEach(st => {
+        st.alpha += st.speed;
+        if (st.alpha > 1 || st.alpha < 0.15) st.speed *= -1;
+        sCtx.beginPath();
+        sCtx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+        sCtx.fillStyle = `rgba(255, 244, 214, ${st.alpha})`;
+        sCtx.fill();
+      });
+
+      // Bintang jatuh sesekali
+      if (Math.random() < 0.012 && shootingStars.length < 2) {
+        shootingStars.push({
+          x: Math.random() * starCanvas.width,
+          y: Math.random() * (starCanvas.height * 0.4),
+          len: Math.random() * 70 + 40,
+          vx: -(Math.random() * 5 + 4),
+          vy: Math.random() * 3 + 2,
+          life: 1
+        });
+      }
+
+      shootingStars.forEach((ss, idx) => {
+        sCtx.beginPath();
+        sCtx.moveTo(ss.x, ss.y);
+        sCtx.lineTo(ss.x - ss.vx * 4, ss.y - ss.vy * 4);
+        sCtx.strokeStyle = `rgba(255, 209, 102, ${ss.life})`;
+        sCtx.lineWidth = 2;
+        sCtx.stroke();
+        ss.x += ss.vx;
+        ss.y += ss.vy;
+        ss.life -= 0.025;
+        if (ss.life <= 0) shootingStars.splice(idx, 1);
+      });
+
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+
+    /* =========================================================================
+       5. KONEKSI P2P (PEERJS) & MANAJEMEN STATE
+       ========================================================================= */
+    let peer = null;
+    let conn = null;
+    let isHost = false;
+    let myZodiac = 'Virgo';
+    let partnerZodiac = 'Sagittarius';
+    let roomCode = '';
+    let unreadChat = 0;
+    let chatOpen = false;
+
+    // Game State
+    let gameState = {
+      mode: null,
+      round: 0,
+      maxRounds: 5,
+      score: 0,
+      maxPossibleScore: 500,
+      questions: [],
+      myAnswer: null,
+      partnerAnswer: null,
+      // Khusus Wavelength
+      clueGiver: 'Virgo',
+      targetNumber: 5,
+      clueWord: '',
+      // Khusus KnowMe
+      knowMePhase: 'answer', // 'answer' atau 'guess'
+      mySelfAnswers: [],
+      partnerSelfAnswers: [],
+      // Timer Draw
+      timerInterval: null
+    };
+
+    function selectZodiac(zodiac) {
+      playSound('click');
+      myZodiac = zodiac;
+      partnerZodiac = zodiac === 'Virgo' ? 'Sagittarius' : 'Virgo';
+      document.getElementById('pickVirgo').classList.toggle('active', zodiac === 'Virgo');
+      document.getElementById('pickSagi').classList.toggle('active', zodiac === 'Sagittarius');
+      document.getElementById('roleBadge').textContent = zodiac === 'Virgo' ? '♍ Virgo' : '♐ Sagittarius';
+    }
+
+    function generateShortId() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let res = 'VS-';
+      for (let i = 0; i < 4; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+      return res;
+    }
+
+    function updateConnectionUI(state, text) {
+      const dot = document.getElementById('statusDot');
+      const label = document.getElementById('statusText');
+      dot.className = 'status-dot ' + state;
+      label.textContent = text;
+    }
+
+    function createRoom() {
+      playSound('click');
+      isHost = true;
+      roomCode = generateShortId();
+      updateConnectionUI('waiting', 'Membuka portal rasi bintang...');
+
+      peer = new Peer(roomCode);
+
+      peer.on('open', (id) => {
+        document.getElementById('displayRoomCode').textContent = id;
+        document.getElementById('inviteSection').classList.remove('hidden');
+        document.getElementById('btnCreateRoom').classList.add('hidden');
+        updateConnectionUI('waiting', 'Menunggu pasangan masuk...');
+        showToast('Ruang bintang berhasil dibuat! Kirim link ke dia ✨', '🌠');
+      });
+
+      peer.on('connection', (connection) => {
+        conn = connection;
+        setupConnectionHandlers();
+      });
+
+      peer.on('error', (err) => {
+        showToast('Gangguan sinyal kosmik: ' + err.type, '⚠️');
+      });
+    }
+
+    function joinRoom(autoCode = null) {
+      playSound('click');
+      const code = (autoCode || document.getElementById('inputJoinCode').value).trim().toUpperCase();
+      if (!code) {
+        showToast('Masukkan kode ruang dulu ya!', '💫');
+        return;
+      }
+      isHost = false;
+      roomCode = code;
+      updateConnectionUI('waiting', 'Menghubungkan ke ruang ' + code + '...');
+
+      peer = new Peer();
+      peer.on('open', () => {
+        conn = peer.connect(code, { reliable: true });
+        setupConnectionHandlers();
+      });
+
+      peer.on('error', () => {
+        showToast('Ruang tidak ditemukan. Cek lagi kodenya!', '❌');
+        updateConnectionUI('', 'Gagal terhubung');
+      });
+    }
+
+    function setupConnectionHandlers() {
+      conn.on('open', () => {
+        playSound('match');
+        updateConnectionUI('online', `Terhubung dengan ${partnerZodiac} 💫`);
+        showToast(`Yeay! ${partnerZodiac} sudah bergabung!`, '🎉');
+        // Kirim info zodiak kita
+        sendData({ type: 'HANDSHAKE', zodiac: myZodiac });
+        switchScreen('screenMenu');
+        document.getElementById('btnHome').classList.remove('hidden');
+      });
+
+      conn.on('data', (data) => {
+        handleIncomingData(data);
+      });
+
+      conn.on('close', () => {
+        updateConnectionUI('', 'Koneksi terputus');
+        showToast('Pasangan terputus dari ruang bintang 😢', '📡');
+      });
+    }
+
+    function sendData(payload) {
+      if (conn && conn.open) {
+        conn.send(payload);
+      }
+    }
+
+    function copyInviteLink() {
+      playSound('click');
+      const url = new URL(window.location.href);
+      url.searchParams.set('room', roomCode);
+      url.searchParams.set('role', myZodiac === 'Virgo' ? 'Sagittarius' : 'Virgo');
+      navigator.clipboard.writeText(url.toString());
+      showToast('Link undangan disalin! Tinggal paste ke chat dia 💌', '🔗');
+    }
+
+    function copyRoomCode() {
+      playSound('click');
+      navigator.clipboard.writeText(roomCode);
+      showToast('Kode ruang ' + roomCode + ' berhasil disalin!', '📋');
+    }
+
+    // Auto-detect parameter URL saat pasangan membuka link undangan
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlRoom = params.get('room');
+      const urlRole = params.get('role');
+      if (urlRole && (urlRole === 'Virgo' || urlRole === 'Sagittarius')) {
+        selectZodiac(urlRole);
+      }
+      if (urlRoom) {
+        document.getElementById('inputJoinCode').value = urlRoom;
+        showToast(`Undangan ke ruang ${urlRoom} terdeteksi! Klik Gabung 🚀`, '💌');
+      }
+    });
+
+    /* =========================================================================
+       6. CHAT LUCU & EMOJI REACTION
+       ========================================================================= */
+    function toggleChat() {
+      playSound('click');
+      chatOpen = !chatOpen;
+      document.getElementById('chatDrawer').classList.toggle('hidden', !chatOpen);
+      if (chatOpen) {
+        unreadChat = 0;
+        document.getElementById('unreadBadge').classList.add('hidden');
+      }
+    }
+
+    function sendChat() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      appendChatMessage(text, true);
+      sendData({ type: 'CHAT', text });
+      input.value = '';
+      playSound('chat');
+    }
+
+    function sendQuickChat(text) {
+      appendChatMessage(text, true);
+      sendData({ type: 'CHAT', text });
+      playSound('chat');
+    }
+
+    function appendChatMessage(text, isMe) {
+      const box = document.getElementById('chatMessages');
+      if (box.children.length === 1 && box.children[0].style.textAlign === 'center') {
+        box.innerHTML = '';
+      }
+      const div = document.createElement('div');
+      div.className = 'msg-bubble ' + (isMe ? 'msg-me' : 'msg-partner');
+      div.textContent = text;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+
+      if (!isMe && !chatOpen) {
+        unreadChat++;
+        const badge = document.getElementById('unreadBadge');
+        badge.textContent = unreadChat;
+        badge.classList.remove('hidden');
+        showToast(`${partnerZodiac}: ${text}`, '💬');
+      }
+    }
+
+    function sendReaction(emoji) {
+      playSound('click');
+      spawnFloatingEmoji(emoji);
+      sendData({ type: 'EMOJI', emoji });
+    }
+
+    /* =========================================================================
+       7. ROUTING SCREEN & HANDLER DATA P2P
+       ========================================================================= */
+    function switchScreen(screenId) {
+      ['screenLobby', 'screenMenu', 'screenGame', 'screenResult'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    function requestBackToMenu() {
+      playSound('click');
+      clearInterval(gameState.timerInterval);
+      switchScreen('screenMenu');
+      sendData({ type: 'BACK_MENU' });
+    }
+
+    document.getElementById('btnHome').onclick = requestBackToMenu;
+
+    function pickRandomQuestions(arr, count) {
+      const shuffled = [...arr].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+
+    function handleIncomingData(data) {
+      switch (data.type) {
+        case 'HANDSHAKE':
+          partnerZodiac = data.zodiac;
+          if (partnerZodiac === myZodiac) {
+            // Otomatis sesuaikan agar tidak kembar
+            selectZodiac(partnerZodiac === 'Virgo' ? 'Sagittarius' : 'Virgo');
+          }
+          updateConnectionUI('online', `Terhubung dengan ${partnerZodiac} 💫`);
+          break;
+
+        case 'CHAT':
+          playSound('chat');
+          appendChatMessage(data.text, false);
+          break;
+
+        case 'EMOJI':
+          spawnFloatingEmoji(data.emoji);
+          break;
+
+        case 'BACK_MENU':
+          clearInterval(gameState.timerInterval);
+          switchScreen('screenMenu');
+          showToast(`${partnerZodiac} kembali ke menu utama`, '🏠');
+          break;
+
+        case 'START_GAME':
+          initGameSession(data.mode, data.questions, data.targetNumber);
+          break;
+
+        case 'SUBMIT_ANSWER':
+          gameState.partnerAnswer = data.answer;
+          checkRoundCompletion();
+          break;
+
+        case 'WAVELENGTH_CLUE':
+          gameState.clueWord = data.clue;
+          renderWavelengthGuess();
+          break;
+
+        case 'VALIDATE_MATCH':
+          // Pasangan menekan tombol "Sah / Cocok!" pada Mind Sync
+          playSound('match');
+          gameState.score += 100;
+          updateHUD();
+          showToast('Disepakati SAH! +100 Poin Kecocokan! 💖', '🎉');
+          document.getElementById('btnNextRound').disabled = false;
+          const validateBtn = document.getElementById('btnValidateSync');
+          if (validateBtn) validateBtn.remove();
+          break;
+
+        case 'NEXT_ROUND':
+          advanceRound(data.nextTarget);
+          break;
+      }
+    }
+
+    /* =========================================================================
+       8. LOGIKA 5 MODE GAME KECOCOKAN
+       ========================================================================= */
+    function startGame(mode) {
+      playSound('click');
+      const count = mode === 'draw' ? 3 : 5;
+      const selectedQuestions = pickRandomQuestions(QUESTION_BANK[mode], count);
+      const firstTarget = Math.floor(Math.random() * 10) + 1;
+
+      sendData({
+        type: 'START_GAME',
+        mode,
+        questions: selectedQuestions,
+        targetNumber: firstTarget
+      });
+
+      initGameSession(mode, selectedQuestions, firstTarget);
+    }
+
+    function initGameSession(mode, questions, targetNumber) {
+      clearInterval(gameState.timerInterval);
+      gameState = {
+        mode,
+        round: 0,
+        maxRounds: questions.length,
+        score: 0,
+        maxPossibleScore: questions.length * 100,
+        questions,
+        myAnswer: null,
+        partnerAnswer: null,
+        clueGiver: 'Virgo',
+        targetNumber,
+        clueWord: '',
+        knowMePhase: 'answer',
+        mySelfAnswers: [],
+        partnerSelfAnswers: [],
+        timerInterval: null
+      };
+
+      const titles = {
+        tot: '⚡ This or That',
+        mindsync: '🔮 Mind Sync',
+        wavelength: '🎚️ Wavelength',
+        knowme: '💌 Seberapa Kenal Aku?',
+        draw: '🎨 Draw & Match'
+      };
+
+      document.getElementById('hudTitle').textContent = titles[mode];
+      switchScreen('screenGame');
+      renderCurrentRound();
+    }
+
+    function updateHUD() {
+      const phaseLabel = gameState.mode === 'knowme'
+        ? (gameState.knowMePhase === 'answer' ? 'Babak Jawab' : 'Babak Tebak') + ' • '
+        : '';
+      document.getElementById('hudRound').textContent = `${phaseLabel}Ronde ${gameState.round + 1}/${gameState.maxRounds}`;
+      document.getElementById('hudScore').textContent = `✨ ${gameState.score} Poin`;
+    }
+
+    function renderCurrentRound() {
+      updateHUD();
+      gameState.myAnswer = null;
+      gameState.partnerAnswer = null;
+      const area = document.getElementById('gamePlayArea');
+      const q = gameState.questions[gameState.round];
+
+      // --- MODE 1: THIS OR THAT ---
+      if (gameState.mode === 'tot') {
+        area.innerHTML = `
+          <div class="question-box">Pilih yang paling menggambarkan dirimu!</div>
+          <div class="tot-options">
+            <button class="tot-btn" id="optA" onclick="submitToT('A')">${q.a}</button>
+            <button class="tot-btn" id="optB" onclick="submitToT('B')">${q.b}</button>
+          </div>
+          <div id="waitStatus" style="text-align:center; margin-top:14px; font-size:0.82rem; color:var(--text-muted);"></div>
+        `;
+      }
+
+      // --- MODE 2: MIND SYNC ---
+      else if (gameState.mode === 'mindsync') {
+        area.innerHTML = `
+          <div class="question-box">"${q}"</div>
+          <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
+            Ketik jawaban yang kira-kira bakal sama dengan jawaban ${partnerZodiac}!
+          </p>
+          <input type="text" id="mindInput" placeholder="Ketik jawaban telepatimu..." />
+          <button class="btn btn-primary" style="margin-top:12px;" id="btnLockMind" onclick="submitMindSync()">
+            🔒 Kunci Jawaban
+          </button>
+          <div id="waitStatus" style="text-align:center; margin-top:14px; font-size:0.82rem; color:var(--text-muted);"></div>
+        `;
+      }
+
+      // --- MODE 3: WAVELENGTH ---
+      else if (gameState.mode === 'wavelength') {
+        const amIGiver = gameState.clueGiver === myZodiac;
+        if (amIGiver) {
+          area.innerHTML = `
+            <div style="text-align:center; font-size:0.82rem; color:var(--gold); font-weight:700;">
+              Giliranmu memberi petunjuk untuk ${partnerZodiac}!
+            </div>
+            <div class="spectrum-labels">
+              <span style="color:var(--virgo-color);">${q.left} (1)</span>
+              <span style="color:var(--sagi-color);">(10) ${q.right}</span>
+            </div>
+            <div style="background:rgba(255,209,102,0.12); border:1px solid var(--gold); border-radius:14px; padding:12px; text-align:center; margin:12px 0;">
+              <div style="font-size:0.78rem; color:var(--text-muted);">Angka Target Rahasia:</div>
+              <div style="font-size:2rem; font-weight:800; color:var(--gold);">${gameState.targetNumber} / 10</div>
+            </div>
+            <input type="text" id="clueInput" placeholder="Tulis 1-2 kata petunjuk..." />
+            <button class="btn btn-primary" style="margin-top:12px;" onclick="sendWavelengthClue()">
+              📡 Kirim Petunjuk ke ${partnerZodiac}
+            </button>
+          `;
+        } else {
+          area.innerHTML = `
+            <div class="question-box">Menunggu ${partnerZodiac} merangkai kata petunjuk... 🔮</div>
+            <div class="spectrum-labels">
+              <span style="color:var(--virgo-color);">${q.left} (1)</span>
+              <span style="color:var(--sagi-color);">(10) ${q.right}</span>
+            </div>
+          `;
+        }
+      }
+
+      // --- MODE 4: SEBERAPA KENAL AKU ---
+      else if (gameState.mode === 'knowme') {
+        const isAnswerPhase = gameState.knowMePhase === 'answer';
+        area.innerHTML = `
+          <div style="text-align:center; font-size:0.78rem; color:var(--gold); font-weight:700;">
+            ${isAnswerPhase ? 'TAHAP 1: Jawab jujur tentang DIRIMU SENDIRI' : `TAHAP 2: Tebak apa jawaban ${partnerZodiac}!`}
+          </div>
+          <div class="question-box">"${q}"</div>
+          <input type="text" id="knowMeInput" placeholder="${isAnswerPhase ? 'Jawaban tentang diriku...' : `Tebakan jawaban ${partnerZodiac}...`}" />
+          <button class="btn btn-primary" style="margin-top:12px;" id="btnLockKnow" onclick="submitKnowMe()">
+            ✨ Kirim Jawaban
+          </button>
+          <div id="waitStatus" style="text-align:center; margin-top:14px; font-size:0.82rem; color:var(--text-muted);"></div>
+        `;
+      }
+
+      // --- MODE 5: DRAW & MATCH ---
+      else if (gameState.mode === 'draw') {
+        area.innerHTML = `
+          <div style="text-align:center; font-weight:700; color:var(--gold); margin-bottom:6px;">
+            Tema: "${q}"
+          </div>
+          <div style="text-align:center; font-size:0.82rem; color:var(--danger); font-weight:700; margin-bottom:8px;">
+            ⏱️ Sisa Waktu: <span id="drawTimer">30</span> detik
+          </div>
+          <div class="draw-wrapper">
+            <canvas id="drawCanvas" width="320" height="260"></canvas>
+            <div class="color-palette">
+              <div class="color-dot active" style="background:#ffd166;" onclick="setBrushColor('#ffd166', this)"></div>
+              <div class="color-dot" style="background:#6ee7b7;" onclick="setBrushColor('#6ee7b7', this)"></div>
+              <div class="color-dot" style="background:#f472b6;" onclick="setBrushColor('#f472b6', this)"></div>
+              <div class="color-dot" style="background:#60a5fa;" onclick="setBrushColor('#60a5fa', this)"></div>
+              <div class="color-dot" style="background:#ffffff;" onclick="setBrushColor('#ffffff', this)"></div>
+              <button class="btn btn-outline btn-sm" onclick="clearDrawingCanvas()">🗑️ Hapus</button>
+            </div>
+            <button class="btn btn-success" id="btnFinishDraw" onclick="finishDrawing()">✅ Selesai Menggambar</button>
+          </div>
+          <div id="waitStatus" style="text-align:center; margin-top:8px; font-size:0.8rem; color:var(--text-muted);"></div>
+        `;
+        setupDrawingCanvas();
+      }
+    }
+
+    /* --- HANDLER SUB-GAME --- */
+    function submitToT(choice) {
+      if (gameState.myAnswer) return;
+      playSound('click');
+      gameState.myAnswer = choice;
+      document.getElementById('opt' + choice).classList.add('selected');
+      document.getElementById('waitStatus').textContent = `Menunggu ${partnerZodiac} memilih... ⏳`;
+      sendData({ type: 'SUBMIT_ANSWER', answer: choice });
+      checkRoundCompletion();
+    }
+
+    function submitMindSync() {
+      const val = document.getElementById('mindInput').value.trim();
+      if (!val) {
+        showToast('Isi jawabannya dulu ya!', '✍️');
+        return;
+      }
+      playSound('click');
+      gameState.myAnswer = val;
+      document.getElementById('mindInput').disabled = true;
+      document.getElementById('btnLockMind').disabled = true;
+      document.getElementById('waitStatus').textContent = `Jawaban dikunci! Menunggu ${partnerZodiac}... 🔒`;
+      sendData({ type: 'SUBMIT_ANSWER', answer: val });
+      checkRoundCompletion();
+    }
+
+    function sendWavelengthClue() {
+      const clue = document.getElementById('clueInput').value.trim();
+      if (!clue) {
+        showToast('Tulis kata petunjuk dulu!', '💡');
+        return;
+      }
+      playSound('click');
+      gameState.clueWord = clue;
+      sendData({ type: 'WAVELENGTH_CLUE', clue });
+      document.getElementById('gamePlayArea').innerHTML = `
+        <div class="question-box">Petunjuk "${clue}" terkirim! 🚀</div>
+        <p style="text-align:center; font-size:0.85rem; color:var(--text-muted);">
+          Menunggu ${partnerZodiac} menggeser spektrum tebakannya...
+        </p>
+      `;
+    }
+
+    function renderWavelengthGuess() {
+      const q = gameState.questions[gameState.round];
+      const area = document.getElementById('gamePlayArea');
+      area.innerHTML = `
+        <div style="text-align:center; font-size:0.82rem; color:var(--text-muted);">Petunjuk dari ${partnerZodiac}:</div>
+        <div style="background:rgba(255,209,102,0.14); border:1px solid var(--gold); border-radius:14px; padding:12px; text-align:center; margin:8px 0 14px; font-size:1.25rem; font-weight:800; color:var(--gold);">
+          "${gameState.clueWord}"
+        </div>
+        <div class="spectrum-labels">
+          <span style="color:var(--virgo-color);">${q.left} (1)</span>
+          <span style="color:var(--sagi-color);">(10) ${q.right}</span>
+        </div>
+        <input type="range" id="waveSlider" min="1" max="10" value="5" oninput="document.getElementById('sliderVal').textContent = this.value" />
+        <div style="text-align:center; font-size:1.3rem; font-weight:800; color:var(--gold); margin:8px 0;">
+          Tebakanmu: <span id="sliderVal">5</span>
+        </div>
+        <button class="btn btn-primary" onclick="submitWavelengthGuess()">🎯 Kunci Tebakan</button>
+      `;
+    }
+
+    function submitWavelengthGuess() {
+      playSound('click');
+      const guess = parseInt(document.getElementById('waveSlider').value, 10);
+      gameState.myAnswer = guess;
+      gameState.partnerAnswer = gameState.targetNumber;
+      sendData({ type: 'SUBMIT_ANSWER', answer: guess });
+      revealWavelengthResult(guess, gameState.targetNumber);
+    }
+
+    function submitKnowMe() {
+      const val = document.getElementById('knowMeInput').value.trim();
+      if (!val) {
+        showToast('Jangan dikosongin dong jawabannya 😄', '✍️');
+        return;
+      }
+      playSound('click');
+      gameState.myAnswer = val;
+      document.getElementById('knowMeInput').disabled = true;
+      document.getElementById('btnLockKnow').disabled = true;
+      document.getElementById('waitStatus').textContent = `Terkirim! Menunggu ${partnerZodiac}... ⏳`;
+      sendData({ type: 'SUBMIT_ANSWER', answer: val });
+      checkRoundCompletion();
+    }
+
+    /* --- KANVAS GAMBAR --- */
+    let currentBrushColor = '#ffd166';
+    let isDrawing = false;
+
+    function setBrushColor(color, el) {
+      currentBrushColor = color;
+      document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function clearDrawingCanvas() {
+      const c = document.getElementById('drawCanvas');
+      if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height);
+    }
+
+    function setupDrawingCanvas() {
+      const canvas = document.getElementById('drawCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+
+      const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: (clientX - rect.left) * (canvas.width / rect.width),
+          y: (clientY - rect.top) * (canvas.height / rect.height)
+        };
+      };
+
+      const start = (e) => {
+        isDrawing = true;
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+      };
+
+      const move = (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        ctx.strokeStyle = currentBrushColor;
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      };
+
+      const end = () => { isDrawing = false; };
+
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', move);
+      window.addEventListener('mouseup', end);
+
+      canvas.addEventListener('touchstart', start, { passive: false });
+      canvas.addEventListener('touchmove', move, { passive: false });
+      canvas.addEventListener('touchend', end);
+
+      // Hitung mundur 30 detik
+      let timeLeft = 30;
+      gameState.timerInterval = setInterval(() => {
+        timeLeft--;
+        const timerEl = document.getElementById('drawTimer');
+        if (timerEl) timerEl.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(gameState.timerInterval);
+          finishDrawing();
+        }
+      }, 1000);
+    }
+
+    function finishDrawing() {
+      if (gameState.myAnswer) return;
+      clearInterval(gameState.timerInterval);
+      playSound('click');
+      const canvas = document.getElementById('drawCanvas');
+      const dataUrl = canvas.toDataURL('image/png', 0.6);
+      gameState.myAnswer = dataUrl;
+      const btn = document.getElementById('btnFinishDraw');
+      if (btn) btn.disabled = true;
+      document.getElementById('waitStatus').textContent = `Gambar terkirim! Menunggu karya ${partnerZodiac}... 🎨`;
+      sendData({ type: 'SUBMIT_ANSWER', answer: dataUrl });
+      checkRoundCompletion();
+    }
+
+    /* =========================================================================
+       9. PENGECEKAN HASIL RONDE & REVEAL
+       ========================================================================= */
+    function checkRoundCompletion() {
+      if (gameState.mode === 'wavelength') {
+        // Jika saya pemberi petunjuk dan pasangan sudah menebak
+        if (gameState.clueGiver === myZodiac && gameState.partnerAnswer !== null) {
+          revealWavelengthResult(gameState.partnerAnswer, gameState.targetNumber);
+        }
+        return;
+      }
+
+      if (gameState.myAnswer === null || gameState.partnerAnswer === null) return;
+
+      const area = document.getElementById('gamePlayArea');
+      const q = gameState.questions[gameState.round];
+
+      // --- HASIL THIS OR THAT ---
+      if (gameState.mode === 'tot') {
+        const isMatch = gameState.myAnswer === gameState.partnerAnswer;
+        if (isMatch) {
+          gameState.score += 100;
+          playSound('match');
+          spawnFloatingEmoji('💖');
+        } else {
+          playSound('miss');
+        }
+        updateHUD();
+
+        const myLabel = gameState.myAnswer === 'A' ? q.a : q.b;
+        const partnerLabel = gameState.partnerAnswer === 'A' ? q.a : q.b;
+
+        area.innerHTML = `
+          <div style="text-align:center; font-size:1.2rem; font-weight:800; color:${isMatch ? 'var(--success)' : 'var(--danger)'};">
+            ${isMatch ? '✨ SEHATI! +100 Poin!' : '😅 Beda Selera! +0 Poin'}
+          </div>
+          <div class="reveal-grid">
+            <div class="reveal-card"><span class="who">${myZodiac} (Kamu)</span><strong>${myLabel}</strong></div>
+            <div class="reveal-card"><span class="who">${partnerZodiac}</span><strong>${partnerLabel}</strong></div>
+          </div>
+          ${renderNextButton()}
+        `;
+      }
+
+      // --- HASIL MIND SYNC ---
+      else if (gameState.mode === 'mindsync') {
+        const exactMatch = gameState.myAnswer.toLowerCase() === gameState.partnerAnswer.toLowerCase();
+        if (exactMatch) {
+          gameState.score += 100;
+          playSound('match');
+          spawnFloatingEmoji('🔮');
+        } else {
+          playSound('click');
+        }
+        updateHUD();
+
+        area.innerHTML = `
+          <div style="text-align:center; font-size:1.1rem; font-weight:800; color:${exactMatch ? 'var(--success)' : 'var(--gold)'};">
+            ${exactMatch ? '🎯 TELEPATI SEMPURNA! +100 Poin!' : '🤔 Hmm, Mirip Nggak Nih?'}
+          </div>
+          <div class="reveal-grid">
+            <div class="reveal-card"><span class="who">${myZodiac}</span><strong>"${gameState.myAnswer}"</strong></div>
+            <div class="reveal-card"><span class="who">${partnerZodiac}</span><strong>"${gameState.partnerAnswer}"</strong></div>
+          </div>
+          ${!exactMatch ? `
+            <button class="btn btn-success" id="btnValidateSync" style="margin-bottom:10px;" onclick="validateMatchManually()">
+              🤝 Anggap Sah / Cocok! (+100 Poin)
+            </button>
+          ` : ''}
+          ${renderNextButton()}
+        `;
+      }
+
+      // --- HASIL SEBERAPA KENAL AKU ---
+      else if (gameState.mode === 'knowme') {
+        if (gameState.knowMePhase === 'answer') {
+          // Simpan jawaban babak 1, langsung lanjut ke ronde berikutnya atau masuk babak tebak
+          gameState.mySelfAnswers.push(gameState.myAnswer);
+          gameState.partnerSelfAnswers.push(gameState.partnerAnswer);
+          showToast('Jawaban tersimpan rahasia! Lanjut... 🤫', '💌');
+          setTimeout(() => {
+            if (isHost) triggerNextRound();
+          }, 900);
+        } else {
+          // Babak Tebak: bandingkan tebakanku dengan jawaban asli pasangan, & tebakan pasangan dengan jawabanku
+          const actualPartnerAns = gameState.partnerSelfAnswers[gameState.round];
+          const actualMyAns = gameState.mySelfAnswers[gameState.round];
+          const iGuessedRight = gameState.myAnswer.toLowerCase() === actualPartnerAns.toLowerCase();
+          const partnerGuessedRight = gameState.partnerAnswer.toLowerCase() === actualMyAns.toLowerCase();
+
+          let gained = 0;
+          if (iGuessedRight) gained += 50;
+          if (partnerGuessedRight) gained += 50;
+          gameState.score += gained;
+          if (gained > 0) playSound('match'); else playSound('click');
+          updateHUD();
+
+          area.innerHTML = `
+            <div style="text-align:center; font-size:1.05rem; font-weight:800; color:var(--gold);">
+              Hasil Tebakan Ronde Ini (+${gained} Poin)
+            </div>
+            <div class="reveal-grid">
+              <div class="reveal-card">
+                <span class="who">Jawaban Asli ${partnerZodiac}</span>
+                <strong style="color:var(--sagi-color);">${actualPartnerAns}</strong>
+                <div style="font-size:0.75rem; margin-top:6px; color:var(--text-muted);">Tebakanmu: "${gameState.myAnswer}"</div>
+              </div>
+              <div class="reveal-card">
+                <span class="who">Jawaban Asli Kamu</span>
+                <strong style="color:var(--virgo-color);">${actualMyAns}</strong>
+                <div style="font-size:0.75rem; margin-top:6px; color:var(--text-muted);">Tebakan Dia: "${gameState.partnerAnswer}"</div>
+              </div>
+            </div>
+            <button class="btn btn-success" id="btnValidateSync" style="margin-bottom:10px;" onclick="validateMatchManually()">
+              💖 Tebakan Mirip / Sah! (+100 Poin)
+            </button>
+            ${renderNextButton()}
+          `;
+        }
+      }
+
+      // --- HASIL DRAW & MATCH ---
+      else if (gameState.mode === 'draw') {
+        playSound('match');
+        area.innerHTML = `
+          <div style="text-align:center; font-size:1.1rem; font-weight:800; color:var(--gold);">
+            🎨 Mahakarya Virgo & Sagittarius!
+          </div>
+          <div class="reveal-grid">
+            <div class="reveal-card">
+              <span class="who">${myZodiac}</span>
+              <img src="${gameState.myAnswer}" style="width:100%; border-radius:10px; border:1px solid rgba(255,255,255,0.2);" />
+            </div>
+            <div class="reveal-card">
+              <span class="who">${partnerZodiac}</span>
+              <img src="${gameState.partnerAnswer}" style="width:100%; border-radius:10px; border:1px solid rgba(255,255,255,0.2);" />
+            </div>
+          </div>
+          <button class="btn btn-success" id="btnValidateSync" style="margin-bottom:10px;" onclick="validateMatchManually()">
+            🌟 Gambar Kita Sekonsep! (+100 Poin)
+          </button>
+          ${renderNextButton()}
+        `;
+      }
+    }
+
+    function revealWavelengthResult(guess, target) {
+      const diff = Math.abs(guess - target);
+      let pts = 0;
+      let label = '😅 Jauh Banget!';
+      if (diff === 0) { pts = 100; label = '🎯 TEPAT SASARAN! +100 Poin!'; playSound('match'); spawnFloatingEmoji('🔥'); }
+      else if (diff === 1) { pts = 75; label = '✨ Nyaris Tepat! +75 Poin!'; playSound('match'); }
+      else if (diff === 2) { pts = 50; label = '👍 Lumayan Dekat! +50 Poin!'; playSound('click'); }
+      else { playSound('miss'); }
+
+      gameState.score += pts;
+      updateHUD();
+
+      const area = document.getElementById('gamePlayArea');
+      area.innerHTML = `
+        <div style="text-align:center; font-size:1.15rem; font-weight:800; color:var(--gold); margin-bottom:10px;">
+          ${label}
+        </div>
+        <div class="reveal-grid">
+          <div class="reveal-card"><span class="who">Angka Target</span><strong style="font-size:1.5rem; color:var(--gold);">${target}</strong></div>
+          <div class="reveal-card"><span class="who">Tebakan Spektrum</span><strong style="font-size:1.5rem; color:var(--virgo-color);">${guess}</strong></div>
+        </div>
+        ${renderNextButton()}
+      `;
+    }
+
+    function validateMatchManually() {
+      playSound('match');
+      gameState.score += 100;
+      updateHUD();
+      showToast('Kecocokan disahkan! +100 Poin ✨', '💖');
+      const btn = document.getElementById('btnValidateSync');
+      if (btn) btn.remove();
+      sendData({ type: 'VALIDATE_MATCH' });
+    }
+
+    function renderNextButton() {
+      if (!isHost) {
+        return `<div style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-top:8px;">Menunggu Host melanjutkan ronde... ✨</div>`;
+      }
+      const isLast = gameState.round + 1 >= gameState.maxRounds;
+      return `
+        <button class="btn btn-primary" id="btnNextRound" onclick="triggerNextRound()">
+          ${isLast ? '🏆 Lihat Hasil Kecocokan' : '➡️ Ronde Berikutnya'}
+        </button>
+      `;
+    }
+
+    function triggerNextRound() {
+      playSound('click');
+      const nextTarget = Math.floor(Math.random() * 10) + 1;
+      sendData({ type: 'NEXT_ROUND', nextTarget });
+      advanceRound(nextTarget);
+    }
+
+    function advanceRound(nextTarget) {
+      gameState.round++;
+      gameState.targetNumber = nextTarget;
+      gameState.clueGiver = gameState.clueGiver === 'Virgo' ? 'Sagittarius' : 'Virgo';
+
+      if (gameState.round >= gameState.maxRounds) {
+        // Khusus KnowMe: setelah selesai babak jawab, pindah ke babak tebak
+        if (gameState.mode === 'knowme' && gameState.knowMePhase === 'answer') {
+          gameState.knowMePhase = 'guess';
+          gameState.round = 0;
+          showToast('Sekarang giliran menebak jawaban pasanganmu! 🔮', '💌');
+          renderCurrentRound();
+          return;
+        }
+        showFinalResult();
+      } else {
+        renderCurrentRound();
+      }
+    }
+
+    function showFinalResult() {
+      playSound('win');
+      spawnFloatingEmoji('💖');
+      spawnFloatingEmoji('✨');
+      switchScreen('screenResult');
+
+      const pct = Math.min(100, Math.round((gameState.score / gameState.maxPossibleScore) * 100));
+      document.getElementById('finalPercent').textContent = pct + '%';
+
+      let rank = 'Belahan Jiwa Kosmik 🌌';
+      let desc = 'Keseimbangan sempurna antara ketelitian Virgo dan jiwa bebas Sagittarius. Telepati kalian luar biasa!';
+      if (pct < 50) {
+        rank = 'Kutub Magnet Saling Melengkapi 🧲';
+        desc = 'Kalian punya cara pandang berbeda yang justru bikin hubungan selalu penuh warna dan kejutan baru!';
+      } else if (pct < 80) {
+        rank = 'Harmoni Rasi Bintang ✨';
+        desc = 'Sudah sangat saling memahami, dengan sedikit ruang misteri yang bikin makin penasaran satu sama lain.';
+      }
+
+      document.getElementById('finalRankTitle').textContent = rank;
+      document.getElementById('finalRankDesc').textContent = desc;
+    }
+  </script>
+</body>
+</html>
