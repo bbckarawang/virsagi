@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Connect 4 Kosmik — Virgo ♍ vs Sagitarius ♐</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PeerJS untuk Koneksi P2P Tanpa Firebase -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <!-- Google Fonts: Cinzel, Plus Jakarta Sans & JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=JetBrains+Mono:wght@600;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --space-void: #040510;
+      --space-deep: #0b0e26;
+      --nebula-purple: #2e1065;
+      --nebula-emerald: #064e3b;
+      --virgo-emerald: #10b981;
+      --virgo-silver: #e2e8f0;
+      --sag-purple: #9333ea;
+      --sag-gold: #fbbf24;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--space-void);
+      color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100dvh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .font-cosmic {
+      font-family: 'Cinzel', serif;
+    }
+
+    /* ==================== LATAR BELAKANG KOSMIK & NEBULA ==================== */
+    .cosmos-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 18% 18%, rgba(16, 185, 129, 0.22) 0%, transparent 48%),
+        radial-gradient(ellipse at 82% 22%, rgba(147, 51, 234, 0.26) 0%, transparent 52%),
+        radial-gradient(ellipse at 50% 88%, rgba(251, 191, 36, 0.14) 0%, transparent 55%),
+        radial-gradient(circle at 50% 50%, #0d1230 0%, #040510 100%);
+      overflow: hidden;
+    }
+
+    /* Cincin Orbit Kosmik Halus */
+    .cosmic-orbit {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 50%;
+      border: 1px dashed rgba(226, 232, 240, 0.08);
+      transform: translate(-50%, -50%);
+      animation: orbitSpin 90s linear infinite;
+    }
+    .cosmic-orbit-1 { width: 520px; height: 520px; }
+    .cosmic-orbit-2 { width: 840px; height: 840px; animation-direction: reverse; animation-duration: 140s; border-color: rgba(251, 191, 36, 0.07); }
+
+    @keyframes orbitSpin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* Lapisan Bintang Berkelip */
+    .star-dot {
+      position: absolute;
+      border-radius: 50%;
+      background: #ffffff;
+      animation: starTwinkle var(--twinkle-dur, 3s) ease-in-out infinite alternate;
+      opacity: var(--star-op, 0.7);
+    }
+
+    @keyframes starTwinkle {
+      0% { opacity: 0.15; transform: scale(0.8); }
+      100% { opacity: 0.95; transform: scale(1.25); }
+    }
+
+    /* ==================== PAPAN KOSMIK CONNECT 4 ==================== */
+    .c4-board-frame {
+      background: linear-gradient(160deg, rgba(20, 27, 65, 0.92) 0%, rgba(11, 15, 42, 0.96) 55%, rgba(26, 16, 56, 0.94) 100%);
+      backdrop-filter: blur(12px);
+      border: 2px solid rgba(167, 243, 208, 0.35);
+      box-shadow:
+        0 24px 50px rgba(0, 0, 0, 0.85),
+        0 0 35px rgba(139, 92, 246, 0.22),
+        inset 0 1px 2px rgba(255, 255, 255, 0.28),
+        0 8px 0 #070a1f;
+      border-radius: 22px;
+      padding: 10px;
+      position: relative;
+    }
+
+    @media (min-width: 640px) {
+      .c4-board-frame {
+        padding: 14px;
+        border-radius: 26px;
+      }
+    }
+
+    /* Lubang Slot Papan Kosmik (Overflow visible agar animasi jatuh dari atas papan terlihat nyata!) */
+    .c4-cell {
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #03040c 0%, #080c24 72%, #131b45 100%);
+      box-shadow:
+        inset 0 5px 10px rgba(0, 0, 0, 0.92),
+        0 0 0 1px rgba(148, 163, 184, 0.18),
+        0 1px 0 rgba(255, 255, 255, 0.16);
+      position: relative;
+      overflow: visible;
+    }
+
+    /* ==================== ORB ZODIAK VIRGO (1) & SAGITARIUS (2) ==================== */
+    .disc {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      will-change: transform;
+      z-index: 5;
+    }
+
+    /* Virgo: Zamrud Kosmik & Perak Bintang */
+    .disc-1 {
+      background: radial-gradient(circle at 30% 28%, #ecfdf5 0%, #6ee7b7 22%, #10b981 55%, #065f46 88%, #022c22 100%);
+      box-shadow:
+        inset 0 0 0 2.5px rgba(226, 232, 240, 0.65),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.55),
+        0 0 12px rgba(16, 185, 129, 0.45);
+      color: #ecfdf5;
+    }
+
+    /* Sagitarius: Ungu Nebula & Emas Kosmik */
+    .disc-2 {
+      background: radial-gradient(circle at 30% 28%, #fef3c7 0%, #fbbf24 24%, #9333ea 58%, #581c87 88%, #2e1065 100%);
+      box-shadow:
+        inset 0 0 0 2.5px rgba(253, 224, 71, 0.7),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.55),
+        0 0 12px rgba(251, 191, 36, 0.45);
+      color: #fef08a;
+    }
+
+    /* Cincin astral & lambang zodiak di tengah orb */
+    .disc::before {
+      content: '';
+      position: absolute;
+      inset: 13%;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      pointer-events: none;
+    }
+
+    .disc-symbol {
+      font-size: clamp(0.85rem, 3.2vw, 1.3rem);
+      font-weight: 900;
+      line-height: 1;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
+      pointer-events: none;
+    }
+
+    /* ==================== FISIKA JATUH GRAVITASI & PANTULAN GANDA REALISTIS ==================== */
+    /* Kurva menggunakan timing per-segmen untuk simulasi percepatan gravitasi g dan pantulan meredam */
+    @keyframes cosmicGravityDrop {
+      0% {
+        transform: translateY(var(--drop-start, -280px)) scale(0.95);
+        animation-timing-function: cubic-bezier(0.55, 0.03, 0.85, 0.35); /* Percepatan gravitasi jatuh bebas */
+      }
+      56% {
+        transform: translateY(0px) scaleY(0.92) scaleX(1.06); /* Tumbukan pertama + sedikit kompresi elastis */
+        animation-timing-function: cubic-bezier(0.18, 0.82, 0.36, 1); /* Melambat naik saat memantul */
+      }
+      73% {
+        transform: translateY(var(--bounce-1, -24px)) scale(1); /* Puncak pantulan 1 (~18% tinggi) */
+        animation-timing-function: cubic-bezier(0.55, 0.04, 0.85, 0.4); /* Jatuh kembali */
+      }
+      86% {
+        transform: translateY(0px) scaleY(0.96) scaleX(1.03); /* Tumbukan kedua */
+        animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
+      }
+      94% {
+        transform: translateY(var(--bounce-2, -7px)) scale(1); /* Pantulan mikro ke-2 */
+        animation-timing-function: ease-in;
+      }
+      100% {
+        transform: translateY(0px) scale(1); /* Diam stabil di slot */
+      }
+    }
+
+    .disc-drop {
+      animation: cosmicGravityDrop var(--drop-duration, 0.56s) forwards;
+      z-index: 20;
+    }
+
+    /* Efek Gelombang Kilau Kosmik saat Koin Mendarat */
+    @keyframes impactRing {
+      0% {
+        opacity: 0.95;
+        transform: scale(0.75);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.65);
+      }
+    }
+    .impact-shockwave {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid var(--shock-color, #6ee7b7);
+      box-shadow: 0 0 12px var(--shock-color, #6ee7b7);
+      pointer-events: none;
+      animation: impactRing 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      z-index: 15;
+    }
+
+    /* Sorotan 4 Orb Kemenangan Zodiak */
+    @keyframes winConstellationPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 3px #ffffff, 0 0 22px #fbbf24;
+      }
+      50% {
+        transform: scale(0.92);
+        box-shadow: 0 0 0 5px #34d399, 0 0 32px #34d399;
+      }
+    }
+    .disc-winner {
+      animation: winConstellationPulse 0.95s infinite ease-in-out;
+      z-index: 12;
+    }
+
+    /* Kolom Interaktif Hover / Tap */
+    .c4-col-btn {
+      cursor: pointer;
+      border-radius: 14px;
+      transition: background-color 0.15s ease;
+    }
+    .c4-col-btn:hover {
+      background-color: rgba(255, 255, 255, 0.04);
+    }
+
+    /* Animasi Floating Chat & Emoji */
+    @keyframes floatBubble {
+      0% { opacity: 0; transform: translateY(10px) scale(0.7); }
+      15% { opacity: 1; transform: translateY(0) scale(1.08); }
+      25% { transform: translateY(0) scale(1); }
+      85% { opacity: 1; transform: translateY(-6px) scale(1); }
+      100% { opacity: 0; transform: translateY(-18px) scale(0.9); }
+    }
+    .chat-bubble-anim {
+      animation: floatBubble 3.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes pulseTurnVirgo {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.75); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    @keyframes pulseTurnSag {
+      0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.75); }
+      70% { box-shadow: 0 0 0 8px rgba(251, 191, 36, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+    }
+    .active-turn-virgo {
+      animation: pulseTurnVirgo 1.5s infinite;
+      border-color: #10b981 !important;
+    }
+    .active-turn-sag {
+      animation: pulseTurnSag 1.5s infinite;
+      border-color: #fbbf24 !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== LATAR BELAKANG NEBULA & BINTANG ==================== -->
+  <div id="cosmos-backdrop" class="cosmos-backdrop">
+    <div class="cosmic-orbit cosmic-orbit-1"></div>
+    <div class="cosmic-orbit cosmic-orbit-2"></div>
+    <!-- Bintang berkelip di-render oleh JS -->
+  </div>
+
+  <!-- ==================== CUSTOM TOAST CONTAINER ==================== -->
+  <div id="toast-container" class="fixed top-3 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 pointer-events-none w-[92%] max-w-sm"></div>
+
+  <!-- ==================== SCREEN 1: LOBBY KOSMIK ==================== -->
+  <div id="screen-lobby" class="flex-1 flex flex-col items-center justify-center p-4 overflow-y-auto z-20">
+    <div class="w-full max-w-md bg-slate-950/80 backdrop-blur-xl border border-emerald-400/30 rounded-3xl p-5 sm:p-7 shadow-[0_20px_60px_rgba(0,0,0,0.85)]">
+      <!-- Header -->
+      <div class="text-center mb-5">
+        <div class="inline-flex items-center justify-center gap-2 px-3.5 py-1 rounded-full bg-purple-950/90 border border-purple-400/35 text-amber-300 text-[11px] font-bold tracking-wider uppercase mb-2">
+          <span>♍ Virgo</span>
+          <span class="text-slate-400">✦</span>
+          <span>Room Permanen P2P</span>
+          <span class="text-slate-400">✦</span>
+          <span>Sagitarius ♐</span>
+        </div>
+        <h1 class="font-cosmic text-2xl sm:text-3xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-slate-100 to-amber-300">
+          COSMIC CONNECT 4
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-300 mt-1">Sejajarkan 4 rasi bintang zodiak untuk menguasai galaksi!</p>
+      </div>
+
+      <!-- Nama & Avatar -->
+      <div class="mb-4">
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Identitas Penjelajah Kosmik</label>
+        <div class="flex gap-2">
+          <button id="btn-cycle-avatar" type="button" title="Ganti Lambang Zodiak / Kosmik" class="w-12 h-11 rounded-xl bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-400/40 flex items-center justify-center text-2xl transition active:scale-95">
+            ♍
+          </button>
+          <input id="input-player-name" type="text" maxlength="14" placeholder="Nama kamu..." class="flex-1 bg-slate-900/90 border border-slate-700 focus:border-emerald-400 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-white outline-none transition" />
+        </div>
+      </div>
+
+      <!-- Tab Mode -->
+      <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-900/90 rounded-xl mb-4 border border-slate-800">
+        <button id="tab-host" type="button" class="py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 shadow transition">
+          ♍ Host Virgo
+        </button>
+        <button id="tab-join" type="button" class="py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition">
+          ♐ Gabung Sagitarius
+        </button>
+        <button id="tab-bot" type="button" class="py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition">
+          ✨ Bot Kosmik
+        </button>
+      </div>
+
+      <!-- Panel Host Room Permanen (Virgo) -->
+      <div id="panel-host" class="space-y-3">
+        <div class="bg-slate-900/80 p-3 rounded-xl border border-emerald-500/30 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-emerald-300 font-bold flex items-center gap-1">🔒 ID Room Permanen</span>
+            <button id="btn-reset-perm-host" type="button" class="text-[11px] text-amber-300 hover:underline font-semibold">Reset Default</button>
+          </div>
+          <div class="flex gap-1.5">
+            <input id="input-perm-host-code" type="text" maxlength="20" value="VIRGO-SAGITARIUS" class="flex-1 bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-lg px-3 py-2 text-xs sm:text-sm font-extrabold tracking-wider uppercase text-emerald-300 outline-none font-mono" />
+            <button id="btn-copy-perm-lobby" type="button" title="Salin ID Room Permanen" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 border border-slate-600 transition">
+              📋
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed">
+            Room ini <strong class="text-slate-200">permanen & dapat dipakai ulang</strong> kapan saja. Otomatis bersih setelah 5 menit tanpa aktivitas.
+          </p>
+        </div>
+
+        <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+          <span class="text-xs text-slate-300 font-semibold">Format Pertandingan</span>
+          <select id="select-win-target" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-amber-300 outline-none">
+            <option value="1">1 Ronde Langsung</option>
+            <option value="2">Best of 3 (2 Menang)</option>
+            <option value="3" selected>Best of 5 (3 Menang)</option>
+          </select>
+        </div>
+
+        <button id="btn-create-room" type="button" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:brightness-110 text-slate-950 font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/25 transition active:scale-[0.98]">
+          ♍ Buka Room Permanen (Virgo)
+        </button>
+      </div>
+
+      <!-- Panel Gabung Room Permanen (Sagitarius) -->
+      <div id="panel-join" class="space-y-3 hidden">
+        <div class="bg-slate-900/80 p-3 rounded-xl border border-purple-500/35 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-amber-300">♐ ID Room Permanen Tujuan</label>
+            <button id="btn-reset-perm-join" type="button" class="text-[11px] text-purple-300 hover:underline font-semibold">Gunakan Default</button>
+          </div>
+          <input id="input-room-code" type="text" maxlength="20" value="VIRGO-SAGITARIUS" placeholder="VIRGO-SAGITARIUS" class="w-full bg-slate-950/95 border border-purple-500/40 focus:border-amber-400 rounded-xl px-3 py-2.5 text-center text-base sm:text-lg font-extrabold tracking-widest uppercase text-amber-300 outline-none font-mono" />
+          <p class="text-[11px] text-slate-400 text-center">Langsung masuk ke room yang sama tanpa kode acak baru.</p>
+        </div>
+        <button id="btn-join-room" type="button" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-amber-500 hover:brightness-110 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-purple-500/30 transition active:scale-[0.98]">
+          ♐ Masuk Room sebagai Sagitarius
+        </button>
+      </div>
+
+      <!-- Panel Lawan Bot AI Kosmik -->
+      <div id="panel-bot" class="space-y-3 hidden">
+        <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+          <span class="text-xs text-slate-300 font-semibold">Kecerdasan Oracle Sagitarius</span>
+          <select id="select-bot-level" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-purple-300 outline-none">
+            <option value="easy">Nebula (Mudah)</option>
+            <option value="medium" selected>Astral (Sedang)</option>
+            <option value="hard">Supernova (Sulit)</option>
+          </select>
+        </div>
+        <button id="btn-start-bot" type="button" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-500 hover:brightness-110 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-indigo-500/25 transition active:scale-[0.98]">
+          ✨ Duel Lawan Oracle Sagitarius
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-5 pt-4 border-t border-slate-800/90 flex items-center justify-between text-xs text-slate-400">
+        <button id="btn-open-rules" type="button" class="hover:text-emerald-300 font-semibold transition">
+          📖 Panduan Kosmik
+        </button>
+        <button id="btn-lobby-sound" type="button" class="hover:text-white font-semibold transition">
+          <span id="lobby-sound-icon">🔊</span> <span id="lobby-sound-text">Suara Aktif</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 2: WAITING ROOM PERMANEN ==================== -->
+  <div id="screen-waiting" class="flex-1 flex-col items-center justify-center p-4 hidden z-20">
+    <div class="w-full max-w-md bg-slate-950/85 backdrop-blur-xl border border-emerald-400/40 rounded-3xl p-6 text-center shadow-2xl">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/90 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold uppercase tracking-wider mb-2">
+        <span>♍ Virgo Siap di Orbit</span>
+      </div>
+      <div class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">ID Room Permanen</div>
+      <div id="display-room-code" class="text-xl sm:text-2xl font-black tracking-widest text-amber-300 font-mono bg-slate-900/95 border border-purple-500/40 py-3 px-2 rounded-2xl mb-3 break-all">
+        VIRGO-SAGITARIUS
+      </div>
+
+      <div class="flex items-center justify-center gap-2 mb-4">
+        <button id="btn-copy-code" type="button" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow transition active:scale-95">
+          📋 Salin ID Room
+        </button>
+        <div class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-[11px] font-mono text-slate-300">
+          Auto-Clean: <span id="waiting-idle-timer" class="text-amber-300 font-bold">05:00</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center gap-3 py-3 px-4 rounded-2xl bg-slate-900/80 border border-slate-800 mb-5">
+        <span class="w-3 h-3 rounded-full bg-amber-400 animate-ping"></span>
+        <span class="text-xs sm:text-sm font-semibold text-slate-200">Menunggu Sagitarius ♐ bergabung...</span>
+      </div>
+
+      <button id="btn-cancel-waiting" type="button" class="w-full py-3 rounded-xl bg-rose-950/90 hover:bg-rose-900 border border-rose-600/50 text-rose-200 font-bold text-xs sm:text-sm transition">
+        🚪 Exit & Bersihkan Room
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 3: ARENA PERMAINAN KOSMIK ==================== -->
+  <div id="screen-game" class="flex-1 flex-col justify-between hidden relative overflow-hidden z-20">
+
+    <!-- TOP BAR -->
+    <header class="w-full px-3 py-2 sm:px-5 bg-slate-950/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between z-30 shrink-0">
+      <div class="flex items-center gap-2">
+        <!-- TOMBOL EXIT & BERSIHKAN ROOM -->
+        <button id="btn-exit-game" type="button" title="Keluar & Bersihkan Room" class="px-2.5 py-1.5 rounded-xl bg-rose-950/90 hover:bg-rose-800 border border-rose-500/50 flex items-center gap-1 text-rose-200 text-xs font-extrabold transition active:scale-95">
+          <span>🚪</span>
+          <span>Exit</span>
+        </button>
+        <div>
+          <div class="text-xs sm:text-sm font-extrabold text-white flex items-center gap-1.5">
+            <span>Ronde <span id="hud-round" class="text-amber-400">1</span></span>
+            <span id="hud-room-badge" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-950/90 border border-purple-400/30 text-purple-200 font-mono truncate max-w-[110px] sm:max-w-[160px]">VIRGO-SAGITARIUS</span>
+          </div>
+          <div class="text-[10px] text-slate-400 flex items-center gap-2">
+            <span>Target: <strong id="hud-target" class="text-slate-200">3</strong></span>
+            <span>•</span>
+            <span title="Room otomatis bersih jika tidak ada aktivitas selama 5 menit">⏳ <strong id="hud-idle-timer" class="text-emerald-300 font-mono">05:00</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button id="btn-toggle-chat" type="button" class="relative px-3 py-1.5 rounded-xl bg-purple-700 hover:bg-purple-600 border border-purple-400/30 text-white text-xs font-bold flex items-center gap-1.5 shadow transition active:scale-95">
+          <span>💬 Reaksi</span>
+        </button>
+        <button id="btn-game-sound" type="button" class="w-8 h-8 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 flex items-center justify-center text-sm transition">
+          🔊
+        </button>
+      </div>
+    </header>
+
+    <!-- SCOREBOARD & KARTU ZODIAK VIRGO vs SAGITARIUS -->
+    <section class="w-full max-w-lg mx-auto px-3 pt-2 pb-1 flex items-center justify-between gap-2 z-20 shrink-0">
+      <!-- Pemain 1: Virgo (Zamrud / Perak) -->
+      <div id="p1-card" class="flex-1 relative flex items-center gap-2 bg-slate-950/85 border-2 border-emerald-900/70 rounded-2xl px-2.5 py-2 transition">
+        <div id="bubble-p1" class="absolute top-full mt-1.5 left-2 z-50 pointer-events-none"></div>
+        <div class="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-300 to-emerald-700 border border-white/80 flex items-center justify-center text-xs font-black text-slate-950 shrink-0 shadow">♍</div>
+        <span id="p1-avatar" class="text-lg sm:text-xl">♍</span>
+        <div class="min-w-0 flex-1">
+          <div id="p1-name" class="text-xs font-extrabold text-emerald-200 truncate">Virgo</div>
+          <div class="text-[10px] text-slate-400">Skor: <strong id="p1-score" class="text-emerald-300 text-xs">0</strong></div>
+        </div>
+      </div>
+
+      <div class="text-[11px] font-cosmic font-black text-slate-400 px-0.5">VS</div>
+
+      <!-- Pemain 2: Sagitarius (Ungu / Emas) -->
+      <div id="p2-card" class="flex-1 relative flex items-center justify-end text-right gap-2 bg-slate-950/85 border-2 border-purple-900/70 rounded-2xl px-2.5 py-2 transition">
+        <div id="bubble-p2" class="absolute top-full mt-1.5 right-2 z-50 pointer-events-none"></div>
+        <div class="min-w-0 flex-1">
+          <div id="p2-name" class="text-xs font-extrabold text-amber-200 truncate">Sagitarius</div>
+          <div class="text-[10px] text-slate-400">Skor: <strong id="p2-score" class="text-amber-300 text-xs">0</strong></div>
+        </div>
+        <span id="p2-avatar" class="text-lg sm:text-xl">♐</span>
+        <div class="w-6 h-6 rounded-full bg-gradient-to-br from-amber-300 to-purple-700 border border-white/80 flex items-center justify-center text-xs font-black text-white shrink-0 shadow">♐</div>
+      </div>
+    </section>
+
+    <!-- STATUS GILIRAN -->
+    <div class="text-center py-1 z-20 shrink-0">
+      <span id="turn-status-text" class="inline-block px-4 py-1 rounded-full bg-slate-950/85 border border-white/15 text-xs font-extrabold text-emerald-300 tracking-wide">
+        Giliran Virgo ♍...
+      </span>
+    </div>
+
+    <!-- PAPAN CONNECT 4 KOSMIK (7 KOLOM x 6 BARIS) -->
+    <main class="flex-1 w-full flex items-center justify-center px-3 py-2 overflow-visible">
+      <div id="c4-board-container" class="w-full max-w-[440px] c4-board-frame">
+        <!-- Grid 7 Kolom -->
+        <div id="c4-grid" class="grid grid-cols-7 gap-1.5 sm:gap-2.5">
+          <!-- 7 kolom x 6 baris di-render via JavaScript -->
+        </div>
+      </div>
+    </main>
+
+    <!-- BAR REAKSI KOSMIK CEPAT DI BAWAH LAYAR -->
+    <footer class="w-full bg-slate-950/90 backdrop-blur-md border-t border-white/10 py-2.5 px-3 z-20 shrink-0">
+      <div class="max-w-md mx-auto flex items-center justify-between gap-1">
+        <span class="text-[11px] font-bold text-slate-400 hidden sm:inline">Sinyal Kosmik:</span>
+        <div class="flex-1 flex items-center justify-around">
+          <button type="button" onclick="sendReaction('emoji', '♍')" class="text-xl hover:scale-125 active:scale-90 transition" title="Virgo">♍</button>
+          <button type="button" onclick="sendReaction('emoji', '♐')" class="text-xl hover:scale-125 active:scale-90 transition" title="Sagitarius">♐</button>
+          <button type="button" onclick="sendReaction('emoji', '🌌')" class="text-xl hover:scale-125 active:scale-90 transition" title="Galaksi">🌌</button>
+          <button type="button" onclick="sendReaction('emoji', '☄️')" class="text-xl hover:scale-125 active:scale-90 transition" title="Komet">☄️</button>
+          <button type="button" onclick="sendReaction('emoji', '😱')" class="text-xl hover:scale-125 active:scale-90 transition">😱</button>
+          <button type="button" onclick="sendReaction('emoji', '🔥')" class="text-xl hover:scale-125 active:scale-90 transition">🔥</button>
+        </div>
+      </div>
+    </footer>
+
+    <!-- DRAWER CHAT SINGKAT -->
+    <div id="chat-drawer" class="fixed top-14 right-3 sm:right-6 w-[86vw] max-w-xs bg-slate-950/95 backdrop-blur-xl border border-purple-500/50 rounded-2xl shadow-2xl p-3 z-50 hidden flex-col">
+      <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800">
+        <span class="text-xs font-extrabold text-amber-300">💬 Transmisi Kosmik</span>
+        <button id="btn-close-chat" type="button" class="text-slate-400 hover:text-white text-xs font-bold px-1.5">✕</button>
+      </div>
+      <div class="flex flex-wrap gap-1.5 mb-2.5">
+        <button type="button" onclick="sendReaction('text', 'Rasi Virgo terkunci! ♍✨')" class="px-2.5 py-1 rounded-lg bg-emerald-950/90 hover:bg-emerald-800 border border-emerald-500/30 text-[11px] font-semibold text-emerald-200 transition">Rasi Virgo terkunci! ♍✨</button>
+        <button type="button" onclick="sendReaction('text', 'Panah Sagitarius melesat! ♐🏹')" class="px-2.5 py-1 rounded-lg bg-purple-950/90 hover:bg-purple-800 border border-purple-500/30 text-[11px] font-semibold text-amber-200 transition">Panah Sagitarius melesat! ♐🏹</button>
+        <button type="button" onclick="sendReaction('text', 'Takdir bintang tak terduga! 🌌')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-[11px] font-semibold text-slate-200 transition">Takdir bintang tak terduga! 🌌</button>
+        <button type="button" onclick="sendReaction('text', 'Langkah kosmik jenius! ☄️')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-[11px] font-semibold text-slate-200 transition">Langkah kosmik jenius! ☄️</button>
+      </div>
+      <form id="form-chat" class="flex gap-1.5">
+        <input id="input-chat" type="text" maxlength="36" placeholder="Kirim pesan kosmik..." class="flex-1 bg-slate-900 border border-slate-700 focus:border-amber-400 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none" />
+        <button type="submit" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-400 to-amber-400 text-slate-950 font-extrabold text-xs">Kirim</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== CUSTOM MODAL DIALOG ==================== -->
+  <div id="modal-backdrop" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[90] hidden items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-slate-900/95 border border-purple-500/50 rounded-3xl p-5 sm:p-6 shadow-2xl">
+      <h3 id="modal-title" class="font-cosmic text-lg sm:text-xl font-black text-amber-300 mb-2">Judul</h3>
+      <div id="modal-body" class="text-xs sm:text-sm text-slate-200 space-y-2.5"></div>
+      <div id="modal-footer" class="mt-5 flex items-center justify-end gap-2"></div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * COSMIC CONNECT 4 — VIRGO (♍) vs SAGITARIUS (♐)
+     * Fitur: Room Permanen P2P, Tombol Exit Bersih, Auto-Clean Idle 5 Menit,
+     *        & Fisika Jatuh Gravitasi Realistis dengan Pantulan Ganda.
+     * ============================================================================
+     */
+
+    // ==================== 0. GENERATOR BINTANG KOSMIK ====================
+    (function initCosmosStars() {
+      const container = document.getElementById('cosmos-backdrop');
+      if (!container) return;
+      const starCount = 75;
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star-dot';
+        const size = (Math.random() * 2.2 + 1).toFixed(1);
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${(Math.random() * 100).toFixed(2)}%`;
+        star.style.top = `${(Math.random() * 100).toFixed(2)}%`;
+        star.style.setProperty('--twinkle-dur', `${(2 + Math.random() * 4).toFixed(2)}s`);
+        star.style.setProperty('--star-op', `${(0.3 + Math.random() * 0.7).toFixed(2)}`);
+        star.style.animationDelay = `${(Math.random() * 3).toFixed(2)}s`;
+        container.appendChild(star);
+      }
+    })();
+
+    // ==================== 1. WEB AUDIO API (SINKRONISASI FISIKA JATUH & PANTULAN) ====================
+    const SoundFX = (() => {
+      let ctx = null;
+      let muted = false;
+
+      function ensure() {
+        if (!ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) ctx = new AudioCtx();
+        }
+        if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+      }
+
+      /**
+       * Memainkan suara tumbukan kristal kosmik yang disinkronkan tepat
+       * dengan momen tumbukan ke-1 (56% durasi jatuh) dan ke-2 (86% durasi jatuh).
+       */
+      function playRealisticCosmicDrop(totalDurationSec = 0.56) {
+        if (muted) return;
+        ensure();
+        if (!ctx) return;
+
+        // Momen tumbukan sesuai keyframe cosmicGravityDrop (56% dan 86%)
+        const impactTimes = [
+          { delay: totalDurationSec * 0.56, gainVal: 0.36, freqStart: 520, freqEnd: 170 },
+          { delay: totalDurationSec * 0.86, gainVal: 0.16, freqStart: 680, freqEnd: 230 }
+        ];
+
+        impactTimes.forEach((imp) => {
+          const t = ctx.currentTime + imp.delay;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(imp.freqStart, t);
+          osc.frequency.exponentialRampToValueAtTime(imp.freqEnd, t + 0.065);
+          gain.gain.setValueAtTime(imp.gainVal, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.075);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.08);
+        });
+      }
+
+      function playPop() {
+        if (muted) return;
+        ensure();
+        if (!ctx) return;
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(540, t);
+        osc.frequency.exponentialRampToValueAtTime(960, t + 0.07);
+        gain.gain.setValueAtTime(0.16, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.085);
+      }
+
+      function playWin() {
+        if (muted) return;
+        ensure();
+        if (!ctx) return;
+        [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((freq, i) => {
+          const t = ctx.currentTime + i * 0.1;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.24, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.43);
+        });
+      }
+
+      function toggleMute() {
+        muted = !muted;
+        return muted;
+      }
+
+      return { playRealisticCosmicDrop, playPop, playWin, toggleMute };
+    })();
+
+    // ==================== 2. CUSTOM TOAST & MODAL ====================
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      const colors = {
+        info: 'bg-slate-950/95 border-purple-400/50 text-white',
+        success: 'bg-emerald-950/95 border-emerald-400 text-emerald-100',
+        warning: 'bg-amber-950/95 border-amber-400 text-amber-100',
+        error: 'bg-rose-950/95 border-rose-400 text-rose-100'
+      };
+      el.className = `px-4 py-2.5 rounded-2xl border shadow-xl backdrop-blur-md text-xs sm:text-sm font-bold transition-all duration-300 transform -translate-y-3 opacity-0 ${colors[type] || colors.info}`;
+      el.textContent = msg;
+      container.appendChild(el);
+
+      requestAnimationFrame(() => el.classList.remove('-translate-y-3', 'opacity-0'));
+      setTimeout(() => {
+        el.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => el.remove(), 300);
+      }, 2600);
+    }
+
+    function openModal({ title, bodyHtml, buttons = [] }) {
+      const backdrop = document.getElementById('modal-backdrop');
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-body').innerHTML = bodyHtml;
+      const footer = document.getElementById('modal-footer');
+      footer.innerHTML = '';
+
+      buttons.forEach(btn => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = btn.className || 'px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm transition';
+        b.textContent = btn.label;
+        b.onclick = () => {
+          if (btn.onClick) btn.onClick();
+          if (btn.close !== false) closeModal();
+        };
+        footer.appendChild(b);
+      });
+
+      backdrop.classList.remove('hidden');
+      backdrop.classList.add('flex');
+    }
+
+    function closeModal() {
+      const backdrop = document.getElementById('modal-backdrop');
+      backdrop.classList.add('hidden');
+      backdrop.classList.remove('flex');
+    }
+
+    // ==================== 3. STATE & KONFIGURASI ROOM PERMANEN ====================
+    const ROWS = 6;
+    const COLS = 7;
+    const COSMIC_AVATARS = ['♍', '♐', '🌌', '✨', '☄️', '🌙', '🪐', '🔮', '⭐', '🌠'];
+    const PEER_PREFIX = 'COSMIC-C4-PERM-';
+    const DEFAULT_PERM_ROOM = 'VIRGO-SAGITARIUS';
+    const IDLE_LIMIT_SECONDS = 300; // 5 menit = 300 detik
+
+    const State = {
+      activeScreen: 'lobby', // 'lobby' | 'waiting' | 'game'
+      mode: 'BOT', // 'P2P' | 'BOT'
+      isHost: true,
+      mySlot: 1, // 1 = Virgo (Zamrud/Perak), 2 = Sagitarius (Ungu/Emas)
+      myName: 'Virgo',
+      myAvatar: '♍',
+      roomCode: DEFAULT_PERM_ROOM,
+      peer: null,
+      conn: null,
+      botLevel: 'medium',
+      botTimer: null,
+
+      // Timer Auto-Clean Idle 5 Menit
+      idleSecondsLeft: IDLE_LIMIT_SECONDS,
+      idleInterval: null,
+      idleWarned: false,
+
+      game: {
+        board: [],
+        turn: 1,
+        round: 1,
+        winTarget: 3,
+        status: 'PLAYING',
+        lastMove: null, // { r, c, animId }
+        moveSeq: 0,
+        winCells: [],
+        p1: { name: 'Virgo ♍', avatar: '♍', score: 0 },
+        p2: { name: 'Sagitarius ♐', avatar: '♐', score: 0 }
+      }
+    };
+
+    function createEmptyBoard() {
+      return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+    }
+
+    function sanitizeRoomId(raw) {
+      const cleaned = (raw || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+      return cleaned.length >= 3 ? cleaned : DEFAULT_PERM_ROOM;
+    }
+
+    // ==================== 4. SISTEM AUTO-CLEAN IDLE 5 MENIT ====================
+    function formatSecondsMMSS(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateIdleTimerUI() {
+      const formatted = formatSecondsMMSS(State.idleSecondsLeft);
+      const hudEl = document.getElementById('hud-idle-timer');
+      const waitEl = document.getElementById('waiting-idle-timer');
+      if (hudEl) {
+        hudEl.textContent = formatted;
+        hudEl.className = State.idleSecondsLeft <= 30
+          ? 'text-rose-400 font-mono font-black animate-pulse'
+          : 'text-emerald-300 font-mono';
+      }
+      if (waitEl) {
+        waitEl.textContent = formatted;
+      }
+    }
+
+    function resetIdleTimer(broadcastToPeer = false) {
+      State.idleSecondsLeft = IDLE_LIMIT_SECONDS;
+      State.idleWarned = false;
+      updateIdleTimerUI();
+
+      if (broadcastToPeer && State.mode === 'P2P' && State.conn && State.conn.open) {
+        State.conn.send({ type: 'PING_ACTIVITY' });
+      }
+    }
+
+    function startIdleMonitor() {
+      stopIdleMonitor();
+      State.idleSecondsLeft = IDLE_LIMIT_SECONDS;
+      State.idleWarned = false;
+      updateIdleTimerUI();
+
+      State.idleInterval = setInterval(() => {
+        if (State.activeScreen === 'lobby') return;
+
+        State.idleSecondsLeft -= 1;
+        updateIdleTimerUI();
+
+        if (State.idleSecondsLeft === 30 && !State.idleWarned) {
+          State.idleWarned = true;
+          showToast('⏳ 30 detik lagi room otomatis dibersihkan karena tidak ada aktivitas!', 'warning');
+        }
+
+        if (State.idleSecondsLeft <= 0) {
+          stopIdleMonitor();
+          cleanAndExitRoom('Room otomatis dibersihkan setelah 5 menit tanpa aktivitas.');
+        }
+      }, 1000);
+    }
+
+    function stopIdleMonitor() {
+      if (State.idleInterval) {
+        clearInterval(State.idleInterval);
+        State.idleInterval = null;
+      }
+    }
+
+    // ==================== 5. PEMBERSIHAN ROOM TOTAL (EXIT & AUTO-CLEAN) ====================
+    function cleanAndExitRoom(reasonMsg = 'Room telah dibersihkan & koneksi diputus.') {
+      clearTimeout(State.botTimer);
+      stopIdleMonitor();
+
+      // Beri tahu lawan jika masih terhubung sebelum menutup koneksi
+      if (State.mode === 'P2P' && State.conn && State.conn.open) {
+        try {
+          State.conn.send({ type: 'ROOM_CLOSED' });
+        } catch (e) {}
+      }
+
+      if (State.conn) {
+        try { State.conn.close(); } catch (e) {}
+        State.conn = null;
+      }
+
+      if (State.peer) {
+        try { State.peer.destroy(); } catch (e) {}
+        State.peer = null;
+      }
+
+      // Reset total state papan & skor agar room benar-benar bersih
+      State.game = {
+        board: createEmptyBoard(),
+        turn: 1,
+        round: 1,
+        winTarget: 3,
+        status: 'PLAYING',
+        lastMove: null,
+        moveSeq: 0,
+        winCells: [],
+        p1: { name: 'Virgo ♍', avatar: '♍', score: 0 },
+        p2: { name: 'Sagitarius ♐', avatar: '♐', score: 0 }
+      };
+
+      const btnCreate = document.getElementById('btn-create-room');
+      const btnJoin = document.getElementById('btn-join-room');
+      if (btnCreate) {
+        btnCreate.disabled = false;
+        btnCreate.textContent = '♍ Buka Room Permanen (Virgo)';
+      }
+      if (btnJoin) {
+        btnJoin.disabled = false;
+        btnJoin.textContent = '♐ Masuk Room sebagai Sagitarius';
+      }
+
+      closeModal();
+      document.getElementById('chat-drawer').classList.add('hidden');
+      switchScreen('lobby');
+      if (reasonMsg) showToast(reasonMsg, 'info');
+    }
+
+    // ==================== 6. LOGIKA CONNECT 4 & DETEKSI 4 SEBARIS ====================
+    function getAvailableRow(board, col) {
+      for (let r = ROWS - 1; r >= 0; r--) {
+        if (board[r][col] === 0) return r;
+      }
+      return -1;
+    }
+
+    function checkWinAt(board, r, c, player) {
+      const directions = [
+        [0, 1],  // Horizontal
+        [1, 0],  // Vertikal
+        [1, 1],  // Diagonal kanan bawah
+        [1, -1]  // Diagonal kiri bawah
+      ];
+
+      for (const [dr, dc] of directions) {
+        const line = [[r, c]];
+        for (let step = 1; step < 4; step++) {
+          const nr = r + dr * step;
+          const nc = c + dc * step;
+          if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && board[nr][nc] === player) {
+            line.push([nr, nc]);
+          } else break;
+        }
+        for (let step = 1; step < 4; step++) {
+          const nr = r - dr * step;
+          const nc = c - dc * step;
+          if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && board[nr][nc] === player) {
+            line.push([nr, nc]);
+          } else break;
+        }
+
+        if (line.length >= 4) return line;
+      }
+      return null;
+    }
+
+    function isBoardFull(board) {
+      return board[0].every(cell => cell !== 0);
+    }
+
+    // ==================== 7. KONEKSI P2P ROOM PERMANEN (PEERJS) ====================
+    const ICE_CONFIG = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+      ]
+    };
+
+    function hostPermanentRoom() {
+      State.mode = 'P2P';
+      State.isHost = true;
+      State.mySlot = 1; // Virgo
+      const rawName = document.getElementById('input-player-name').value.trim();
+      State.myName = rawName || 'Virgo ♍';
+      const permCode = sanitizeRoomId(document.getElementById('input-perm-host-code').value);
+      document.getElementById('input-perm-host-code').value = permCode;
+      State.roomCode = permCode;
+      State.game.winTarget = parseInt(document.getElementById('select-win-target').value, 10);
+
+      const btn = document.getElementById('btn-create-room');
+      btn.disabled = true;
+      btn.textContent = '⏳ Membuka Orbit Room...';
+
+      if (State.peer) {
+        try { State.peer.destroy(); } catch (e) {}
+      }
+
+      State.peer = new Peer(PEER_PREFIX + State.roomCode, { config: ICE_CONFIG });
+
+      State.peer.on('open', () => {
+        btn.disabled = false;
+        btn.textContent = '♍ Buka Room Permanen (Virgo)';
+        document.getElementById('display-room-code').textContent = State.roomCode;
+        switchScreen('waiting');
+        startIdleMonitor();
+        showToast(`Room Permanen "${State.roomCode}" aktif!`, 'success');
+      });
+
+      State.peer.on('connection', (conn) => {
+        if (State.conn && State.conn.open) {
+          conn.close();
+          return;
+        }
+        State.conn = conn;
+        setupConnectionListeners(conn);
+      });
+
+      State.peer.on('error', (err) => {
+        btn.disabled = false;
+        btn.textContent = '♍ Buka Room Permanen (Virgo)';
+        if (err.type === 'unavailable-id') {
+          showToast(`Room "${State.roomCode}" sudah dibuka Virgo! Silakan gabung sebagai Sagitarius.`, 'warning');
+        } else {
+          showToast('Kendala koneksi P2P: ' + err.type, 'error');
+        }
+      });
+    }
+
+    function guestJoinPermanentRoom() {
+      const code = sanitizeRoomId(document.getElementById('input-room-code').value);
+      document.getElementById('input-room-code').value = code;
+
+      State.mode = 'P2P';
+      State.isHost = false;
+      State.mySlot = 2; // Sagitarius
+      const rawName = document.getElementById('input-player-name').value.trim();
+      State.myName = rawName || 'Sagitarius ♐';
+      State.roomCode = code;
+
+      const btn = document.getElementById('btn-join-room');
+      btn.disabled = true;
+      btn.textContent = '⏳ Memasuki Orbit Room...';
+
+      if (State.peer) {
+        try { State.peer.destroy(); } catch (e) {}
+      }
+
+      State.peer = new Peer({ config: ICE_CONFIG });
+
+      State.peer.on('open', () => {
+        const conn = State.peer.connect(PEER_PREFIX + code, { reliable: true });
+        State.conn = conn;
+
+        const timer = setTimeout(() => {
+          if (!conn.open) {
+            btn.disabled = false;
+            btn.textContent = '♐ Masuk Room sebagai Sagitarius';
+            showToast(`Room "${code}" belum dibuka oleh Host Virgo!`, 'error');
+          }
+        }, 8000);
+
+        conn.on('open', () => {
+          clearTimeout(timer);
+          btn.disabled = false;
+          btn.textContent = '♐ Masuk Room sebagai Sagitarius';
+          conn.send({
+            type: 'HELLO',
+            name: State.myName,
+            avatar: State.myAvatar
+          });
+        });
+
+        setupConnectionListeners(conn);
+      });
+
+      State.peer.on('error', (err) => {
+        btn.disabled = false;
+        btn.textContent = '♐ Masuk Room sebagai Sagitarius';
+        showToast('Gagal terhubung ke room: ' + err.type, 'error');
+      });
+    }
+
+    function setupConnectionListeners(conn) {
+      conn.on('data', (msg) => {
+        resetIdleTimer(false);
+
+        if (msg.type === 'HELLO' && State.isHost) {
+          State.game.p1 = { name: State.myName, avatar: State.myAvatar, score: 0 };
+          State.game.p2 = { name: msg.name.slice(0, 14), avatar: msg.avatar || '♐', score: 0 };
+          State.game.board = createEmptyBoard();
+          State.game.turn = 1;
+          State.game.round = 1;
+          State.game.status = 'PLAYING';
+          State.game.lastMove = null;
+          State.game.moveSeq = 0;
+          State.game.winCells = [];
+
+          syncP2PState();
+          switchScreen('game');
+          startIdleMonitor();
+          renderGame();
+          showToast(`${State.game.p2.name} (Sagitarius ♐) bergabung!`, 'success');
+        }
+        else if (msg.type === 'SYNC_STATE') {
+          State.game = msg.game;
+          closeModal();
+          if (State.activeScreen !== 'game') {
+            switchScreen('game');
+            startIdleMonitor();
+          }
+          renderGame();
+          if (msg.sound === 'drop') {
+            const dropDur = msg.dropDur || 0.56;
+            SoundFX.playRealisticCosmicDrop(dropDur);
+          }
+          if (msg.sound === 'win') SoundFX.playWin();
+          if (State.game.status === 'ROUND_OVER' || State.game.status === 'MATCH_OVER') {
+            showEndRoundModal();
+          }
+        }
+        else if (msg.type === 'DROP_COL' && State.isHost) {
+          processDropColumn(2, msg.col);
+        }
+        else if (msg.type === 'REACTION') {
+          displayReactionBubble(msg.slot, msg.kind, msg.content);
+        }
+        else if (msg.type === 'ROOM_CLOSED') {
+          cleanAndExitRoom('Lawan keluar (Exit). Room telah dibersihkan!');
+        }
+      });
+
+      conn.on('close', () => {
+        if (State.activeScreen !== 'lobby') {
+          cleanAndExitRoom('Koneksi terputus. Room telah dibersihkan.');
+        }
+      });
+    }
+
+    function syncP2PState(sound = null, dropDur = 0.56) {
+      if (State.mode === 'P2P' && State.isHost && State.conn && State.conn.open) {
+        State.conn.send({
+          type: 'SYNC_STATE',
+          game: State.game,
+          sound,
+          dropDur
+        });
+      }
+    }
+
+    // ==================== 8. MULAI MODE BOT AI & FISIKA JATUH ====================
+    function startBotMode() {
+      State.mode = 'BOT';
+      State.isHost = true;
+      State.mySlot = 1; // Virgo
+      const rawName = document.getElementById('input-player-name').value.trim();
+      State.myName = rawName || 'Virgo ♍';
+      State.botLevel = document.getElementById('select-bot-level').value;
+
+      State.game = {
+        board: createEmptyBoard(),
+        turn: 1,
+        round: 1,
+        winTarget: 3,
+        status: 'PLAYING',
+        lastMove: null,
+        moveSeq: 0,
+        winCells: [],
+        p1: { name: State.myName, avatar: State.myAvatar, score: 0 },
+        p2: { name: `Oracle ♐ (${State.botLevel.toUpperCase()})`, avatar: '♐', score: 0 }
+      };
+
+      switchScreen('game');
+      startIdleMonitor();
+      renderGame();
+    }
+
+    /**
+     * Menghitung parameter fisika gravitasi nyata berdasarkan baris tujuan (row 0..5).
+     * Semakin dalam barisnya, semakin tinggi jarak jatuhnya (h) dan durasi t = sqrt(2h/g).
+     */
+    function computeGravityPhysics(targetRow) {
+      const boardContainer = document.getElementById('c4-board-container');
+      const boardHeight = boardContainer ? boardContainer.clientHeight : 360;
+      const cellPitch = boardHeight / ROWS;
+
+      // Jarak jatuh aktual dari tepat di atas bibir papan ke baris target
+      const dropDistancePx = Math.round((targetRow + 1.15) * cellPitch);
+
+      // Durasi proporsional dengan sqrt(tinggi jatuh) agar percepatan gravitasi terasa konsisten
+      const durationSec = Number((0.36 + Math.sqrt(targetRow + 1) * 0.11).toFixed(3));
+
+      // Tinggi pantulan meredam proporsional terhadap kecepatan tumbukan
+      const bounce1Px = -Math.round(Math.min(34, 13 + targetRow * 3.8));
+      const bounce2Px = -Math.round(Math.max(4, Math.abs(bounce1Px) * 0.28));
+
+      return { dropDistancePx, durationSec, bounce1Px, bounce2Px };
+    }
+
+    function handleColumnClick(col) {
+      resetIdleTimer(true);
+
+      if (State.game.status !== 'PLAYING') return;
+      if (State.game.turn !== State.mySlot) {
+        showToast('Tunggu giliran rasi lawan!', 'warning');
+        return;
+      }
+
+      if (getAvailableRow(State.game.board, col) === -1) {
+        showToast('Kolom kosmik ini sudah penuh!', 'warning');
+        return;
+      }
+
+      if (State.mode === 'P2P' && !State.isHost) {
+        if (State.conn && State.conn.open) {
+          State.conn.send({ type: 'DROP_COL', col });
+        }
+        return;
+      }
+
+      processDropColumn(State.mySlot, col);
+    }
+
+    function processDropColumn(playerSlot, col) {
+      if (State.game.status !== 'PLAYING' || State.game.turn !== playerSlot) return;
+      const row = getAvailableRow(State.game.board, col);
+      if (row === -1) return;
+
+      resetIdleTimer(false);
+      State.game.moveSeq += 1;
+      State.game.board[row][col] = playerSlot;
+      State.game.lastMove = { r: row, c: col, seq: State.game.moveSeq };
+
+      const physics = computeGravityPhysics(row);
+      SoundFX.playRealisticCosmicDrop(physics.durationSec);
+
+      const winLine = checkWinAt(State.game.board, row, col, playerSlot);
+      if (winLine) {
+        State.game.winCells = winLine;
+        if (playerSlot === 1) State.game.p1.score += 1;
+        else State.game.p2.score += 1;
+
+        const winnerScore = playerSlot === 1 ? State.game.p1.score : State.game.p2.score;
+        State.game.status = winnerScore >= State.game.winTarget ? 'MATCH_OVER' : 'ROUND_OVER';
+        State.game.roundWinner = playerSlot;
+
+        renderGame();
+        syncP2PState('win', physics.durationSec);
+        setTimeout(() => {
+          SoundFX.playWin();
+          showEndRoundModal();
+        }, Math.round(physics.durationSec * 650));
+        return;
+      }
+
+      if (isBoardFull(State.game.board)) {
+        State.game.status = 'ROUND_OVER';
+        State.game.roundWinner = 0;
+        renderGame();
+        syncP2PState('drop', physics.durationSec);
+        setTimeout(() => showEndRoundModal(), Math.round(physics.durationSec * 650));
+        return;
+      }
+
+      State.game.turn = playerSlot === 1 ? 2 : 1;
+      renderGame();
+      syncP2PState('drop', physics.durationSec);
+
+      if (State.mode === 'BOT' && State.game.turn === 2) {
+        triggerBotMove();
+      }
+    }
+
+    // Kecerdasan Buatan Oracle Sagitarius (3 Tingkat Kesulitan)
+    function triggerBotMove() {
+      clearTimeout(State.botTimer);
+      State.botTimer = setTimeout(() => {
+        if (State.game.status !== 'PLAYING' || State.game.turn !== 2) return;
+
+        const validCols = [];
+        for (let c = 0; c < COLS; c++) {
+          if (getAvailableRow(State.game.board, c) !== -1) validCols.push(c);
+        }
+        if (validCols.length === 0) return;
+
+        let chosenCol = validCols[Math.floor(Math.random() * validCols.length)];
+
+        if (State.botLevel !== 'easy') {
+          // 1. Cek kemenangan langsung untuk Sagitarius
+          for (const c of validCols) {
+            const r = getAvailableRow(State.game.board, c);
+            State.game.board[r][c] = 2;
+            const win = checkWinAt(State.game.board, r, c, 2);
+            State.game.board[r][c] = 0;
+            if (win) {
+              processDropColumn(2, c);
+              return;
+            }
+          }
+
+          // 2. Blokir rasi 4-sebaris milik Virgo
+          for (const c of validCols) {
+            const r = getAvailableRow(State.game.board, c);
+            State.game.board[r][c] = 1;
+            const block = checkWinAt(State.game.board, r, c, 1);
+            State.game.board[r][c] = 0;
+            if (block) {
+              processDropColumn(2, c);
+              return;
+            }
+          }
+
+          // 3. Prioritaskan poros tengah galaksi pada tingkat Supernova
+          if (State.botLevel === 'hard') {
+            const centerPref = [3, 2, 4, 1, 5, 0, 6];
+            for (const c of centerPref) {
+              if (validCols.includes(c)) {
+                chosenCol = c;
+                break;
+              }
+            }
+          }
+        }
+
+        processDropColumn(2, chosenCol);
+      }, 720);
+    }
+
+    function startNextRound(resetMatch = false) {
+      resetIdleTimer(true);
+      if (resetMatch) {
+        State.game.round = 1;
+        State.game.p1.score = 0;
+        State.game.p2.score = 0;
+        State.game.turn = 1;
+      } else {
+        State.game.round += 1;
+        State.game.turn = State.game.round % 2 === 1 ? 1 : 2;
+      }
+
+      State.game.board = createEmptyBoard();
+      State.game.status = 'PLAYING';
+      State.game.lastMove = null;
+      State.game.winCells = [];
+
+      renderGame();
+      syncP2PState();
+
+      if (State.mode === 'BOT' && State.game.turn === 2) {
+        triggerBotMove();
+      }
+    }
+
+    // ==================== 9. REAKSI EMOJI & CHAT ====================
+    window.sendReaction = function(kind, content) {
+      resetIdleTimer(true);
+      displayReactionBubble(State.mySlot, kind, content);
+      if (State.mode === 'P2P' && State.conn && State.conn.open) {
+        State.conn.send({
+          type: 'REACTION',
+          slot: State.mySlot,
+          kind,
+          content
+        });
+      }
+      document.getElementById('chat-drawer').classList.add('hidden');
+    };
+
+    function displayReactionBubble(slot, kind, content) {
+      SoundFX.playPop();
+      const target = document.getElementById(`bubble-p${slot}`);
+      if (!target) return;
+
+      const bubble = document.createElement('div');
+      if (kind === 'emoji') {
+        bubble.className = 'chat-bubble-anim text-3xl sm:text-4xl drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)]';
+        bubble.textContent = content;
+      } else {
+        const bgClass = slot === 1
+          ? 'bg-emerald-400 text-slate-950 border-white'
+          : 'bg-amber-400 text-slate-950 border-white';
+        bubble.className = `chat-bubble-anim whitespace-nowrap px-3 py-1 rounded-xl font-extrabold text-xs shadow-xl border ${bgClass}`;
+        bubble.textContent = content;
+      }
+
+      target.innerHTML = '';
+      target.appendChild(bubble);
+      setTimeout(() => {
+        if (target.contains(bubble)) bubble.remove();
+      }, 3400);
+    }
+
+    // ==================== 10. RENDERING UI & PAPAN KOSMIK ====================
+    function switchScreen(name) {
+      State.activeScreen = name;
+      ['lobby', 'waiting', 'game'].forEach(s => {
+        const el = document.getElementById(`screen-${s}`);
+        if (s === name) {
+          el.classList.remove('hidden');
+          el.classList.add('flex');
+        } else {
+          el.classList.add('hidden');
+          el.classList.remove('flex');
+        }
+      });
+    }
+
+    function renderGame() {
+      const g = State.game;
+      document.getElementById('hud-round').textContent = g.round;
+      document.getElementById('hud-room-badge').textContent = State.mode === 'P2P' ? State.roomCode : 'VS ORACLE AI';
+      document.getElementById('hud-target').textContent = g.winTarget;
+
+      document.getElementById('p1-avatar').textContent = g.p1.avatar;
+      document.getElementById('p1-name').textContent = g.p1.name;
+      document.getElementById('p1-score').textContent = g.p1.score;
+
+      document.getElementById('p2-avatar').textContent = g.p2.avatar;
+      document.getElementById('p2-name').textContent = g.p2.name;
+      document.getElementById('p2-score').textContent = g.p2.score;
+
+      const p1Card = document.getElementById('p1-card');
+      const p2Card = document.getElementById('p2-card');
+      p1Card.classList.toggle('active-turn-virgo', g.status === 'PLAYING' && g.turn === 1);
+      p2Card.classList.toggle('active-turn-sag', g.status === 'PLAYING' && g.turn === 2);
+
+      const statusText = document.getElementById('turn-status-text');
+      if (g.status === 'PLAYING') {
+        const isMyTurn = g.turn === State.mySlot;
+        const activeName = g.turn === 1 ? `${g.p1.name} ♍` : `${g.p2.name} ♐`;
+        if (isMyTurn) {
+          statusText.textContent = State.mySlot === 1
+            ? '♍ Giliran Virgo! Ketuk kolom untuk jatuhkan orb zamrud'
+            : '♐ Giliran Sagitarius! Ketuk kolom untuk jatuhkan orb emas';
+          statusText.className = State.mySlot === 1
+            ? 'inline-block px-4 py-1 rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 text-slate-950 text-xs font-black tracking-wide shadow-lg'
+            : 'inline-block px-4 py-1 rounded-full bg-gradient-to-r from-amber-400 to-purple-400 text-slate-950 text-xs font-black tracking-wide shadow-lg';
+        } else {
+          statusText.textContent = `✨ Menunggu langkah ${activeName}...`;
+          statusText.className = 'inline-block px-4 py-1 rounded-full bg-slate-950/85 border border-white/15 text-xs font-bold text-slate-300';
+        }
+      }
+
+      // Render Grid 7 Kolom x 6 Baris
+      const grid = document.getElementById('c4-grid');
+      grid.innerHTML = '';
+
+      for (let c = 0; c < COLS; c++) {
+        const colBtn = document.createElement('div');
+        colBtn.className = 'c4-col-btn flex flex-col gap-1.5 sm:gap-2.5 p-0.5';
+        colBtn.onclick = () => handleColumnClick(c);
+
+        for (let r = 0; r < ROWS; r++) {
+          const cell = document.createElement('div');
+          cell.className = 'c4-cell';
+
+          const val = g.board[r][c];
+          if (val !== 0) {
+            const disc = document.createElement('div');
+            const isLast = g.lastMove && g.lastMove.r === r && g.lastMove.c === c;
+            const isWinCell = g.winCells.some(([wr, wc]) => wr === r && wc === c);
+
+            disc.className = `disc disc-${val} ${isLast ? 'disc-drop' : ''} ${isWinCell ? 'disc-winner' : ''}`;
+
+            // Tambahkan simbol zodiak di dalam orb
+            const sym = document.createElement('span');
+            sym.className = 'disc-symbol';
+            sym.textContent = val === 1 ? '♍' : '♐';
+            disc.appendChild(sym);
+
+            if (isLast) {
+              const phys = computeGravityPhysics(r);
+              disc.style.setProperty('--drop-start', `${-phys.dropDistancePx}px`);
+              disc.style.setProperty('--drop-duration', `${phys.durationSec}s`);
+              disc.style.setProperty('--bounce-1', `${phys.bounce1Px}px`);
+              disc.style.setProperty('--bounce-2', `${phys.bounce2Px}px`);
+
+              // Gelombang kilau tumbukan tepat saat orb menyentuh dasar slot
+              const shock = document.createElement('div');
+              shock.className = 'impact-shockwave';
+              shock.style.setProperty('--shock-color', val === 1 ? '#34d399' : '#fbbf24');
+              shock.style.animationDelay = `${(phys.durationSec * 0.55).toFixed(3)}s`;
+              cell.appendChild(shock);
+            }
+
+            cell.appendChild(disc);
+          }
+
+          colBtn.appendChild(cell);
+        }
+
+        grid.appendChild(colBtn);
+      }
+    }
+
+    function showEndRoundModal() {
+      const g = State.game;
+      const isMatchOver = g.status === 'MATCH_OVER';
+      let title = 'Ronde Kosmik Selesai!';
+      let msgHtml = '';
+
+      if (g.roundWinner === 0) {
+        title = '🌌 Orbit Penuh (Seri)!';
+        msgHtml = '<p>Seluruh slot galaksi terisi tanpa 4 rasi sejajar. Tidak ada poin ditambahkan.</p>';
+      } else {
+        const winner = g.roundWinner === 1 ? g.p1 : g.p2;
+        const zodiacTag = g.roundWinner === 1 ? '♍ VIRGO' : '♐ SAGITARIUS';
+        title = isMatchOver ? `🏆 PENGUASA GALAKSI (${zodiacTag})!` : `✨ ${winner.name} Menang Ronde!`;
+        msgHtml = `
+          <div class="text-center bg-slate-950/90 border border-purple-400/40 rounded-2xl p-4">
+            <div class="text-4xl mb-1">${winner.avatar}</div>
+            <div class="text-base font-extrabold text-white">${winner.name}</div>
+            <div class="text-xs text-amber-300 font-bold mt-1">Skor: Virgo ${g.p1.score} — ${g.p2.score} Sagitarius</div>
+          </div>
+        `;
+      }
+
+      const buttons = [];
+      if (State.isHost) {
+        buttons.push({
+          label: isMatchOver ? '🔄 Duel Kosmik Ulang' : '▶️ Ronde Berikutnya',
+          onClick: () => startNextRound(isMatchOver)
+        });
+      } else {
+        buttons.push({
+          label: 'Menunggu Virgo (Host)...',
+          className: 'px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs cursor-default',
+          close: false
+        });
+      }
+
+      openModal({ title, bodyHtml: msgHtml, buttons });
+    }
+
+    // ==================== 11. INISIALISASI EVENT LISTENERS ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('input-player-name').value = 'Virgo_' + Math.floor(10 + Math.random() * 89);
+
+      let avIdx = 0;
+      document.getElementById('btn-cycle-avatar').onclick = () => {
+        avIdx = (avIdx + 1) % COSMIC_AVATARS.length;
+        State.myAvatar = COSMIC_AVATARS[avIdx];
+        document.getElementById('btn-cycle-avatar').textContent = State.myAvatar;
+        SoundFX.playPop();
+      };
+
+      // Tabs Lobby
+      const tabs = [
+        { id: 'host', activeClass: 'py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 shadow transition' },
+        { id: 'join', activeClass: 'py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-purple-600 to-amber-500 text-white shadow transition' },
+        { id: 'bot', activeClass: 'py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow transition' }
+      ];
+
+      tabs.forEach(t => {
+        document.getElementById(`tab-${t.id}`).onclick = () => {
+          tabs.forEach(other => {
+            const btn = document.getElementById(`tab-${other.id}`);
+            const panel = document.getElementById(`panel-${other.id}`);
+            if (other.id === t.id) {
+              btn.className = other.activeClass;
+              panel.classList.remove('hidden');
+            } else {
+              btn.className = 'py-2 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition';
+              panel.classList.add('hidden');
+            }
+          });
+          // Otomatis sesuaikan saran nama & avatar saat berpindah peran zodiak
+          const nameInp = document.getElementById('input-player-name');
+          if (t.id === 'join' && nameInp.value.startsWith('Virgo_')) {
+            nameInp.value = 'Sagitarius_' + Math.floor(10 + Math.random() * 89);
+            State.myAvatar = '♐';
+            document.getElementById('btn-cycle-avatar').textContent = '♐';
+          } else if (t.id === 'host' && nameInp.value.startsWith('Sagitarius_')) {
+            nameInp.value = 'Virgo_' + Math.floor(10 + Math.random() * 89);
+            State.myAvatar = '♍';
+            document.getElementById('btn-cycle-avatar').textContent = '♍';
+          }
+        };
+      });
+
+      // Reset ID Room Permanen ke default
+      document.getElementById('btn-reset-perm-host').onclick = () => {
+        document.getElementById('input-perm-host-code').value = DEFAULT_PERM_ROOM;
+        showToast('ID Room Permanen dikembalikan ke VIRGO-SAGITARIUS', 'info');
+      };
+      document.getElementById('btn-reset-perm-join').onclick = () => {
+        document.getElementById('input-room-code').value = DEFAULT_PERM_ROOM;
+        showToast('ID Room Tujuan disetel ke VIRGO-SAGITARIUS', 'info');
+      };
+
+      function copyTextToClipboard(text) {
+        const inp = document.createElement('input');
+        inp.value = text;
+        document.body.appendChild(inp);
+        inp.select();
+        document.execCommand('copy');
+        document.body.removeChild(inp);
+        showToast(`ID Room Permanen "${text}" disalin!`, 'success');
+      }
+
+      document.getElementById('btn-copy-perm-lobby').onclick = () => {
+        copyTextToClipboard(sanitizeRoomId(document.getElementById('input-perm-host-code').value));
+      };
+      document.getElementById('btn-copy-code').onclick = () => {
+        copyTextToClipboard(State.roomCode);
+      };
+
+      document.getElementById('btn-create-room').onclick = hostPermanentRoom;
+      document.getElementById('btn-join-room').onclick = guestJoinPermanentRoom;
+      document.getElementById('btn-start-bot').onclick = startBotMode;
+
+      // Tombol Exit di Waiting Room
+      document.getElementById('btn-cancel-waiting').onclick = () => {
+        cleanAndExitRoom('Room dibersihkan & kembali ke lobby.');
+      };
+
+      // Tombol Exit di Arena Permainan (Konfirmasi & Pembersihan Room)
+      document.getElementById('btn-exit-game').onclick = () => {
+        openModal({
+          title: '🚪 Exit & Bersihkan Room?',
+          bodyHtml: '<p>Keluar dari arena akan mereset papan, menghapus skor, memutus koneksi P2P, dan membersihkan room agar siap dipakai ulang.</p>',
+          buttons: [
+            { label: 'Batal', className: 'px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs' },
+            {
+              label: 'Ya, Exit & Bersihkan',
+              className: 'px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs',
+              onClick: () => cleanAndExitRoom('Room berhasil dibersihkan!')
+            }
+          ]
+        });
+      };
+
+      document.getElementById('btn-open-rules').onclick = () => {
+        openModal({
+          title: '📖 Panduan Kosmik Virgo vs Sagitarius',
+          bodyHtml: `
+            <ul class="list-disc pl-4 space-y-2 text-slate-300">
+              <li><strong>Virgo (♍ Zamrud/Perak)</strong> dan <strong>Sagitarius (♐ Ungu/Emas)</strong> bergantian menjatuhkan orb ke salah satu dari <strong>7 kolom orbit</strong>.</li>
+              <li><strong>Room Permanen:</strong> Gunakan ID tetap (default <code class="text-amber-300">VIRGO-SAGITARIUS</code>) agar kedua pemain dapat langsung masuk kapan saja tanpa kode acak.</li>
+              <li><strong>Pembersihan Otomatis:</strong> Tekan tombol <strong>Exit</strong> kapan saja untuk membersihkan room, atau biarkan sistem membersihkannya otomatis setelah <strong>5 menit tanpa aktivitas</strong>.</li>
+              <li>Susun <strong>4 orb zodiak sewarna</strong> secara horizontal, vertikal, atau diagonal untuk memenangkan ronde!</li>
+            </ul>
+          `,
+          buttons: [{ label: 'Siap Menjelajah!' }]
+        });
+      };
+
+      function toggleSoundUI() {
+        const isMuted = SoundFX.toggleMute();
+        document.getElementById('lobby-sound-icon').textContent = isMuted ? '🔇' : '🔊';
+        document.getElementById('lobby-sound-text').textContent = isMuted ? 'Suara Mati' : 'Suara Aktif';
+        document.getElementById('btn-game-sound').textContent = isMuted ? '🔇' : '🔊';
+        showToast(isMuted ? 'Suara kosmik dimatikan' : 'Suara kosmik diaktifkan', 'info');
+      }
+      document.getElementById('btn-lobby-sound').onclick = toggleSoundUI;
+      document.getElementById('btn-game-sound').onclick = toggleSoundUI;
+
+      const chatDrawer = document.getElementById('chat-drawer');
+      document.getElementById('btn-toggle-chat').onclick = () => {
+        resetIdleTimer(false);
+        chatDrawer.classList.toggle('hidden');
+        chatDrawer.classList.toggle('flex');
+      };
+      document.getElementById('btn-close-chat').onclick = () => {
+        chatDrawer.classList.add('hidden');
+        chatDrawer.classList.remove('flex');
+      };
+      document.getElementById('form-chat').onsubmit = (e) => {
+        e.preventDefault();
+        const inp = document.getElementById('input-chat');
+        const txt = inp.value.trim();
+        if (!txt) return;
+        sendReaction('text', txt);
+        inp.value = '';
+      };
+    });
+  </script>
+</body>
+</html>
