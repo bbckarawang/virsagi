@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Othello Kosmik: Virgo vs Sagitarius</title>
+<style>
+:root{
+  --space:#070514;
+  --nebula:#150e36;
+  --starlight:#f3efff;
+  --gold:#e5b95c;
+  --virgo:#10b981;
+  --virgo-dark:#043828;
+  --sagi:#a855f7;
+  --sagi-dark:#2b0d4d;
+  --board:#0d0924;
+  --cell:#140f36;
+  --cell2:#0f0b29;
+  --ink:#090617;
+  --danger:#ef4444;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;height:100%;background:var(--space);color:var(--starlight);font-family:'Palatino Linotype',Georgia,serif;overflow:hidden}
+button,input{font:inherit}
+#app{
+  max-width:480px;height:100%;margin:auto;position:relative;
+  background:radial-gradient(120% 80% at 50% 25%,var(--nebula),var(--space));
+  display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  overflow:hidden;
+}
+#app::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 15% 20%, #fff 80%, transparent),
+    radial-gradient(1px 1px at 82% 14%, var(--gold) 80%, transparent),
+    radial-gradient(2px 2px at 28% 72%, #c084fc 80%, transparent),
+    radial-gradient(1.5px 1.5px at 74% 64%, #34d399 80%, transparent),
+    radial-gradient(1px 1px at 45% 40%, #fff 80%, transparent),
+    radial-gradient(1.5px 1.5px at 90% 85%, var(--gold) 80%, transparent),
+    radial-gradient(1px 1px at 10% 88%, #fff 80%, transparent);
+  opacity:.75;
+}
+.pad{padding:18px;gap:12px;display:flex;flex-direction:column;overflow-y:auto;position:relative;z-index:1}
+.scr{display:none;flex:1;flex-direction:column;min-height:0;position:relative;z-index:1}.scr.on{display:flex}
+h1{font-size:28px;margin:0;letter-spacing:1px;color:var(--gold);text-shadow:0 0 16px #e5b95c55}
+.btn{background:linear-gradient(135deg,#f3cd74,var(--gold));color:var(--ink);border:0;border-radius:14px;padding:13px 16px;font-weight:700;box-shadow:0 3px 0 #8a6419,0 0 14px #e5b95c44;transition:.1s;flex-shrink:0;cursor:pointer}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn.v-btn{background:linear-gradient(135deg,#34d399,#059669);color:#fff;box-shadow:0 3px 0 #064e3b,0 0 14px #10b98144}
+.btn.s-btn{background:linear-gradient(135deg,#c084fc,#7e22ce);color:#fff;box-shadow:0 3px 0 #3b0764,0 0 14px #a855f744}
+.btn.g{background:#ffffff12;color:var(--starlight);box-shadow:none;border:1px solid #e5b95c44}
+.btn.d{background:#ef444422;color:#fca5a5;box-shadow:none;border:1px solid #ef444466}
+.btn[disabled]{opacity:.4;pointer-events:none}
+input{background:#05031299;border:1px solid #e5b95c55;color:var(--starlight);border-radius:12px;padding:12px;width:100%}
+input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 10px #e5b95c44}
+.emo{display:flex;flex-wrap:wrap;gap:6px}
+.emo span{font-size:24px;padding:4px 8px;border-radius:12px;border:1.5px solid transparent;cursor:pointer}
+.emo span.s{border-color:var(--gold);background:#e5b95c22;box-shadow:0 0 10px #e5b95c44}
+.card{background:#0b0824b3;border:1px solid #e5b95c33;border-radius:16px;padding:12px;flex-shrink:0;backdrop-filter:blur(4px)}
+.pl{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #ffffff14}.pl:last-child{border-bottom:0}.pl b{flex:1}
+
+/* Game & Bidak Zodiak */
+#top{display:flex;gap:8px;padding:10px 12px 6px;align-items:stretch}
+.pbox{flex:1;background:#0b0824cc;border:1.5px solid #ffffff1a;border-radius:14px;padding:8px 10px;display:flex;align-items:center;gap:8px;transition:.25s;min-width:0}
+.pbox.on.v-box{border-color:var(--virgo);box-shadow:0 0 18px #10b98166;transform:translateY(-2px)}
+.pbox.on.s-box{border-color:var(--sagi);box-shadow:0 0 18px #a855f766;transform:translateY(-2px)}
+.pbox.off{opacity:.45}
+.pbox b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+
+.disc-ico{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.disc-ico.b{background:radial-gradient(circle at 30% 30%,#34d399,var(--virgo) 60%,var(--virgo-dark));border:1.5px solid var(--gold);color:#fff;box-shadow:0 0 8px #10b98188}
+.disc-ico.b::after{content:'♍'}
+.disc-ico.w{background:radial-gradient(circle at 30% 30%,#d8b4fe,var(--sagi) 60%,var(--sagi-dark));border:1.5px solid #e9d5ff;color:#fff;box-shadow:0 0 8px #a855f788}
+.disc-ico.w::after{content:'♐'}
+
+#status{text-align:center;font-size:14px;padding:4px 12px;min-height:26px;display:flex;align-items:center;justify-content:center;letter-spacing:.3px}
+#board-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 12px;min-height:0}
+#board{
+  width:100%;max-width:392px;aspect-ratio:1/1;
+  background:var(--board);padding:8px;border-radius:18px;
+  box-shadow:0 0 30px #6b21a855,inset 0 0 0 2px var(--gold);
+  display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);gap:3px;
+}
+.cell{
+  background:linear-gradient(145deg,var(--cell),var(--cell2));
+  border:1px solid #ffffff08;border-radius:6px;position:relative;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.cell.hint::after{
+  content:'✦';font-size:13px;color:var(--gold);
+  text-shadow:0 0 8px var(--gold);
+  animation:pulse 1.4s infinite ease-in-out;
+}
+.cell.last{box-shadow:inset 0 0 0 1.5px var(--gold),0 0 10px #e5b95c44}
+@keyframes pulse{0%,100%{transform:scale(.8) rotate(0deg);opacity:.45}50%{transform:scale(1.2) rotate(45deg);opacity:1}}
+
+.piece{width:82%;height:82%;border-radius:50%;position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.25,1.2,.4,1)}
+.piece.w{transform:rotateY(180deg)}
+.piece .f{
+  position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;
+}
+.piece .front{
+  background:radial-gradient(circle at 32% 28%,#6ee7b7,var(--virgo) 55%,var(--virgo-dark));
+  border:1.5px solid var(--gold);
+  box-shadow:0 3px 8px #000b,inset 0 0 6px #fef08a88;
+  color:#fef9c3;text-shadow:0 1px 3px #022c22;
+}
+.piece .front::after{content:'♍'}
+.piece .backf{
+  background:radial-gradient(circle at 32% 28%,#e9d5ff,var(--sagi) 55%,var(--sagi-dark));
+  border:1.5px solid #e0e7ff;
+  box-shadow:0 3px 8px #000b,inset 0 0 6px #f3e8ffaa;
+  color:#ffffff;text-shadow:0 1px 3px #1e1b4b;
+  transform:rotateY(180deg);
+}
+.piece .backf::after{content:'♐'}
+
+.piece.pop{animation:pop .3s ease-out}
+@keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
+#dock{display:flex;gap:8px;padding:6px 12px 12px}
+#toasts{position:absolute;top:calc(env(safe-area-inset-top) + 64px);left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:9}
+.toast{background:#0e0a29f2;border:1px solid var(--gold);border-radius:20px;padding:8px 16px;font-size:14px;animation:ti .35s cubic-bezier(.2,1.4,.4,1),to .4s 2.3s forwards;max-width:90%;box-shadow:0 6px 20px #000a}
+.toast.c{background:linear-gradient(135deg,#2e1065f5,#064e3bf5);color:#fff;border-color:#e9d5ff}
+@keyframes ti{from{transform:translateY(-30px) scale(.7);opacity:0}}@keyframes to{to{opacity:0;transform:translateY(-14px)}}
+#chat{position:absolute;left:0;right:0;bottom:0;background:#0a0721fa;border-top:2px solid var(--gold);border-radius:20px 20px 0 0;padding:12px;transform:translateY(105%);transition:.3s;z-index:8;max-height:70%;display:flex;flex-direction:column;gap:8px}
+#chat.on{transform:none}#log{overflow:auto;flex:1;min-height:90px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.qk{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.qk span{flex:none;background:#ffffff14;border:1px solid #e5b95c33;border-radius:16px;padding:6px 11px;font-size:13px;cursor:pointer}
+.fl{position:absolute;bottom:90px;font-size:34px;animation:fl 2s ease-out forwards;pointer-events:none;z-index:7}
+@keyframes fl{to{transform:translateY(-55vh) rotate(20deg) scale(1.6);opacity:0}}
+#ov{position:absolute;inset:0;background:#050312d9;backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:10;flex-direction:column;gap:12px;text-align:center;padding:20px}#ov.on{display:flex}
+.hint{opacity:.78;font-size:13px}.shake{animation:sk .3s}@keyframes sk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+</style></head><body>
+<div id="app">
+  <div id="home" class="scr on pad">
+    <h1>✨ Othello Kosmik</h1>
+    <div class="hint">Ruang pribadi <b>Virgo ♍</b> & <b>Sagitarius ♐</b>. Terkunci khusus untuk kalian berdua tanpa perlu mengetik kode.</div>
+    <input id="nm" maxlength="12" placeholder="Nama panggilanmu...">
+    <div class="emo" id="eo"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+      <button class="btn v-btn" id="mk">♍ Masuk sebagai Virgo (Buka Room)</button>
+      <button class="btn s-btn" id="jn">♐ Masuk sebagai Sagitarius (Gabung)</button>
+    </div>
+    <div class="card hint" style="margin-top:auto">
+      🔒 <b>Privasi & Otomatis Bersih:</b><br>
+      • Hanya 2 perangkat dengan kunci rahasia yang dapat terhubung.<br>
+      • Tekan <b>Keluar</b> kapan saja untuk menutup dan membersihkan room.<br>
+      • Room otomatis bersih jika tidak ada aktivitas selama <b>5 menit</b>.
+    </div>
+  </div>
+
+  <div id="lobby" class="scr pad">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <h1>🔭 Observatorium</h1>
+      <button class="btn d" id="ex-l" style="padding:8px 12px;font-size:13px">🚪 Keluar</button>
+    </div>
+    <div class="card">
+      <div class="hint">Status Portal Pribadi</div>
+      <div style="font-size:18px;font-weight:700;color:var(--gold);margin-top:4px">🔒 VIRGO-SAGITARIUS PRIVATE</div>
+      <div class="hint" style="margin-top:4px">Otomatis bersih jika diam 5 menit.</div>
+    </div>
+    <div class="card" id="pls"></div>
+    <div class="card hint">Pemegang <b style="color:#34d399">Virgo ♍</b> melangkah lebih dulu, diikuti <b style="color:#c084fc">Sagitarius ♐</b>.</div>
+    <button class="btn" id="go" style="display:none">Mulai Duel Bintang 🌠</button>
+    <div class="hint" id="wt"></div>
+  </div>
+
+  <div id="game" class="scr">
+    <div id="top"></div>
+    <div id="status"></div>
+    <div id="board-wrap"><div id="board"></div></div>
+    <div id="dock">
+      <button class="btn g" id="ht" style="flex:1">✦ Petunjuk: ON</button>
+      <button class="btn g" id="ct" style="flex:0 0 58px">💬</button>
+      <button class="btn d" id="ex-g" style="flex:0 0 84px">🚪 Keluar</button>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+  <div id="chat">
+    <div id="log"></div>
+    <div class="qk" id="rx"></div>
+    <div class="qk" id="qk"></div>
+    <div style="display:flex;gap:6px">
+      <input id="ci" maxlength="60" placeholder="Kirim pesan kosmik…">
+      <button class="btn" id="cs" style="padding:10px 14px">Kirim</button>
+    </div>
+    <button class="btn g" id="cc" style="padding:8px">Tutup</button>
+  </div>
+  <div id="ov"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),R=a=>a[Math.random()*a.length|0];
+const EM=['♍','♐','💖','✨','🌙','☀️','🪐','☄️','🔮','🌌'];
+const QK=['Takdir berbalik! ✨','Awas panah Sagitarius 🏹','Kalkulasi presisi Virgo ♍','Pojok galaksi milikku 🪐','Sayang banget keapit 🤣','GGWP sayang 💖'];
+const RX=['💖','✨','🔥','☄️','🔮','🏹','🌿','😘'];
+const DIRS=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+
+/* ---- KONFIGURASI ROOM PATEN & KEAMANAN ---- */
+// Ubah kedua string di bawah ini jika ingin mengganti kunci rahasia kalian berdua
+const FIXED_ROOM_ID = 'kosmik-virgo-sagitarius-paten-9926';
+const SECRET_KEY    = 'rahasia-cinta-virgo-sagi-2026';
+const IDLE_LIMIT_MS = 5 * 60 * 1000; // 5 menit tanpa aktivitas = auto clean
+
+let S,me,host=false,peer,conn,hc,lastSeq=-1,name,emo=R(EM),ac,mute=false,showHints=true,idleTimer=null;
+
+/* ---- suara kosmik ---- */
+function tn(f,d,ty='sine',v=.15,t=0,sl){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain(),n=ac.currentTime+t;o.type=ty;o.frequency.setValueAtTime(f,n);if(sl)o.frequency.exponentialRampToValueAtTime(sl,n+d);g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g).connect(ac.destination);o.start(n);o.stop(n+d)}catch(e){}}
+const SND={
+  place:()=>tn(320,.1,'sine',.18,0,140),
+  flip:(k=0)=>tn(440+k*65,.11,'triangle',.12,k*.045,680+k*65),
+  pass:()=>tn(340,.3,'sine',.14,0,180),
+  no:()=>tn(130,.18,'sawtooth',.12,0,80),
+  chat:()=>{tn(780,.06,'sine',.12);tn(1120,.09,'sine',.1,.06)},
+  turn:()=>{tn(880,.12,'sine',.1);tn(1320,.16,'sine',.09,.1)},
+  win:()=>[523,659,784,1047].forEach((f,i)=>tn(f,.2,'triangle',.16,i*.11)),
+  lose:()=>[390,320,250,180].forEach((f,i)=>tn(f,.22,'sawtooth',.11,i*.14))
+};
+const snd=(k,x)=>!mute&&SND[k]&&SND[k](x);
+
+/* ---- ui kecil ---- */
+function toast(h,c=''){const d=document.createElement('div');d.className='toast '+c;d.innerHTML=h;$('#toasts').append(d);setTimeout(()=>d.remove(),2800)}
+function float(e){for(let i=0;i<3;i++){const d=document.createElement('div');d.className='fl';d.textContent=e;d.style.left=(10+Math.random()*75)+'%';d.style.animationDelay=i*.15+'s';$('#app').append(d);setTimeout(()=>d.remove(),2400)}}
+const esc=s=>String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+function show(id){document.querySelectorAll('.scr').forEach(e=>e.classList.toggle('on',e.id==id))}
+
+/* ---- pembersihan room & timer 5 menit ---- */
+function resetIdle(){
+  clearTimeout(idleTimer);
+  if(!peer)return;
+  idleTimer=setTimeout(()=>{
+    exitRoom('⏰ 5 menit tidak ada aktivitas. Room dibersihkan otomatis.');
+  },IDLE_LIMIT_MS);
+}
+
+function exitRoom(msg='🚪 Room telah ditutup dan dibersihkan.',notifyPeer=true){
+  clearTimeout(idleTimer);
+  idleTimer=null;
+  if(notifyPeer){
+    try{
+      if(host&&conn&&conn.open)conn.send({t:'bye'});
+      if(!host&&hc&&hc.open)hc.send({t:'bye'});
+    }catch(e){}
+  }
+  setTimeout(()=>{
+    try{if(conn)conn.close()}catch(e){}
+    try{if(hc)hc.close()}catch(e){}
+    try{if(peer)peer.destroy()}catch(e){}
+    conn=null;hc=null;peer=null;S=null;host=false;me=null;lastSeq=-1;
+    $('#log').innerHTML='';
+    $('#chat').classList.remove('on');
+    ov(0);
+    $('#mk').disabled=false;
+    $('#jn').disabled=false;
+    show('home');
+    if(msg)toast(msg);
+  },120);
+}
+
+window.addEventListener('beforeunload',()=>{
+  try{if(host&&conn&&conn.open)conn.send({t:'bye'})}catch(e){}
+  try{if(!host&&hc&&hc.open)hc.send({t:'bye'})}catch(e){}
+  try{if(peer)peer.destroy()}catch(e){}
+});
+
+/* ---- jaringan p2p privat (2 pemain) ---- */
+function startHost(){
+  peer=new Peer(FIXED_ROOM_ID);
+  peer.on('error',e=>{
+    $('#mk').disabled=false;
+    if(e.type=='unavailable-id')toast('⚠️ Room Virgo sudah aktif! Jika kamu pasangannya, masuk sebagai Sagitarius.');
+    else toast('⚠️ Gangguan sinyal kosmik: '+e.type);
+  });
+  peer.on('open',()=>{
+    host=true;me='H';
+    S={phase:'lobby',players:[{id:'H',name,emo,color:1,off:false}],board:initBoard(),turn:1,lastMove:null,seq:0,ev:null,res:null};
+    resetIdle();
+    bc();show('lobby');
+  });
+  peer.on('connection',c=>{
+    let verified=false;
+    const authTimer=setTimeout(()=>{if(!verified)try{c.close()}catch(e){}},3000);
+
+    c.on('data',m=>{
+      if(!verified){
+        // Validasi kunci rahasia & kapasitas maksimal 2 orang
+        if(m&&m.t==='hi'&&m.key===SECRET_KEY&&S&&S.phase==='lobby'&&S.players.length<2&&!conn){
+          verified=true;
+          clearTimeout(authTimer);
+          conn=c;
+          resetIdle();
+          hrecv(c,m);
+        }else{
+          clearTimeout(authTimer);
+          try{c.send({t:'deny'})}catch(e){}
+          setTimeout(()=>c.close(),200);
+        }
+        return;
+      }
+      resetIdle();
+      if(m.t==='bye')return exitRoom('🚪 Pasanganmu keluar. Room dibersihkan.',false);
+      hrecv(c,m);
+    });
+
+    c.on('close',()=>{
+      clearTimeout(authTimer);
+      if(conn!=c)return;
+      exitRoom('🔌 Koneksi terputus. Room otomatis dibersihkan.',false);
+    });
+  });
+}
+
+function join(){
+  peer=new Peer();
+  peer.on('error',e=>{
+    $('#jn').disabled=false;
+    toast('⚠️ '+(e.type=='peer-unavailable'?'Room belum dibuka oleh Virgo ♍':e.type));
+  });
+  peer.on('open',id=>{
+    me=id;hc=peer.connect(FIXED_ROOM_ID,{reliable:true});
+    hc.on('open',()=>{
+      resetIdle();
+      hc.send({t:'hi',key:SECRET_KEY,name,emo});
+    });
+    hc.on('data',m=>{
+      resetIdle();
+      if(m.t=='s')onState(m.s);
+      else if(m.t=='c')onChat(m);
+      else if(m.t=='bye')exitRoom('🚪 Virgo menutup room. Room dibersihkan.',false);
+      else if(m.t=='deny')exitRoom('🚫 Akses ditolak: Room penuh atau kunci tidak cocok.',false);
+    });
+    hc.on('close',()=>{
+      if(peer)exitRoom('🔌 Terputus dari room. Room dibersihkan.',false);
+    });
+  });
+}
+
+function hrecv(c,m){
+  if(m.t=='hi'){
+    S.players.push({id:c.peer,name:m.name,emo:m.emo,color:2,off:false});
+    bc();
+  }else act(c.peer,m);
+}
+function bc(){
+  if(conn&&conn.open)conn.send({t:'s',s:S});
+  onState(S);
+}
+function send(m){resetIdle();host?act('H',m):hc.send(m)}
+
+/* ---- aturan othello (host) ---- */
+function initBoard(){
+  const b=Array.from({length:8},()=>Array(8).fill(0));
+  b[3][3]=2;b[3][4]=1;b[4][3]=1;b[4][4]=2;
+  return b;
+}
+function flips(b,r,c,col){
+  if(r<0||r>7||c<0||c>7||b[r][c]!==0)return[];
+  const opp=col===1?2:1,got=[];
+  for(const[dr,dc]of DIRS){
+    let nr=r+dr,nc=c+dc,line=[];
+    while(nr>=0&&nr<8&&nc>=0&&nc<8&&b[nr][nc]===opp){line.push([nr,nc]);nr+=dr;nc+=dc}
+    if(line.length&&nr>=0&&nr<8&&nc>=0&&nc<8&&b[nr][nc]===col)got.push(...line);
+  }
+  return got;
+}
+function validMoves(b,col){
+  const m=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){const f=flips(b,r,c,col);if(f.length)m.push({r,c,flips:f})}
+  return m;
+}
+function countDiscs(b){
+  let b1=0,w2=0;
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){if(b[r][c]===1)b1++;else if(b[r][c]===2)w2++}
+  return {1:b1,2:w2};
+}
+function em(k,o={}){S.seq++;S.ev={k,...o}}
+
+function startGame(){
+  resetIdle();
+  S.phase='play';S.board=initBoard();S.turn=1;S.lastMove=null;S.res=null;
+  em('start',{col:1});bc();
+}
+
+function act(pid,m){
+  if(m.t=='chat')return chatAll(pid,m.m);
+  if(S.phase!='play')return;
+  const p=S.players.find(x=>x.id==pid);
+  if(!p||p.color!==S.turn)return;
+  if(m.t=='move')makeMove(p.color,m.r,m.c);
+}
+
+function makeMove(col,r,c){
+  const f=flips(S.board,r,c,col);
+  if(!f.length)return;
+  S.board[r][c]=col;
+  for(const[fr,fc]of f)S.board[fr][fc]=col;
+  S.lastMove={r,c,col};
+  em('move',{col,r,c,flipped:f.length});
+  stepTurn(col===1?2:1,false);
+}
+
+function stepTurn(nextCol,justPassed){
+  const nm=validMoves(S.board,nextCol);
+  const cnt=countDiscs(S.board);
+  if(cnt[1]+cnt[2]===64||cnt[1]===0||cnt[2]===0)return finishGame(cnt);
+  if(nm.length){
+    S.turn=nextCol;
+    bc();
+    return;
+  }
+  if(justPassed){
+    return finishGame(cnt);
+  }
+  S.turn=nextCol===1?2:1;
+  const om=validMoves(S.board,S.turn);
+  if(!om.length)return finishGame(cnt);
+  em('pass',{passedCol:nextCol,nextCol:S.turn});
+  bc();
+}
+
+function finishGame(cnt){
+  S.phase='over';
+  const winCol=cnt[1]>cnt[2]?1:(cnt[2]>cnt[1]?2:0);
+  S.res={winCol,counts:cnt};
+  em('over',{winCol});
+  bc();
+}
+
+/* ---- chat ---- */
+function chatAll(pid,m){
+  const p=S.players.find(x=>x.id==pid);if(!p)return;
+  const o={t:'c',n:p.name,e:p.emo,m:String(m).slice(0,60)};
+  if(conn&&conn.open)conn.send(o);
+  onChat(o);
+}
+function onChat(o){
+  snd('chat');
+  if(RX.includes(o.m))float(o.m);
+  const li=$('#log');li.insertAdjacentHTML('beforeend',`<div>${o.e} <b>${esc(o.n)}</b>: ${esc(o.m)}</div>`);
+  li.scrollTop=1e9;
+  if(!$('#chat').classList.contains('on'))toast(`${o.e} <b>${esc(o.n)}</b>: ${esc(o.m)}`,'c');
+}
+
+/* ---- tampilan ---- */
+const signName=col=>col===1?'Virgo ♍':'Sagitarius ♐';
+
+function onState(s){
+  S=s;
+  if(s.phase=='lobby'){lastSeq=s.seq;ov(0);return drawLobby()}
+  if(!$('#game').classList.contains('on'))show('game');
+  if(s.ev&&s.seq!=lastSeq){lastSeq=s.seq;fx(s.ev)}
+  render();
+}
+
+function fx(ev){
+  const meP=S.players.find(p=>p.id==me);
+  if(ev.k=='start'){
+    ov(0);snd('turn');
+    toast(meP&&meP.color===1?'Giliranmu mulai duluan (Virgo ♍)! ✨':'Virgo ♍ memulai orbit duluan ✨');
+  }else if(ev.k=='move'){
+    snd('place');
+    snd('flip',Math.min(ev.flipped,6));
+    if(ev.flipped>=4)toast(`Supernova! ${ev.flipped} bintang terbalik ☄️`);
+    const nextP=S.players.find(p=>p.color===(ev.col===1?2:1));
+    if(nextP&&nextP.id==me&&S.phase=='play')setTimeout(()=>{snd('turn');toast('Giliranmu! ✨')},360);
+  }else if(ev.k=='pass'){
+    snd('pass');
+    const pp=S.players.find(p=>p.color===ev.passedCol);
+    toast(`${pp?pp.emo+' '+esc(pp.name):'Lawan'} melewati orbit (buntu) ⏭️`);
+    const np=S.players.find(p=>p.color===ev.nextCol);
+    if(np&&np.id==me&&S.phase=='play')setTimeout(()=>{snd('turn');toast('Giliranmu! ✨')},360);
+  }else if(ev.k=='over'){
+    const w=S.players.find(p=>p.color===S.res.winCol);
+    snd(w&&w.id==me?'win':'lose');
+    if(w&&w.id==me)'✨🌟🪐☄️'.match(/./gu).forEach(float);
+    setTimeout(()=>ov(1),750);
+  }
+}
+
+function ov(h){
+  const o=$('#ov');
+  if(h===0){o.classList.remove('on');return}
+  if(h===1){
+    const r=S.res,w=S.players.find(p=>p.color===r.winCol);
+    let html=`<h1>${w?`👑 ${w.emo} ${esc(w.name)} Menguasai Langit!`:'⚖️ Keseimbangan Kosmik (Seri)!'}</h1>`;
+    html+=`<div class="card" style="width:100%">`+S.players.map(p=>`
+      <div class="pl">
+        <span class="disc-ico ${p.color===1?'b':'w'}"></span>
+        <span>${p.emo}</span><b>${esc(p.name)}</b>
+        <b>${r.counts[p.color]} bintang</b>
+      </div>`).join('')+'</div>';
+    html+=host?'<button class="btn" id="nx">Main Lagi 🔄</button>':'<div class="hint">Menunggu Virgo memulai ronde baru…</div>';
+    html+='<button class="btn d" id="ex-o" style="margin-top:4px">🚪 Keluar & Bersihkan Room</button>';
+    o.innerHTML=html;o.classList.add('on');
+    const b=$('#nx');if(b)b.onclick=startGame;
+    const eo=$('#ex-o');if(eo)eo.onclick=()=>exitRoom();
+  }
+}
+
+function drawLobby(){
+  show('lobby');
+  $('#pls').innerHTML=S.players.map(p=>`
+    <div class="pl">
+      <span class="disc-ico ${p.color===1?'b':'w'}"></span>
+      <span style="font-size:24px">${p.emo}</span>
+      <b>${esc(p.name)}</b>
+      <span class="hint">${p.id=='H'?'Virgo ♍':'Sagitarius ♐'}</span>
+    </div>`).join('')+`<div class="hint" style="margin-top:6px">${S.players.length}/2 terhubung di ruang pribadi</div>`;
+  $('#go').style.display=host?'block':'none';
+  $('#go').disabled=S.players.length<2;
+  $('#wt').textContent=host?(S.players.length<2?'Menunggu Sagitarius ♐ bergabung…':''):'Menunggu Virgo ♍ memulai permainan…';
+}
+
+function render(){
+  const cnt=countDiscs(S.board);
+  $('#top').innerHTML=S.players.map(p=>{
+    const cls=p.color===1?'v-box':'s-box';
+    return `
+    <div class="pbox ${cls} ${p.color===S.turn&&S.phase=='play'?'on':''} ${p.off?'off':''}">
+      <span class="disc-ico ${p.color===1?'b':'w'}"></span>
+      <span style="font-size:22px">${p.emo}</span>
+      <div style="min-width:0;flex:1">
+        <b>${esc(p.name)}</b>
+        <span class="hint">${signName(p.color)} · <b>${cnt[p.color]}</b></span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const meP=S.players.find(p=>p.id==me);
+  const myTurn=!!(meP&&meP.color===S.turn&&S.phase=='play');
+  const moves=myTurn?validMoves(S.board,meP.color):[];
+  const moveMap=new Map(moves.map(m=>[m.r+','+m.c,m]));
+
+  const curP=S.players.find(p=>p.color===S.turn);
+  $('#status').innerHTML=S.phase!='play'
+    ?'<span class="hint">Siklus kosmik selesai</span>'
+    :(myTurn
+      ?`<b>Giliranmu</b> (${signName(meP.color)}) — pilih bintang bertanda ✦`
+      :`<span class="hint">Giliran ${curP?curP.emo+' <b>'+esc(curP.name)+'</b> ('+signName(curP.color)+')':'…'}</span>`);
+
+  const bd=$('#board');
+  bd.innerHTML='';
+  for(let r=0;r<8;r++){
+    for(let c=0;c<8;c++){
+      const v=S.board[r][c];
+      const cell=document.createElement('div');
+      cell.className='cell';
+      if(S.lastMove&&S.lastMove.r===r&&S.lastMove.c===c)cell.classList.add('last');
+      if(showHints&&moveMap.has(r+','+c))cell.classList.add('hint');
+      if(v!==0){
+        const pc=document.createElement('div');
+        pc.className='piece '+(v===2?'w':'');
+        if(S.lastMove&&S.lastMove.r===r&&S.lastMove.c===c)pc.classList.add('pop');
+        pc.innerHTML='<div class="f front"></div><div class="f backf"></div>';
+        cell.appendChild(pc);
+      }
+      cell.onclick=()=>onCellClick(r,c,cell,myTurn,moveMap.has(r+','+c));
+      bd.appendChild(cell);
+    }
+  }
+}
+
+function onCellClick(r,c,cell,myTurn,isValid){
+  if(S.phase!='play')return;
+  if(!myTurn){snd('no');toast('Sabar, belum giliran orbitmu 🪐');return}
+  if(!isValid){
+    snd('no');cell.classList.add('shake');
+    toast(R(['Tidak ada energi lawan yang terapit 🙅','Pilih petak yang memancarkan sinar ✦']));
+    setTimeout(()=>cell.classList.remove('shake'),350);
+    return;
+  }
+  send({t:'move',r,c});
+}
+
+/* ---- event ---- */
+$('#eo').innerHTML=EM.map(e=>`<span>${e}</span>`).join('');
+const pe=()=>[...$('#eo').children].forEach(s=>s.classList.toggle('s',s.textContent==emo));pe();
+$('#eo').onclick=e=>{if(e.target.tagName=='SPAN'){emo=e.target.textContent;pe();snd('chat')}};
+const nm=(def)=>{name=$('#nm').value.trim()||def;try{ac=ac||new AudioContext()}catch(e){}return true};
+
+$('#mk').onclick=()=>{nm('Virgo');$('#mk').disabled=true;startHost()};
+$('#jn').onclick=()=>{nm('Sagitarius');$('#jn').disabled=true;join()};
+$('#ex-l').onclick=()=>exitRoom();
+$('#ex-g').onclick=()=>exitRoom();
+
+$('#go').onclick=startGame;
+$('#ht').onclick=()=>{showHints=!showHints;$('#ht').textContent=showHints?'✦ Petunjuk: ON':'✦ Petunjuk: OFF';render()};
+$('#ct').onclick=()=>{resetIdle();$('#chat').classList.add('on')};
+$('#cc').onclick=()=>$('#chat').classList.remove('on');
+$('#qk').innerHTML=QK.map(q=>`<span>${q}</span>`).join('');
+$('#rx').innerHTML=RX.map(q=>`<span style="font-size:22px">${q}</span>`).join('');
+const sc=m=>{if(m){resetIdle();host?chatAll('H',m):hc.send({t:'chat',m})}};
+$('#qk').onclick=$('#rx').onclick=e=>{if(e.target.tagName=='SPAN')sc(e.target.textContent)};
+$('#cs').onclick=()=>{sc($('#ci').value.trim());$('#ci').value=''};
+$('#ci').onkeydown=e=>{if(e.key=='Enter')$('#cs').click()};
+</script></body></html>
