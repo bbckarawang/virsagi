@@ -182,6 +182,7 @@
     .batch-card:nth-child(3) { animation-delay: 0.19s; }
     .batch-card:nth-child(4) { animation-delay: 0.26s; }
     .batch-card:nth-child(5) { animation-delay: 0.33s; }
+    .batch-card:nth-child(6) { animation-delay: 0.40s; }
 
     .batch-card:hover {
       transform: translateY(-3px);
@@ -207,6 +208,10 @@
     .batch-4:hover {
       border-color: var(--blue-accent);
       box-shadow: 0 12px 30px rgba(56, 189, 248, 0.24);
+    }
+    .batch-5:hover {
+      border-color: var(--purple-accent);
+      box-shadow: 0 12px 30px rgba(139, 92, 246, 0.26);
     }
     .batch-secret {
       border-style: dashed;
@@ -252,6 +257,7 @@
     .batch-2 .batch-icon { background: rgba(110, 231, 183, 0.16); border: 1px solid rgba(110, 231, 183, 0.4); }
     .batch-3 .batch-icon { background: rgba(255, 209, 102, 0.16); border: 1px solid rgba(255, 209, 102, 0.4); }
     .batch-4 .batch-icon { background: rgba(56, 189, 248, 0.16); border: 1px solid rgba(56, 189, 248, 0.4); }
+    .batch-5 .batch-icon { background: rgba(139, 92, 246, 0.16); border: 1px solid rgba(139, 92, 246, 0.45); }
     .batch-secret .batch-icon { background: rgba(244, 114, 182, 0.16); border: 1px solid rgba(244, 114, 182, 0.45); }
 
     .batch-label {
@@ -267,6 +273,7 @@
     .batch-2 .batch-label { color: var(--virgo-color); }
     .batch-3 .batch-label { color: var(--gold); }
     .batch-4 .batch-label { color: var(--blue-accent); }
+    .batch-5 .batch-label { color: #c4b5fd; }
     .batch-secret .batch-label { color: var(--sagi-color); }
 
     .batch-title {
@@ -467,7 +474,7 @@
           <div class="batch-title-group">
             <div class="batch-icon">🎲</div>
             <div>
-              <span class="batch-label">Batch 4 • 5 Koleksi Papan</span>
+              <span class="batch-label">Batch 4 • 6 Koleksi Papan</span>
               <h2 class="batch-title">Boardgames Berdua</h2>
             </div>
           </div>
@@ -481,6 +488,7 @@
           <span class="game-tag">🐍 Ular Tangga</span>
           <span class="game-tag">⚫⚪ Othello</span>
           <span class="game-tag">🔴🟡 Connect 4</span>
+          <span class="game-tag">♟️ Catur Santai</span>
           <span class="game-tag">🔒 Secret</span>
         </div>
       </button>
@@ -551,7 +559,22 @@
           </div>
         </a>
 
-        <!-- 5. SECRET GAME -->
+        <!-- 5. CATUR SANTAI -->
+        <a href="https://bbckarawang.github.io/virsagi/catur" class="batch-card batch-5" onclick="playSelectSound()">
+          <div class="batch-top compact">
+            <div class="batch-title-group">
+              <div class="batch-icon">♟️</div>
+              <div>
+                <span class="batch-label">Friendly Chess • Anti-Bingung</span>
+                <h2 class="batch-title">Catur Santai Berdua</h2>
+                <span class="batch-sub">Main catur tanpa pusing dengan panduan langkah otomatis & saran!</span>
+              </div>
+            </div>
+            <div class="play-arrow">➔</div>
+          </div>
+        </a>
+
+        <!-- 6. SECRET GAME -->
         <button type="button" class="batch-card batch-secret" onclick="triggerSecretToast()">
           <div class="batch-top compact">
             <div class="batch-title-group">
