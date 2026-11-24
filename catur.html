@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Catur Santai Berdua — Edisi Anti-Bingung</title>
+    <title>VirSagi Cosmic Chess ✨ Catur Santai Berdua</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- PeerJS untuk Multiplayer Serverless P2P -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <!-- Font Plus Jakarta Sans -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Cinzel Decorative & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -17,16 +17,15 @@
                 extend: {
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        cosmic: ['"Cinzel Decorative"', 'cursive'],
                     },
                     colors: {
-                        cream: '#FDF8F5',
-                        warmCard: '#FFFDFB',
-                        boardLight: '#F3E9DC',
-                        boardDark: '#8F9E8B', // Sage lembut yang nyaman di mata
-                        terracotta: '#D97757',
-                        terracottaDark: '#C05E3E',
-                        sageDark: '#5E6E5A',
-                        ink: '#2D2A26',
+                        cosmicDeep: '#070919',
+                        cosmicCard: 'rgba(18, 23, 52, 0.86)',
+                        cosmicGold: '#FFD166',
+                        virgoMint: '#6EE7B7',
+                        sagiPink: '#F472B6',
+                        cosmicPurple: '#8B5CF6',
                     }
                 }
             }
@@ -34,26 +33,42 @@
     </script>
 
     <style>
-        /* Mencegah pull-to-refresh & seleksi teks tidak sengaja di HP */
         html, body {
             overscroll-behavior: none;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            background-color: #FDF8F5;
-            color: #2D2A26;
+            background: radial-gradient(circle at 50% 0%, #171d46 0%, #070919 80%);
+            color: #f8fafc;
         }
 
-        /* Rasio kotak papan catur yang presisi di semua ukuran layar */
+        #starCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(18, 23, 52, 0.84);
+            backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(255, 215, 130, 0.24);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Papan Catur Kosmik */
         .chess-board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
             aspect-ratio: 1 / 1;
             width: 100%;
-            max-width: min(92vw, 460px);
-            border-radius: 16px;
+            max-width: min(92vw, 450px);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 14px 35px -10px rgba(45, 42, 38, 0.22), 0 0 0 6px #E6D9C8;
+            border: 3px solid rgba(255, 209, 102, 0.48);
+            box-shadow: 0 18px 45px -10px rgba(0, 0, 0, 0.75), 0 0 28px rgba(139, 92, 246, 0.28);
         }
 
         .square {
@@ -65,189 +80,242 @@
             transition: background-color 0.15s ease;
         }
 
-        .square.light { background-color: #F3E9DC; }
-        .square.dark  { background-color: #8F9E8B; }
+        /* Petak Terang (Stardust Cream) & Petak Gelap (Nebula Indigo) */
+        .square.light { background-color: #EAE4F8; }
+        .square.dark  { background-color: #363268; }
 
-        /* Highlight kotak dipilih & langkah terakhir */
+        /* Highlight Interaksi */
         .square.selected {
-            background-color: #F6D365 !important;
+            background: radial-gradient(circle, #FDE047 25%, #F59E0B 100%) !important;
         }
         .square.last-move {
-            box-shadow: inset 0 0 0 100px rgba(253, 224, 71, 0.35);
+            box-shadow: inset 0 0 0 100px rgba(255, 209, 102, 0.34);
         }
         .square.in-check {
-            background: radial-gradient(circle, #EF4444 15%, #DC2626 85%) !important;
-            animation: pulseCheck 1.2s infinite;
+            background: radial-gradient(circle, #FB7185 15%, #E11D48 85%) !important;
+            animation: wobblePanic 0.55s ease-in-out infinite;
         }
         .square.hint-from {
-            box-shadow: inset 0 0 0 4px #3B82F6;
-            background-color: rgba(59, 130, 246, 0.25) !important;
+            box-shadow: inset 0 0 0 4px #38BDF8;
+            background-color: rgba(56, 189, 248, 0.32) !important;
         }
         .square.hint-to {
-            box-shadow: inset 0 0 0 4px #10B981;
-            background-color: rgba(16, 185, 129, 0.3) !important;
+            box-shadow: inset 0 0 0 4px #6EE7B7;
+            background-color: rgba(110, 231, 183, 0.38) !important;
         }
 
-        @keyframes pulseCheck {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(1.2); }
-        }
-
-        /* Indikator langkah valid (Anti-Bingung) */
-        .move-dot {
-            width: 30%;
-            height: 30%;
-            border-radius: 9999px;
-            background-color: rgba(34, 197, 94, 0.78);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.18);
-            pointer-events: none;
-            z-index: 10;
-            transition: transform 0.15s ease;
-        }
-
-        /* Indikator langkah tapi petak sedang diincar lawan (Bahaya) */
-        .move-dot.danger {
-            background-color: rgba(245, 158, 11, 0.88);
-            border: 2px dashed #991B1B;
-            width: 36%;
-            height: 36%;
-        }
-
-        /* Indikator makan bidak lawan */
-        .capture-ring {
-            position: absolute;
-            inset: 6%;
-            border-radius: 9999px;
-            border: 4px solid rgba(239, 68, 68, 0.88);
-            box-shadow: inset 0 0 8px rgba(239, 68, 68, 0.4);
-            pointer-events: none;
-            z-index: 10;
-        }
-        .capture-ring.danger {
-            border-style: dashed;
-            border-color: #F59E0B;
-        }
-
-        /* SVG Bidak Catur */
+        /* Animasi Lucu & Imut pada Bidak */
         .piece-svg {
             width: 82%;
             height: 82%;
             z-index: 5;
             pointer-events: none;
-            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.28));
-            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .square:active .piece-svg {
-            transform: scale(1.1);
+            filter: drop-shadow(0 4px 4px rgba(7, 9, 25, 0.45));
+            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* Animasi Pop-up Reaksi Emoji */
+        /* Bidak terpilih melompat-lompat senang (Jelly Bounce) */
+        .square.selected .piece-svg {
+            animation: cuteBounce 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+        }
+
+        /* Bidak yang baru mendarat membal kenyal */
+        .piece-landed {
+            animation: jellyLand 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes cuteBounce {
+            0%, 100% { transform: translateY(0) scale(1, 1); }
+            35% { transform: translateY(-16%) scale(0.92, 1.1); }
+            65% { transform: translateY(2%) scale(1.08, 0.92); }
+        }
+
+        @keyframes jellyLand {
+            0% { transform: scale(1.25, 0.78); }
+            45% { transform: scale(0.9, 1.12); }
+            75% { transform: scale(1.05, 0.96); }
+            100% { transform: scale(1, 1); }
+        }
+
+        @keyframes wobblePanic {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-7deg) scale(1.06); }
+            75% { transform: rotate(7deg) scale(1.06); }
+        }
+
+        /* Indikator Langkah Valid (Anti-Bingung) */
+        .move-dot {
+            width: 30%;
+            height: 30%;
+            border-radius: 9999px;
+            background-color: #34D399;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.8);
+            pointer-events: none;
+            z-index: 10;
+            animation: pulseDot 1.4s ease-in-out infinite;
+        }
+        .move-dot.danger {
+            background-color: #FBBF24;
+            border: 2px dashed #BE123C;
+            width: 36%;
+            height: 36%;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.85);
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(0.92); }
+            50% { transform: scale(1.12); }
+        }
+
+        .capture-ring {
+            position: absolute;
+            inset: 6%;
+            border-radius: 9999px;
+            border: 4px solid #FB7185;
+            box-shadow: 0 0 12px rgba(251, 113, 133, 0.7), inset 0 0 8px rgba(251, 113, 133, 0.45);
+            pointer-events: none;
+            z-index: 10;
+            animation: pulseDot 1.2s ease-in-out infinite;
+        }
+        .capture-ring.danger {
+            border-style: dashed;
+            border-color: #FBBF24;
+        }
+
+        /* Partikel Bintang Lucu Saat Melangkah / Makan */
+        .sparkle-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 60;
+            font-size: 1.25rem;
+            animation: sparkleFly 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes sparkleFly {
+            0% { opacity: 1; transform: translate(0, 0) scale(0.5) rotate(0deg); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1.35) rotate(180deg); }
+        }
+
+        /* Animasi Pop-up Reaksi Stiker */
         @keyframes floatSticker {
-            0% { opacity: 0; transform: translateY(20px) scale(0.7); }
-            15% { opacity: 1; transform: translateY(0) scale(1.08); }
-            25% { transform: translateY(0) scale(1); }
+            0% { opacity: 0; transform: translateY(24px) scale(0.6) rotate(-6deg); }
+            18% { opacity: 1; transform: translateY(0) scale(1.1) rotate(4deg); }
+            30% { transform: translateY(0) scale(1) rotate(0deg); }
             85% { opacity: 1; transform: translateY(-10px) scale(1); }
-            100% { opacity: 0; transform: translateY(-35px) scale(0.9); }
+            100% { opacity: 0; transform: translateY(-38px) scale(0.9); }
         }
         .sticker-pop {
             animation: floatSticker 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
+
+        .title-gradient {
+            background: linear-gradient(135deg, #fff8dc 0%, #ffd166 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-between py-3 px-3 sm:px-6">
+<body class="min-h-screen flex flex-col items-center justify-between py-3 px-3 sm:px-6 relative overflow-x-hidden">
+
+    <!-- Latar Langit Berbintang Kosmik -->
+    <canvas id="starCanvas"></canvas>
 
     <!-- ==================== HEADER BAR ==================== -->
-    <header class="w-full max-w-lg flex items-center justify-between bg-warmCard border border-[#EADFD3] rounded-2xl px-4 py-2.5 shadow-sm">
+    <header class="relative z-10 w-full max-w-lg flex items-center justify-between glass-panel rounded-2xl px-3.5 py-2.5">
         <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-terracotta text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-pink-500/30 to-purple-500/30 border border-pink-400/50 text-cosmicGold flex items-center justify-center font-bold text-lg shadow-inner">
                 ♞
             </div>
             <div>
-                <h1 class="font-extrabold text-base sm:text-lg leading-tight text-ink">Catur Berdua</h1>
-                <p id="connectionBadge" class="text-[11px] font-medium text-stone-500 flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span> Pilih Mode Main
+                <h1 class="font-cosmic font-bold text-sm sm:text-base leading-tight title-gradient">VirSagi Chess</h1>
+                <p id="connectionBadge" class="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span> Menunggu di Portal
                 </p>
             </div>
         </div>
 
         <div class="flex items-center gap-1.5">
             <!-- Toggle Mode Santai / Klasik -->
-            <button id="btnToggleCoach" onclick="toggleCoachMode()" title="Aktifkan/Matikan Pelatih Anti-Bingung"
-                class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 transition active:scale-95">
-                ✨ Mode Santai
+            <button id="btnToggleCoach" onclick="toggleCoachMode()" title="Pelatih Anti-Bingung"
+                class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-emerald-500/20 text-virgoMint border border-emerald-400/40 transition active:scale-95">
+                ✨ Santai
             </button>
             <!-- Tombol Suara -->
             <button id="btnSound" onclick="toggleSound()" title="Suara Efek"
-                class="w-9 h-9 rounded-xl bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-base transition active:scale-95">
+                class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm transition active:scale-95">
                 🔊
             </button>
-            <!-- Tombol Menu Utama -->
-            <button onclick="openLobbyModal()" title="Menu & Undang Pasangan"
-                class="w-9 h-9 rounded-xl bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-base transition active:scale-95">
-                ⚙️
+            <!-- Tombol Exit (Membersihkan Room & Keluar) -->
+            <button onclick="exitAndCleanRoom()" title="Keluar & Bersihkan Room"
+                class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 border border-rose-400/40 font-bold text-[11px] transition active:scale-95 flex items-center gap-1">
+                <span>🚪</span> Exit
             </button>
         </div>
     </header>
 
-    <!-- ==================== AREA PEMAIN ATAS (LAWAN / HITAM) ==================== -->
-    <main class="w-full max-w-lg flex-1 flex flex-col items-center justify-center my-2 gap-2.5 relative">
+    <!-- ==================== AREA PERMAINAN UTAMA ==================== -->
+    <main class="relative z-10 w-full max-w-lg flex-1 flex flex-col items-center justify-center my-2 gap-2.5">
         
         <!-- Kartu Status Pemain Atas -->
-        <div id="topPlayerBar" class="w-full flex items-center justify-between bg-warmCard border border-[#EADFD3] rounded-2xl px-3.5 py-2 shadow-sm transition-all">
+        <div id="topPlayerBar" class="w-full flex items-center justify-between glass-panel rounded-2xl px-3.5 py-2 transition-all">
             <div class="flex items-center gap-2.5">
-                <div id="topAvatar" class="w-8 h-8 rounded-full bg-stone-800 text-white flex items-center justify-center font-bold text-sm shadow-inner">
+                <div id="topAvatar" class="w-8 h-8 rounded-full bg-purple-950 border border-pink-400/50 text-sagiPink flex items-center justify-center font-bold text-sm">
                     ♚
                 </div>
                 <div>
                     <div class="flex items-center gap-1.5">
-                        <span id="topPlayerName" class="font-bold text-sm text-ink">Pemain Hitam</span>
-                        <span id="topTurnBadge" class="hidden text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-terracotta text-white">Giliranmu</span>
+                        <span id="topPlayerName" class="font-bold text-xs sm:text-sm text-white">Sagittarius (Hitam) ♐</span>
+                        <span id="topTurnBadge" class="hidden text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-pink-500 to-amber-400 text-slate-950 animate-pulse">Giliran</span>
                     </div>
-                    <div id="topCaptured" class="flex items-center gap-0.5 text-xs text-stone-500 min-h-[16px]">
-                        <span class="text-[11px] italic text-stone-400">Belum ada bidak termakan</span>
+                    <div id="topCaptured" class="flex items-center gap-0.5 text-xs text-slate-400 min-h-[16px]">
+                        <span class="text-[11px] italic text-slate-400">Belum ada tangkapan ✨</span>
                     </div>
                 </div>
             </div>
-            <div id="topStatusTag" class="text-xs font-semibold text-stone-500"></div>
+            <div id="idleTimerBadge" class="text-[10px] font-semibold text-slate-400 bg-white/5 px-2 py-1 rounded-lg border border-white/10" title="Room otomatis dibersihkan jika diam 5 menit">
+                ⏳ 05:00
+            </div>
         </div>
 
         <!-- POPUP REAKSI EMOJI MENGAMBANG -->
         <div id="stickerOverlay" class="pointer-events-none absolute inset-0 z-30 flex items-center justify-center"></div>
 
-        <!-- PAPAN CATUR UTAMA -->
+        <!-- PAPAN CATUR KOSMIK -->
         <div class="relative w-full flex justify-center">
             <div id="chessBoard" class="chess-board"></div>
         </div>
 
         <!-- Kartu Status Pemain Bawah -->
-        <div id="bottomPlayerBar" class="w-full flex items-center justify-between bg-warmCard border border-[#EADFD3] rounded-2xl px-3.5 py-2 shadow-sm transition-all">
+        <div id="bottomPlayerBar" class="w-full flex items-center justify-between glass-panel rounded-2xl px-3.5 py-2 transition-all">
             <div class="flex items-center gap-2.5">
-                <div id="bottomAvatar" class="w-8 h-8 rounded-full bg-[#F3E9DC] border-2 border-stone-400 text-ink flex items-center justify-center font-bold text-sm">
+                <div id="bottomAvatar" class="w-8 h-8 rounded-full bg-amber-100 border-2 border-cosmicGold text-slate-900 flex items-center justify-center font-bold text-sm">
                     ♔
                 </div>
                 <div>
                     <div class="flex items-center gap-1.5">
-                        <span id="bottomPlayerName" class="font-bold text-sm text-ink">Pemain Putih</span>
-                        <span id="bottomTurnBadge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-terracotta text-white">Giliranmu</span>
+                        <span id="bottomPlayerName" class="font-bold text-xs sm:text-sm text-white">Virgo (Putih) ♍</span>
+                        <span id="bottomTurnBadge" class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-emerald-400 to-amber-300 text-slate-950 animate-pulse">Giliran</span>
                     </div>
-                    <div id="bottomCaptured" class="flex items-center gap-0.5 text-xs text-stone-500 min-h-[16px]">
-                        <span class="text-[11px] italic text-stone-400">Belum ada bidak termakan</span>
+                    <div id="bottomCaptured" class="flex items-center gap-0.5 text-xs text-slate-400 min-h-[16px]">
+                        <span class="text-[11px] italic text-slate-400">Belum ada tangkapan ✨</span>
                     </div>
                 </div>
             </div>
-            <div id="bottomStatusTag" class="text-xs font-semibold text-stone-500"></div>
+            <button onclick="openRpsModal()" class="text-[11px] font-bold text-cosmicGold bg-amber-400/15 hover:bg-amber-400/25 px-2.5 py-1 rounded-xl border border-amber-400/30 active:scale-95 transition">
+                ✌️ Suit
+            </button>
         </div>
 
         <!-- ==================== KARTU PELATIH ANTI-BINGUNG ==================== -->
-        <div id="coachCard" class="w-full bg-warmCard border-2 border-[#E6D9C8] rounded-2xl p-3 shadow-sm transition-all">
+        <div id="coachCard" class="w-full glass-panel rounded-2xl p-3 transition-all">
             <div class="flex items-start gap-2.5">
-                <div id="coachIcon" class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-base shrink-0 mt-0.5">
-                    💡
+                <div id="coachIcon" class="w-8 h-8 rounded-xl bg-amber-400/20 border border-amber-400/40 text-cosmicGold flex items-center justify-center text-base shrink-0 mt-0.5">
+                    🌟
                 </div>
                 <div class="flex-1 min-w-0">
-                    <h3 id="coachTitle" class="font-bold text-xs sm:text-sm text-ink">Sentuh bidakmu untuk melihat jalan!</h3>
-                    <p id="coachDesc" class="text-xs text-stone-600 leading-relaxed mt-0.5">
-                        Titik <span class="text-emerald-600 font-bold">hijau</span> = jalan aman. Lingkaran <span class="text-red-600 font-bold">merah</span> = makan bidak lawan. Garis <span class="text-amber-600 font-bold">putus-putus</span> = hati-hati diincar lawan!
+                    <h3 id="coachTitle" class="font-bold text-xs sm:text-sm text-cosmicGold">Sentuh bidakmu, nanti dia lompat lucu!</h3>
+                    <p id="coachDesc" class="text-xs text-slate-300 leading-relaxed mt-0.5">
+                        Titik <span class="text-virgoMint font-bold">hijau</span> = aman. Lingkaran <span class="text-sagiPink font-bold">pink</span> = tangkap bidak. Garis <span class="text-amber-300 font-bold">putus-putus</span> = hati-hati diincar!
                     </p>
                 </div>
             </div>
@@ -255,34 +323,34 @@
 
         <!-- ==================== TOMBOL BANTUAN PASANGAN & STIKER ==================== -->
         <div class="w-full grid grid-cols-3 gap-2">
-            <button onclick="requestHint()" class="flex items-center justify-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 font-bold text-xs py-2.5 px-2 rounded-xl transition active:scale-95">
-                <span>🧭</span> Saran Langkah
+            <button onclick="requestHint()" class="flex items-center justify-center gap-1.5 bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 border border-sky-400/40 font-bold text-xs py-2.5 px-2 rounded-xl transition active:scale-95">
+                <span>🧭</span> Saran
             </button>
-            <button onclick="requestUndo()" class="flex items-center justify-center gap-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold text-xs py-2.5 px-2 rounded-xl transition active:scale-95">
+            <button onclick="requestUndo()" class="flex items-center justify-center gap-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/40 font-bold text-xs py-2.5 px-2 rounded-xl transition active:scale-95">
                 <span>↩️</span> Minta Ulang
             </button>
-            <button onclick="toggleStickerDrawer()" class="flex items-center justify-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 font-bold text-xs py-2.5 px-2 rounded-xl transition active:scale-95">
-                <span>💌</span> Kirim Reaksi
+            <button onclick="toggleStickerDrawer()" class="flex items-center justify-center gap-1.5 bg-pink-500/20 hover:bg-pink-500/30 text-pink-200 border border-pink-400/40 font-bold text-xs py-2.5 px-2 rounded-xl transition active:scale-95">
+                <span>💖</span> Reaksi Lucu
             </button>
         </div>
 
         <!-- Laci Stiker Cepat -->
-        <div id="stickerDrawer" class="hidden w-full bg-warmCard border border-[#EADFD3] rounded-2xl p-2 grid grid-cols-4 gap-1.5 shadow-md">
-            <button onclick="sendSticker('👏', 'Bagus banget!')" class="flex flex-col items-center p-1.5 rounded-xl hover:bg-stone-100 active:scale-95 transition">
-                <span class="text-xl">👏</span>
-                <span class="text-[10px] font-semibold text-stone-600 mt-0.5">Bagus!</span>
+        <div id="stickerDrawer" class="hidden w-full glass-panel rounded-2xl p-2 grid grid-cols-4 gap-1.5">
+            <button onclick="sendSticker('🥰', 'Keren banget sayang!')" class="flex flex-col items-center p-1.5 rounded-xl hover:bg-white/10 active:scale-95 transition">
+                <span class="text-xl">🥰</span>
+                <span class="text-[10px] font-semibold text-slate-300 mt-0.5">Keren!</span>
             </button>
-            <button onclick="sendSticker('😱', 'Waduh jebakan!')" class="flex flex-col items-center p-1.5 rounded-xl hover:bg-stone-100 active:scale-95 transition">
-                <span class="text-xl">😱</span>
-                <span class="text-[10px] font-semibold text-stone-600 mt-0.5">Jebakan!</span>
+            <button onclick="sendSticker('🙈', 'Aduh ketahuan!')" class="flex flex-col items-center p-1.5 rounded-xl hover:bg-white/10 active:scale-95 transition">
+                <span class="text-xl">🙈</span>
+                <span class="text-[10px] font-semibold text-slate-300 mt-0.5">Aduh!</span>
             </button>
-            <button onclick="sendSticker('🥺', 'Ampun dong...')" class="flex flex-col items-center p-1.5 rounded-xl hover:bg-stone-100 active:scale-95 transition">
+            <button onclick="sendSticker('🥺', 'Ampun dong Virgo/Sagi...')" class="flex flex-col items-center p-1.5 rounded-xl hover:bg-white/10 active:scale-95 transition">
                 <span class="text-xl">🥺</span>
-                <span class="text-[10px] font-semibold text-stone-600 mt-0.5">Ampun!</span>
+                <span class="text-[10px] font-semibold text-slate-300 mt-0.5">Ampun!</span>
             </button>
-            <button onclick="sendSticker('🤔', 'Bentar mikir...')" class="flex flex-col items-center p-1.5 rounded-xl hover:bg-stone-100 active:scale-95 transition">
-                <span class="text-xl">🤔</span>
-                <span class="text-[10px] font-semibold text-stone-600 mt-0.5">Mikiiir...</span>
+            <button onclick="sendSticker('✨', 'Bentar mikir cantik...')" class="flex flex-col items-center p-1.5 rounded-xl hover:bg-white/10 active:scale-95 transition">
+                <span class="text-xl">✨</span>
+                <span class="text-[10px] font-semibold text-slate-300 mt-0.5">Mikiiir...</span>
             </button>
         </div>
     </main>
@@ -290,195 +358,237 @@
     <!-- ==================== TOAST NOTIFICATION ==================== -->
     <div id="toastBox" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none flex flex-col items-center gap-2 w-11/12 max-w-sm"></div>
 
-    <!-- ==================== MODAL LOBBY & UNDANG PASANGAN ==================== -->
-    <div id="lobbyModal" class="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-        <div class="bg-warmCard border border-[#EADFD3] rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4">
+    <!-- ==================== MODAL PORTAL LOBBY ROOM PERMANEN ==================== -->
+    <div id="lobbyModal" class="fixed inset-0 z-40 bg-[#070919]/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 relative overflow-hidden">
             <div class="text-center">
-                <div class="w-12 h-12 rounded-2xl bg-terracotta/15 text-terracotta mx-auto flex items-center justify-center text-2xl mb-2">
-                    💕
+                <div class="inline-flex items-center gap-2 bg-amber-400/15 border border-amber-400/40 text-cosmicGold text-[11px] font-bold px-3 py-1 rounded-full mb-2">
+                    ♍ VIRGO &nbsp;✦&nbsp; SAGITTARIUS ♐
                 </div>
-                <h2 class="text-xl font-extrabold text-ink">Catur Santai Berdua</h2>
-                <p class="text-xs text-stone-500 mt-1">Dilengkapi pemandu otomatis supaya tidak bingung & makin seru main bareng!</p>
+                <h2 class="font-cosmic text-xl font-bold title-gradient">VirSagi Cosmic Chess</h2>
+                <p class="text-xs text-slate-300 mt-1">
+                    Room permanen selalu siap! Tinggal klik gabung, otomatis terhubung berdua tanpa ribet kirim-kirim kode.
+                </p>
             </div>
 
-            <!-- Pilihan Mode Main -->
+            <!-- TOMBOL UTAMA: GABUNG ROOM PERMANEN -->
             <div class="space-y-2.5">
-                <button onclick="startLocalMode()" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-[#F3E9DC] hover:bg-[#EAE0D0] border border-[#DFD1BE] text-left transition active:scale-98">
+                <button id="btnJoinPermanent" onclick="connectPermanentRoom()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-amber-400 text-slate-950 font-extrabold text-sm shadow-lg shadow-pink-500/25 hover:brightness-110 transition active:scale-95 flex items-center justify-center gap-2">
+                    <span class="text-lg">🚀</span> Gabung Room Permanen Berdua
+                </button>
+                <p id="permanentRoomStatus" class="hidden text-xs text-center text-virgoMint font-semibold animate-pulse">
+                    Menghubungkan ke orbit VirSagi...
+                </p>
+
+                <!-- Opsi Main 1 Layar -->
+                <button onclick="startLocalMode()" class="w-full flex items-center justify-between p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 text-left transition active:scale-98">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">📱</span>
                         <div>
-                            <div class="font-bold text-sm text-ink">Main Bareng 1 Layar (Pass & Play)</div>
-                            <div class="text-xs text-stone-600">Gantian pegang 1 HP/laptop bersebelahan</div>
+                            <div class="font-bold text-sm text-white">Main Bareng 1 Layar</div>
+                            <div class="text-xs text-slate-400">Gantian di 1 HP saat lagi duduk bareng</div>
                         </div>
                     </div>
-                    <span class="text-stone-400 font-bold">→</span>
+                    <span class="text-cosmicGold font-bold">➔</span>
                 </button>
-
-                <div class="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 space-y-3">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">🔗</span>
-                        <div>
-                            <div class="font-bold text-sm text-ink">Main Jarak Jauh (Online P2P)</div>
-                            <div class="text-xs text-stone-500">Kirim link ke pasangan, langsung terhubung</div>
-                        </div>
-                    </div>
-
-                    <div id="p2pHostSection" class="space-y-2">
-                        <button id="btnCreateRoom" onclick="createP2PRoom()" class="w-full py-2.5 px-4 rounded-xl bg-terracotta hover:bg-terracottaDark text-white font-bold text-xs shadow-sm transition active:scale-95">
-                            Buat Room & Salin Link Ajak Main
-                        </button>
-                        <div id="roomShareBox" class="hidden space-y-2 pt-1">
-                            <div class="flex items-center gap-1.5 bg-white border border-stone-300 rounded-xl p-1.5">
-                                <input id="shareLinkInput" type="text" readonly class="w-full text-xs text-stone-600 bg-transparent px-2 outline-none" value="Membuat link...">
-                                <button onclick="copyRoomLink()" class="shrink-0 px-3 py-1.5 rounded-lg bg-sageDark text-white font-bold text-xs active:scale-95">
-                                    Salin
-                                </button>
-                            </div>
-                            <p id="p2pStatusText" class="text-[11px] text-center text-amber-700 font-medium animate-pulse">
-                                Menunggu pasangan membuka link...
-                            </p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <!-- Suit Batu Gunting Kertas & Pilihan Warna -->
-            <div class="pt-2 border-t border-stone-200 flex items-center justify-between gap-2">
-                <button onclick="openRpsModal()" class="flex-1 py-2.5 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs transition active:scale-95">
-                    ✌️ Suit Tentukan Warna
-                </button>
-                <button onclick="closeLobbyModal()" class="py-2.5 px-4 rounded-xl bg-stone-200 hover:bg-stone-300 text-stone-700 font-bold text-xs transition active:scale-95">
-                    Tutup
-                </button>
+            <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+                <span>✨ Animasi lucu + Pelatih Anti-Bingung</span>
+                <a href="https://bbckarawang.github.io/virsagi/games" class="text-cosmicGold hover:underline font-bold">← Hub Utama</a>
             </div>
         </div>
     </div>
 
     <!-- ==================== MODAL SUIT BATU GUNTING KERTAS ==================== -->
-    <div id="rpsModal" class="hidden fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4">
-        <div class="bg-warmCard border border-[#EADFD3] rounded-3xl max-w-sm w-full p-5 shadow-2xl text-center space-y-4">
-            <h3 class="text-lg font-extrabold text-ink">Suit Tentukan Bidak Putih!</h3>
-            <p class="text-xs text-stone-500">Pemenang suit bermain sebagai <b>Putih (Jalan Duluan)</b>.</p>
+    <div id="rpsModal" class="hidden fixed inset-0 z-50 bg-[#070919]/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-sm w-full p-5 text-center space-y-4">
+            <h3 class="font-cosmic text-base font-bold text-cosmicGold">Suit Tentukan Bidak Putih!</h3>
+            <p class="text-xs text-slate-300">Pemenang suit bermain sebagai <b>Putih (Jalan Duluan)</b>.</p>
             
-            <div id="rpsChoiceGrid" class="grid grid-cols-3 gap-2.5 pt-1">
-                <button onclick="playRps('batu')" class="p-3 rounded-2xl bg-stone-100 hover:bg-amber-100 border border-stone-200 flex flex-col items-center gap-1 transition active:scale-95">
+            <div class="grid grid-cols-3 gap-2.5 pt-1">
+                <button onclick="playRps('batu')" class="p-3 rounded-2xl bg-white/10 hover:bg-pink-500/25 border border-white/15 flex flex-col items-center gap-1 transition active:scale-95">
                     <span class="text-3xl">✊</span>
                     <span class="text-xs font-bold">Batu</span>
                 </button>
-                <button onclick="playRps('gunting')" class="p-3 rounded-2xl bg-stone-100 hover:bg-amber-100 border border-stone-200 flex flex-col items-center gap-1 transition active:scale-95">
+                <button onclick="playRps('gunting')" class="p-3 rounded-2xl bg-white/10 hover:bg-pink-500/25 border border-white/15 flex flex-col items-center gap-1 transition active:scale-95">
                     <span class="text-3xl">✌️</span>
                     <span class="text-xs font-bold">Gunting</span>
                 </button>
-                <button onclick="playRps('kertas')" class="p-3 rounded-2xl bg-stone-100 hover:bg-amber-100 border border-stone-200 flex flex-col items-center gap-1 transition active:scale-95">
+                <button onclick="playRps('kertas')" class="p-3 rounded-2xl bg-white/10 hover:bg-pink-500/25 border border-white/15 flex flex-col items-center gap-1 transition active:scale-95">
                     <span class="text-3xl">🖐️</span>
                     <span class="text-xs font-bold">Kertas</span>
                 </button>
             </div>
 
-            <div id="rpsResultBox" class="hidden p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 font-semibold"></div>
+            <div id="rpsResultBox" class="hidden p-3 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-xs text-virgoMint font-semibold"></div>
 
-            <button onclick="closeRpsModal()" class="w-full py-2.5 rounded-xl bg-stone-200 text-stone-700 font-bold text-xs">
+            <button onclick="closeRpsModal()" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-xs">
                 Kembali
             </button>
         </div>
     </div>
 
     <!-- ==================== MODAL PROMOSI PION ==================== -->
-    <div id="promotionModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-        <div class="bg-warmCard border border-[#EADFD3] rounded-3xl max-w-sm w-full p-5 shadow-2xl text-center space-y-3">
-            <div class="text-2xl">👑</div>
-            <h3 class="text-lg font-extrabold text-ink">Pionmu Sampai Ujung!</h3>
-            <p class="text-xs text-stone-500">Pilih perubahan bidak baru (Menteri paling kuat!):</p>
+    <div id="promotionModal" class="hidden fixed inset-0 z-50 bg-[#070919]/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-sm w-full p-5 text-center space-y-3">
+            <div class="text-3xl animate-bounce">👑</div>
+            <h3 class="font-cosmic text-base font-bold text-cosmicGold">Yeay! Pion Jadi Bintang!</h3>
+            <p class="text-xs text-slate-300">Pilih evolusi bidak baru (Menteri paling sakti!):</p>
             <div class="grid grid-cols-2 gap-2 pt-1">
-                <button onclick="completePromotion('q')" class="p-3 rounded-2xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-left transition active:scale-95">
-                    <div class="font-extrabold text-sm text-amber-900">♕ Menteri (Queen)</div>
-                    <div class="text-[11px] text-amber-700">Bisa jalan ke segala arah!</div>
+                <button onclick="completePromotion('q')" class="p-3 rounded-2xl bg-amber-400/20 hover:bg-amber-400/30 border border-amber-400/50 text-left transition active:scale-95">
+                    <div class="font-extrabold text-sm text-cosmicGold">♕ Menteri</div>
+                    <div class="text-[11px] text-amber-200">Jalan ke segala arah!</div>
                 </button>
-                <button onclick="completePromotion('n')" class="p-3 rounded-2xl bg-stone-50 hover:bg-stone-100 border border-stone-200 text-left transition active:scale-95">
-                    <div class="font-extrabold text-sm text-ink">♘ Kuda (Knight)</div>
-                    <div class="text-[11px] text-stone-500">Lompat huruf L</div>
+                <button onclick="completePromotion('n')" class="p-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-left transition active:scale-95">
+                    <div class="font-extrabold text-sm text-white">♘ Kuda</div>
+                    <div class="text-[11px] text-slate-300">Lompat huruf L</div>
                 </button>
-                <button onclick="completePromotion('r')" class="p-3 rounded-2xl bg-stone-50 hover:bg-stone-100 border border-stone-200 text-left transition active:scale-95">
-                    <div class="font-extrabold text-sm text-ink">♖ Benteng (Rook)</div>
-                    <div class="text-[11px] text-stone-500">Jalan lurus jauh</div>
+                <button onclick="completePromotion('r')" class="p-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-left transition active:scale-95">
+                    <div class="font-extrabold text-sm text-white">♖ Benteng</div>
+                    <div class="text-[11px] text-slate-300">Meluncur lurus</div>
                 </button>
-                <button onclick="completePromotion('b')" class="p-3 rounded-2xl bg-stone-50 hover:bg-stone-100 border border-stone-200 text-left transition active:scale-95">
-                    <div class="font-extrabold text-sm text-ink">♗ Gajah (Bishop)</div>
-                    <div class="text-[11px] text-stone-500">Jalan miring diagonal</div>
+                <button onclick="completePromotion('b')" class="p-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-left transition active:scale-95">
+                    <div class="font-extrabold text-sm text-white">♗ Gajah</div>
+                    <div class="text-[11px] text-slate-300">Meluncur miring</div>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== MODAL KONFIRMASI UNDO / GAME OVER ==================== -->
-    <div id="customDialogModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-        <div class="bg-warmCard border border-[#EADFD3] rounded-3xl max-w-sm w-full p-5 shadow-2xl text-center space-y-4">
-            <div id="dialogIcon" class="text-4xl">🏆</div>
-            <h3 id="dialogTitle" class="text-lg font-extrabold text-ink">Permainan Selesai!</h3>
-            <p id="dialogMessage" class="text-xs text-stone-600 leading-relaxed"></p>
+    <!-- ==================== MODAL DIALOG KUSTOM (UNDO / GAME OVER / EXIT) ==================== -->
+    <div id="customDialogModal" class="hidden fixed inset-0 z-50 bg-[#070919]/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-sm w-full p-5 text-center space-y-4">
+            <div id="dialogIcon" class="text-4xl animate-bounce">🏆</div>
+            <h3 id="dialogTitle" class="font-cosmic text-base font-bold text-cosmicGold">Permainan Selesai!</h3>
+            <p id="dialogMessage" class="text-xs text-slate-300 leading-relaxed"></p>
             <div id="dialogActions" class="flex gap-2 justify-center pt-1"></div>
         </div>
     </div>
 
     <script>
         /* =====================================================================
-           1. ASET SVG BIDAK CATUR BERKUALITAS TINGGI (CRISP & RAMAH MOBILE)
+           1. LATAR LANGIT KOSMIK VIRGO & SAGITTARIUS (ANIMASI BINTANG JATUH)
+           ===================================================================== */
+        const starCanvas = document.getElementById('starCanvas');
+        const sCtx = starCanvas.getContext('2d');
+        let stars = [];
+        let shootingStars = [];
+
+        function resizeStarCanvas() {
+            starCanvas.width = window.innerWidth;
+            starCanvas.height = window.innerHeight;
+            stars = Array.from({ length: 110 }, () => ({
+                x: Math.random() * starCanvas.width,
+                y: Math.random() * starCanvas.height,
+                r: Math.random() * 1.6 + 0.3,
+                alpha: Math.random(),
+                speed: Math.random() * 0.015 + 0.004
+            }));
+        }
+        window.addEventListener('resize', resizeStarCanvas);
+        resizeStarCanvas();
+
+        function animateStars() {
+            sCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+            stars.forEach(st => {
+                st.alpha += st.speed;
+                if (st.alpha > 1 || st.alpha < 0.15) st.speed *= -1;
+                sCtx.beginPath();
+                sCtx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+                sCtx.fillStyle = `rgba(255, 244, 214, ${st.alpha})`;
+                sCtx.fill();
+            });
+
+            if (Math.random() < 0.016 && shootingStars.length < 2) {
+                shootingStars.push({
+                    x: Math.random() * starCanvas.width,
+                    y: Math.random() * (starCanvas.height * 0.35),
+                    vx: -(Math.random() * 5 + 4),
+                    vy: Math.random() * 3 + 2,
+                    life: 1
+                });
+            }
+
+            shootingStars.forEach((ss, idx) => {
+                sCtx.beginPath();
+                sCtx.moveTo(ss.x, ss.y);
+                sCtx.lineTo(ss.x - ss.vx * 4, ss.y - ss.vy * 4);
+                sCtx.strokeStyle = `rgba(255, 209, 102, ${ss.life})`;
+                sCtx.lineWidth = 2;
+                sCtx.stroke();
+                ss.x += ss.vx;
+                ss.y += ss.vy;
+                ss.life -= 0.025;
+                if (ss.life <= 0) shootingStars.splice(idx, 1);
+            });
+
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
+        /* =====================================================================
+           2. ASET SVG BIDAK CATUR KOSMIK (PUTIH EMAS & HITAM NEBULA)
            ===================================================================== */
         const PIECE_SVGS = {
-            wP: `<svg class="piece-svg" viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#FFFDF9" stroke="#2D2A26" stroke-width="2" stroke-linecap="round"/></svg>`,
-            wR: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="#FFFDF9" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 39h27v-3H9v3zM12 36v-4h21v4H12zM11 14V9h4v2h5V9h5v2h5V9h4v5"/><path d="M34 14l-3 3H14l-3-3"/><path d="M31 17v12.5H14V17"/><path d="M31 29.5l1.5 2.5h-20l1.5-2.5"/><path d="M11 14h23" fill="none" stroke-linejoin="miter"/></g></svg>`,
-            wN: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18" fill="#FFFDF9"/><path d="M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10" fill="#FFFDF9"/><circle cx="14.5" cy="15.5" r="1" fill="#2D2A26"/></g></svg>`,
-            wB: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g fill="#FFFDF9" stroke-linecap="butt"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2z"/><path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/><circle cx="22.5" cy="8" r="2.5"/></g><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" stroke-linejoin="miter"/></g></svg>`,
-            wQ: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="#FFFDF9" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2"/><circle cx="14" cy="9" r="2"/><circle cx="22.5" cy="8" r="2"/><circle cx="31" cy="9" r="2"/><circle cx="39" cy="12" r="2"/><path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14l2 12z"/><path d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/><path d="M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0" fill="none"/></g></svg>`,
-            wK: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#2D2A26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.5 11.63V6M20 8h5" stroke-linejoin="miter"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#FFFDF9" stroke-linecap="butt" stroke-linejoin="miter"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z" fill="#FFFDF9"/><path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0"/></g></svg>`,
-            bP: `<svg class="piece-svg" viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#36322E" stroke="#1A1816" stroke-width="2" stroke-linecap="round"/></svg>`,
-            bR: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="#36322E" stroke="#1A1816" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 39h27v-3H9v3zM12.5 32l1.5-2.5h17l1.5 2.5h-20zM12 36v-4h21v4H12z"/><path d="M14 29.5v-13h17v13H14z"/><path d="M14 16.5L11 14h23l-3 2.5H14zM11 14V9h4v2h5V9h5v2h5V9h4v5H11z"/><path d="M12 35.5h21M13 31.5h19M14 29.5h17M14 16.5h17M11 14h23" fill="none" stroke="#F3E9DC" stroke-width="1.2" stroke-linejoin="miter"/></g></svg>`,
-            bN: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#1A1816" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18" fill="#36322E"/><path d="M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10" fill="#36322E"/><circle cx="14.5" cy="15.5" r="1.2" fill="#F3E9DC" stroke="none"/></g></svg>`,
-            bB: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#1A1816" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g fill="#36322E" stroke-linecap="butt"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2z"/><path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/><circle cx="22.5" cy="8" r="2.5"/></g><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" stroke="#F3E9DC" stroke-width="1.5" stroke-linejoin="miter"/></g></svg>`,
-            bQ: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="#36322E" stroke="#1A1816" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2"/><circle cx="14" cy="9" r="2"/><circle cx="22.5" cy="8" r="2"/><circle cx="31" cy="9" r="2"/><circle cx="39" cy="12" r="2"/><path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14l2 12z"/><path d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/><path d="M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0" fill="none" stroke="#F3E9DC" stroke-width="1.2"/></g></svg>`,
-            bK: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#1A1816" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.5 11.63V6M20 8h5" stroke-linejoin="miter"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#36322E" stroke-linecap="butt" stroke-linejoin="miter"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z" fill="#36322E"/><path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0" stroke="#F3E9DC" stroke-width="1.2"/></g></svg>`
+            wP: `<svg class="piece-svg" viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#FFFBEB" stroke="#1E1B4B" stroke-width="2" stroke-linecap="round"/></svg>`,
+            wR: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="#FFFBEB" stroke="#1E1B4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 39h27v-3H9v3zM12 36v-4h21v4H12zM11 14V9h4v2h5V9h5v2h5V9h4v5"/><path d="M34 14l-3 3H14l-3-3"/><path d="M31 17v12.5H14V17"/><path d="M31 29.5l1.5 2.5h-20l1.5-2.5"/><path d="M11 14h23" fill="none" stroke-linejoin="miter"/></g></svg>`,
+            wN: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#1E1B4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18" fill="#FFFBEB"/><path d="M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10" fill="#FFFBEB"/><circle cx="14.5" cy="15.5" r="1.2" fill="#1E1B4B"/></g></svg>`,
+            wB: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#1E1B4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g fill="#FFFBEB" stroke-linecap="butt"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2z"/><path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/><circle cx="22.5" cy="8" r="2.5"/></g><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" stroke-linejoin="miter"/></g></svg>`,
+            wQ: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="#FFFBEB" stroke="#1E1B4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2"/><circle cx="14" cy="9" r="2"/><circle cx="22.5" cy="8" r="2"/><circle cx="31" cy="9" r="2"/><circle cx="39" cy="12" r="2"/><path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14l2 12z"/><path d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/><path d="M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0" fill="none"/></g></svg>`,
+            wK: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#1E1B4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.5 11.63V6M20 8h5" stroke-linejoin="miter"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#FFFBEB" stroke-linecap="butt" stroke-linejoin="miter"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z" fill="#FFFBEB"/><path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0"/></g></svg>`,
+            bP: `<svg class="piece-svg" viewBox="0 0 45 45"><path d="M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z" fill="#1E1638" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+            bR: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="#1E1638" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 39h27v-3H9v3zM12.5 32l1.5-2.5h17l1.5 2.5h-20zM12 36v-4h21v4H12z"/><path d="M14 29.5v-13h17v13H14z"/><path d="M14 16.5L11 14h23l-3 2.5H14zM11 14V9h4v2h5V9h5v2h5V9h4v5H11z"/><path d="M12 35.5h21M13 31.5h19M14 29.5h17M14 16.5h17M11 14h23" fill="none" stroke="#FFD166" stroke-width="1.1" stroke-linejoin="miter"/></g></svg>`,
+            bN: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18" fill="#1E1638"/><path d="M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10" fill="#1E1638"/><circle cx="14.5" cy="15.5" r="1.4" fill="#FFD166" stroke="none"/></g></svg>`,
+            bB: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g fill="#1E1638" stroke-linecap="butt"><path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2z"/><path d="M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z"/><circle cx="22.5" cy="8" r="2.5"/></g><path d="M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5" stroke="#FFD166" stroke-width="1.4" stroke-linejoin="miter"/></g></svg>`,
+            bQ: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="#1E1638" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2"/><circle cx="14" cy="9" r="2"/><circle cx="22.5" cy="8" r="2"/><circle cx="31" cy="9" r="2"/><circle cx="39" cy="12" r="2"/><path d="M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14l2 12z"/><path d="M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z"/><path d="M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0" fill="none" stroke="#FFD166" stroke-width="1.1"/></g></svg>`,
+            bK: `<svg class="piece-svg" viewBox="0 0 45 45"><g fill="none" fill-rule="evenodd" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22.5 11.63V6M20 8h5" stroke="#FFD166" stroke-linejoin="miter"/><path d="M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5" fill="#1E1638" stroke-linecap="butt" stroke-linejoin="miter"/><path d="M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10V37z" fill="#1E1638"/><path d="M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0" stroke="#FFD166" stroke-width="1.1"/></g></svg>`
         };
 
         /* =====================================================================
-           2. KAMUS PELATIH ANTI-BINGUNG (BAHASA INDONESIA SANTAI)
+           3. PELATIH ANTI-BINGUNG & ANIMASI PARTIKEL LUCU
            ===================================================================== */
         const PIECE_GUIDE = {
-            P: {
-                name: 'Pion (Pawn)',
-                icon: '♟️',
-                desc: 'Maju 1 langkah lurus ke depan (bisa 2 langkah di awal). Tapi makannya miring 1 langkah ke kiri/kanan depan!'
-            },
-            R: {
-                name: 'Benteng (Rook)',
-                icon: '♖',
-                desc: 'Bisa meluncur lurus sejauh mungkin ke depan, belakang, kiri, atau kanan selama jalannya kosong.'
-            },
-            N: {
-                name: 'Kuda (Knight)',
-                icon: '♘',
-                desc: 'Jalannya unik membentuk huruf "L" (2 lurus + 1 belok) dan satu-satunya bidak yang bisa melompati bidak lain!'
-            },
-            B: {
-                name: 'Gajah (Bishop)',
-                icon: '♗',
-                desc: 'Meluncur miring (diagonal) sejauh mungkin. Gajah petak terang akan selamanya di petak terang.'
-            },
-            Q: {
-                name: 'Menteri (Queen)',
-                icon: '♕',
-                desc: 'Bidak terkuat! Gabungan Benteng + Gajah: bisa meluncur lurus maupun miring ke segala arah.'
-            },
-            K: {
-                name: 'Raja (King)',
-                icon: '♔',
-                desc: 'Bidak paling penting! Hanya bisa melangkah 1 petak ke segala arah. Jangan sampai terkepung (Skakmat)!'
-            }
+            P: { name: 'Pion Bintang (Pawn)', icon: '♟️', desc: 'Maju 1 langkah lurus ke depan (bisa 2 langkah di awal). Tapi makannya miring 1 langkah ke kiri/kanan depan!' },
+            R: { name: 'Benteng Kosmik (Rook)', icon: '♖', desc: 'Meluncur lurus sejauh mungkin ke depan, belakang, kiri, atau kanan selama jalannya kosong.' },
+            N: { name: 'Kuda Pegasus (Knight)', icon: '♘', desc: 'Melompat membentuk huruf "L" (2 lurus + 1 belok) dan satu-satunya yang bisa melompati bidak lain!' },
+            B: { name: 'Gajah Nebula (Bishop)', icon: '♗', desc: 'Meluncur miring (diagonal) sejauh mungkin mengikuti warna petaknya.' },
+            Q: { name: 'Ratu Galaksi (Queen)', icon: '♕', desc: 'Bidak paling sakti! Bisa meluncur lurus maupun miring ke segala arah.' },
+            K: { name: 'Raja VirSagi (King)', icon: '♔', desc: 'Bidak kesayangan yang harus dijaga! Melangkah 1 petak ke segala arah.' }
         };
 
         const PIECE_VALUES = { P: 10, N: 30, B: 30, R: 50, Q: 90, K: 900 };
 
+        // Munculkan percikan bintang/hati lucu di koordinat layar
+        function spawnCuteSparkles(r, c, isCapture = false) {
+            const isFlipped = (gameMode === 'p2p' && myColor === 'b');
+            const dispR = isFlipped ? 7 - r : r;
+            const dispC = isFlipped ? 7 - c : c;
+            const boardRect = document.getElementById('chessBoard').getBoundingClientRect();
+            const cellW = boardRect.width / 8;
+            const centerX = boardRect.left + (dispC + 0.5) * cellW;
+            const centerY = boardRect.top + (dispR + 0.5) * cellW;
+
+            const emojis = isCapture ? ['💖', '✨', '💫', '🎉', '🌟'] : ['✨', '⭐', '💫'];
+            const count = isCapture ? 8 : 4;
+
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'sparkle-particle';
+                el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                const angle = (Math.PI * 2 * i) / count + (Math.random() * 0.4);
+                const dist = 35 + Math.random() * 45;
+                el.style.left = `${centerX - 10}px`;
+                el.style.top = `${centerY - 10}px`;
+                el.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+                el.style.setProperty('--ty', `${Math.sin(angle) * dist - 15}px`);
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 850);
+            }
+        }
+
         /* =====================================================================
-           3. EFEK SUARA SINTETIS (WEB AUDIO API - TANPA FILE EKSTERNAL)
+           4. EFEK SUARA SINTETIS LUCU (WEB AUDIO API)
            ===================================================================== */
         let audioCtx = null;
         let soundEnabled = true;
@@ -488,42 +598,52 @@
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
-
                 const now = audioCtx.currentTime;
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
 
-                if (type === 'move') {
-                    // Ketukan kayu lembut
+                if (type === 'boing') {
+                    // Suara "boing" lucu saat menyentuh bidak
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(560, now + 0.09);
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                    osc.start(now);
+                    osc.stop(now + 0.09);
+                } else if (type === 'move') {
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(220, now);
-                    osc.frequency.exponentialRampToValueAtTime(95, now + 0.08);
-                    gain.gain.setValueAtTime(0.25, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.frequency.setValueAtTime(420, now);
+                    osc.frequency.exponentialRampToValueAtTime(640, now + 0.08);
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
                     osc.start(now);
                     osc.stop(now + 0.08);
                 } else if (type === 'capture') {
-                    // Nada makan bidak
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(340, now);
-                    osc.frequency.exponentialRampToValueAtTime(140, now + 0.14);
-                    gain.gain.setValueAtTime(0.3, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
-                    osc.start(now);
-                    osc.stop(now + 0.14);
+                    // Suara "pop-chime" manis saat menangkap bidak
+                    [523.25, 783.99].forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.type = 'sine';
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.frequency.setValueAtTime(freq, now + idx * 0.06);
+                        g.gain.setValueAtTime(0.18, now + idx * 0.06);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.16);
+                        o.start(now + idx * 0.06);
+                        o.stop(now + idx * 0.06 + 0.16);
+                    });
                 } else if (type === 'check') {
-                    // Peringatan skak lembut
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(440, now);
-                    osc.frequency.setValueAtTime(554, now + 0.1);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(480, now);
+                    osc.frequency.setValueAtTime(600, now + 0.1);
                     gain.gain.setValueAtTime(0.16, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
                     osc.start(now);
-                    osc.stop(now + 0.25);
+                    osc.stop(now + 0.24);
                 } else if (type === 'win') {
-                    // Fanfare kemenangan hangat
                     [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
                         const o = audioCtx.createOscillator();
                         const g = audioCtx.createGain();
@@ -532,53 +652,98 @@
                         g.connect(audioCtx.destination);
                         o.frequency.setValueAtTime(freq, now + idx * 0.11);
                         g.gain.setValueAtTime(0.2, now + idx * 0.11);
-                        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.11 + 0.35);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.35);
                         o.start(now + idx * 0.11);
                         o.stop(now + idx * 0.11 + 0.35);
                     });
                 } else if (type === 'sticker') {
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(520, now);
-                    osc.frequency.exponentialRampToValueAtTime(780, now + 0.12);
+                    osc.frequency.setValueAtTime(560, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
                     gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
                     osc.start(now);
                     osc.stop(now + 0.12);
                 }
-            } catch (e) { /* Abaikan jika diblokir browser */ }
+            } catch (e) {}
         }
 
         function toggleSound() {
             soundEnabled = !soundEnabled;
             document.getElementById('btnSound').textContent = soundEnabled ? '🔊' : '🔇';
-            showToast(soundEnabled ? 'Suara diaktifkan' : 'Suara dimatikan');
+            showToast(soundEnabled ? 'Suara lucu aktif 🎵' : 'Suara dimatikan 🔇');
         }
 
         /* =====================================================================
-           4. MESIN ATURAN CATUR LENGKAP (LEGAL MOVES, SKAK, SKAKMAT, ROKADE, EN PASSANT)
+           5. MESIN ATURAN CATUR LENGKAP
            ===================================================================== */
         let board = [];
-        let turn = 'w'; // 'w' atau 'b'
-        let selectedSq = null; // {r, c}
+        let turn = 'w';
+        let selectedSq = null;
         let validMovesForSelected = [];
-        let lastMove = null; // {from: {r,c}, to: {r,c}}
-        let hintMove = null; // {from: {r,c}, to: {r,c}, reason: string}
+        let lastMove = null;
+        let hintMove = null;
         let historyStack = [];
         let capturedByWhite = [];
         let capturedByBlack = [];
         let castlingRights = { wK: true, wQ: true, bK: true, bQ: true };
-        let enPassantTarget = null; // {r, c}
-        let pendingPromotion = null; // {from, to, piece}
+        let enPassantTarget = null;
+        let pendingPromotion = null;
         let gameOver = false;
 
-        // Pengaturan Mode & Multiplayer
-        let coachMode = true; // Mode Santai (Anti-Bingung aktif)
+        let coachMode = true;
         let gameMode = 'local'; // 'local' | 'p2p'
-        let myColor = 'w'; // Di P2P: 'w' atau 'b'. Di local: otomatis mengikuti giliran
+        let myColor = 'w';
         let peer = null;
         let conn = null;
         let myRpsChoice = null;
         let partnerRpsChoice = null;
+
+        // Room Permanen VirSagi
+        const PERMANENT_ROOM_ID = 'virsagi-cosmic-chess-permanent-room';
+        const IDLE_LIMIT_SECONDS = 300; // 5 menit otomatis bersih
+        let idleSecondsLeft = IDLE_LIMIT_SECONDS;
+        let idleInterval = null;
+
+        function resetIdleTimer() {
+            idleSecondsLeft = IDLE_LIMIT_SECONDS;
+            updateIdleDisplay();
+        }
+
+        function startIdleWatchdog() {
+            if (idleInterval) clearInterval(idleInterval);
+            resetIdleTimer();
+            idleInterval = setInterval(() => {
+                idleSecondsLeft--;
+                updateIdleDisplay();
+                if (idleSecondsLeft <= 0) {
+                    clearInterval(idleInterval);
+                    autoCleanRoomOnTimeout();
+                }
+            }, 1000);
+        }
+
+        function stopIdleWatchdog() {
+            if (idleInterval) {
+                clearInterval(idleInterval);
+                idleInterval = null;
+            }
+            document.getElementById('idleTimerBadge').textContent = '⏳ 05:00';
+        }
+
+        function updateIdleDisplay() {
+            const mins = String(Math.floor(Math.max(0, idleSecondsLeft) / 60)).padStart(2, '0');
+            const secs = String(Math.max(0, idleSecondsLeft) % 60).padStart(2, '0');
+            document.getElementById('idleTimerBadge').textContent = `⏳ ${mins}:${secs}`;
+        }
+
+        function autoCleanRoomOnTimeout() {
+            destroyPeerSession();
+            initBoardState();
+            renderBoard();
+            openLobbyModal();
+            showToast('Room otomatis dibersihkan karena 5 menit tidak ada aktivitas ✨');
+        }
 
         function initBoardState() {
             board = [
@@ -605,23 +770,11 @@
             gameOver = false;
         }
 
-        function cloneBoard(b) {
-            return b.map(row => [...row]);
-        }
+        function cloneBoard(b) { return b.map(row => [...row]); }
+        function inBounds(r, c) { return r >= 0 && r < 8 && c >= 0 && c < 8; }
+        function getPieceColor(p) { return p ? p[0] : null; }
+        function getPieceType(p) { return p ? p[1] : null; }
 
-        function inBounds(r, c) {
-            return r >= 0 && r < 8 && c >= 0 && c < 8;
-        }
-
-        function getPieceColor(p) {
-            return p ? p[0] : null;
-        }
-
-        function getPieceType(p) {
-            return p ? p[1] : null;
-        }
-
-        // Menghasilkan langkah semu (pseudo-legal) sebelum filter skak
         function getPseudoMoves(b, r, c, cr, epTarget) {
             const piece = b[r][c];
             if (!piece) return [];
@@ -633,15 +786,12 @@
             if (type === 'P') {
                 const dir = color === 'w' ? -1 : 1;
                 const startRow = color === 'w' ? 6 : 1;
-                // Maju 1 langkah
                 if (inBounds(r + dir, c) && !b[r + dir][c]) {
                     moves.push({ r: r + dir, c });
-                    // Maju 2 langkah dari posisi awal
                     if (r === startRow && !b[r + 2 * dir][c]) {
                         moves.push({ r: r + 2 * dir, c, isDoublePawn: true });
                     }
                 }
-                // Makan miring & En Passant
                 for (const dc of [-1, 1]) {
                     const nr = r + dir, nc = c + dc;
                     if (inBounds(nr, nc)) {
@@ -679,8 +829,7 @@
                             }
                             break;
                         }
-                        nr += dr;
-                        nc += dc;
+                        nr += dr; nc += dc;
                     }
                 }
             } else if (type === 'K') {
@@ -696,16 +845,13 @@
                         }
                     }
                 }
-                // Rokade (Castling)
                 const row = color === 'w' ? 7 : 0;
                 if (r === row && c === 4 && !isSquareAttacked(b, row, 4, enemy)) {
-                    // Rokade Pendek (King-side)
                     if ((color === 'w' ? cr.wK : cr.bK) && !b[row][5] && !b[row][6] && b[row][7] === color + 'R') {
                         if (!isSquareAttacked(b, row, 5, enemy) && !isSquareAttacked(b, row, 6, enemy)) {
                             moves.push({ r: row, c: 6, isCastle: 'K' });
                         }
                     }
-                    // Rokade Panjang (Queen-side)
                     if ((color === 'w' ? cr.wQ : cr.bQ) && !b[row][3] && !b[row][2] && !b[row][1] && b[row][0] === color + 'R') {
                         if (!isSquareAttacked(b, row, 3, enemy) && !isSquareAttacked(b, row, 2, enemy)) {
                             moves.push({ r: row, c: 2, isCastle: 'Q' });
@@ -716,21 +862,17 @@
             return moves;
         }
 
-        // Mengecek apakah sebuah kotak (r, c) sedang diserang oleh pihak attackerColor
         function isSquareAttacked(b, r, c, attackerColor) {
-            // Cek serangan pion
             const pawnDir = attackerColor === 'w' ? 1 : -1;
             for (const dc of [-1, 1]) {
                 const pr = r + pawnDir, pc = c + dc;
                 if (inBounds(pr, pc) && b[pr][pc] === attackerColor + 'P') return true;
             }
-            // Cek serangan kuda
             const jumps = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
             for (const [dr, dc] of jumps) {
                 const nr = r + dr, nc = c + dc;
                 if (inBounds(nr, nc) && b[nr][nc] === attackerColor + 'N') return true;
             }
-            // Cek serangan lurus (Benteng / Menteri)
             for (const [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
                 let nr = r + dr, nc = c + dc;
                 while (inBounds(nr, nc)) {
@@ -742,7 +884,6 @@
                     nr += dr; nc += dc;
                 }
             }
-            // Cek serangan diagonal (Gajah / Menteri)
             for (const [dr, dc] of [[-1,-1],[-1,1],[1,-1],[1,1]]) {
                 let nr = r + dr, nc = c + dc;
                 while (inBounds(nr, nc)) {
@@ -754,7 +895,6 @@
                     nr += dr; nc += dc;
                 }
             }
-            // Cek serangan raja lawan
             for (let dr = -1; dr <= 1; dr++) {
                 for (let dc = -1; dc <= 1; dc++) {
                     if (dr === 0 && dc === 0) continue;
@@ -781,27 +921,17 @@
             return isSquareAttacked(b, kingPos.r, kingPos.c, enemy);
         }
 
-        // Simulasi langkah di papan sementara
         function simulateMove(b, from, move) {
             const nb = cloneBoard(b);
             const piece = nb[from.r][from.c];
             nb[move.r][move.c] = piece;
             nb[from.r][from.c] = null;
-
-            if (move.isEnPassant) {
-                nb[from.r][move.c] = null;
-            }
-            if (move.isCastle === 'K') {
-                nb[from.r][5] = nb[from.r][7];
-                nb[from.r][7] = null;
-            } else if (move.isCastle === 'Q') {
-                nb[from.r][3] = nb[from.r][0];
-                nb[from.r][0] = null;
-            }
+            if (move.isEnPassant) nb[from.r][move.c] = null;
+            if (move.isCastle === 'K') { nb[from.r][5] = nb[from.r][7]; nb[from.r][7] = null; }
+            else if (move.isCastle === 'Q') { nb[from.r][3] = nb[from.r][0]; nb[from.r][0] = null; }
             return nb;
         }
 
-        // Langkah legal penuh + info bahaya untuk fitur Pelatih Anti-Bingung
         function getLegalMoves(b, r, c, cr, epTarget) {
             const piece = b[r][c];
             if (!piece) return [];
@@ -813,7 +943,6 @@
             for (const m of pseudo) {
                 const nextBoard = simulateMove(b, { r, c }, m);
                 if (!isKingInCheck(nextBoard, color)) {
-                    // Cek apakah setelah pindah ke kotak tujuan, bidak ini diincar lawan
                     const isDanger = isSquareAttacked(nextBoard, m.r, m.c, enemy);
                     legal.push({ ...m, isDanger });
                 }
@@ -827,9 +956,7 @@
                 for (let c = 0; c < 8; c++) {
                     if (getPieceColor(b[r][c]) === color) {
                         const moves = getLegalMoves(b, r, c, cr, epTarget);
-                        for (const m of moves) {
-                            all.push({ from: { r, c }, to: m, piece: b[r][c] });
-                        }
+                        for (const m of moves) all.push({ from: { r, c }, to: m, piece: b[r][c] });
                     }
                 }
             }
@@ -837,13 +964,12 @@
         }
 
         /* =====================================================================
-           5. RENDER PAPAN & INTERAKSI PENGGUNA
+           6. RENDER PAPAN & INTERAKSI LUCU
            ===================================================================== */
-        function renderBoard() {
+        function renderBoard(justLandedPos = null) {
             const boardEl = document.getElementById('chessBoard');
             boardEl.innerHTML = '';
 
-            // Flip papan jika di mode P2P dan user memegang bidak Hitam
             const isFlipped = (gameMode === 'p2p' && myColor === 'b');
             const kingInCheckPos = isKingInCheck(board, turn) ? findKing(board, turn) : null;
 
@@ -856,34 +982,25 @@
                     const isLight = (r + c) % 2 === 0;
                     sq.className = `square ${isLight ? 'light' : 'dark'}`;
 
-                    // Highlight kotak dipilih
-                    if (selectedSq && selectedSq.r === r && selectedSq.c === c) {
-                        sq.classList.add('selected');
-                    }
-
-                    // Highlight langkah terakhir
+                    if (selectedSq && selectedSq.r === r && selectedSq.c === c) sq.classList.add('selected');
                     if (lastMove && ((lastMove.from.r === r && lastMove.from.c === c) || (lastMove.to.r === r && lastMove.to.c === c))) {
                         sq.classList.add('last-move');
                     }
-
-                    // Highlight Raja yang sedang Skak
-                    if (kingInCheckPos && kingInCheckPos.r === r && kingInCheckPos.c === c) {
-                        sq.classList.add('in-check');
-                    }
-
-                    // Highlight Saran Langkah (Hint)
+                    if (kingInCheckPos && kingInCheckPos.r === r && kingInCheckPos.c === c) sq.classList.add('in-check');
                     if (hintMove) {
                         if (hintMove.from.r === r && hintMove.from.c === c) sq.classList.add('hint-from');
                         if (hintMove.to.r === r && hintMove.to.c === c) sq.classList.add('hint-to');
                     }
 
-                    // Render Bidak
                     const piece = board[r][c];
                     if (piece) {
                         sq.innerHTML += PIECE_SVGS[piece];
+                        if (justLandedPos && justLandedPos.r === r && justLandedPos.c === c) {
+                            const svgEl = sq.querySelector('.piece-svg');
+                            if (svgEl) svgEl.classList.add('piece-landed');
+                        }
                     }
 
-                    // Render Indikator Langkah Valid (Anti-Bingung)
                     const moveInfo = validMovesForSelected.find(m => m.r === r && m.c === c);
                     if (moveInfo) {
                         const showDanger = coachMode && moveInfo.isDanger;
@@ -902,37 +1019,34 @@
                     boardEl.appendChild(sq);
                 }
             }
-
             updatePlayerBars();
         }
 
         function handleSquareClick(r, c) {
+            resetIdleTimer();
             if (gameOver || pendingPromotion) return;
 
-            // Di mode P2P, hanya boleh menggerakkan bidak milik sendiri saat gilirannya
             if (gameMode === 'p2p' && turn !== myColor) {
-                showToast('Sabar ya, sedang giliran pasanganmu 💕');
+                showToast('Tunggu sebentar ya, giliran pasanganmu melangkah 💕');
                 return;
             }
 
             const clickedPiece = board[r][c];
             const clickedColor = getPieceColor(clickedPiece);
 
-            // Jika user menekan salah satu petak tujuan yang valid -> Eksekusi Langkah!
             const chosenMove = validMovesForSelected.find(m => m.r === r && m.c === c);
             if (selectedSq && chosenMove) {
                 executeMove(selectedSq, chosenMove, true);
                 return;
             }
 
-            // Jika user memilih bidak miliknya sendiri
             if (clickedColor === turn) {
                 selectedSq = { r, c };
                 validMovesForSelected = getLegalMoves(board, r, c, castlingRights, enPassantTarget);
+                playSound('boing');
                 updateCoachForPiece(clickedPiece, validMovesForSelected);
                 renderBoard();
             } else {
-                // Batal pilih
                 selectedSq = null;
                 validMovesForSelected = [];
                 resetCoachText();
@@ -941,18 +1055,17 @@
         }
 
         function executeMove(from, move, broadcast = false, promoChoice = null) {
+            resetIdleTimer();
             const piece = board[from.r][from.c];
             const type = getPieceType(piece);
             const color = getPieceColor(piece);
 
-            // Cek apakah Pion mencapai baris terakhir -> Tampilkan Modal Promosi
             if (type === 'P' && (move.r === 0 || move.r === 7) && !promoChoice) {
                 pendingPromotion = { from, to: move, piece };
                 document.getElementById('promotionModal').classList.remove('hidden');
                 return;
             }
 
-            // Simpan riwayat sebelum papan berubah (untuk fitur Minta Ulang / Undo)
             historyStack.push({
                 board: cloneBoard(board),
                 turn,
@@ -963,7 +1076,6 @@
                 capturedByBlack: [...capturedByBlack]
             });
 
-            // Catat bidak lawan yang termakan
             let capturedPiece = board[move.r][move.c];
             if (move.isEnPassant) {
                 capturedPiece = board[from.r][move.c];
@@ -974,20 +1086,12 @@
                 else capturedByBlack.push(capturedPiece);
             }
 
-            // Pindahkan bidak
             board[move.r][move.c] = promoChoice ? (color + promoChoice.toUpperCase()) : piece;
             board[from.r][from.c] = null;
 
-            // Eksekusi Rokade jika ada
-            if (move.isCastle === 'K') {
-                board[from.r][5] = board[from.r][7];
-                board[from.r][7] = null;
-            } else if (move.isCastle === 'Q') {
-                board[from.r][3] = board[from.r][0];
-                board[from.r][0] = null;
-            }
+            if (move.isCastle === 'K') { board[from.r][5] = board[from.r][7]; board[from.r][7] = null; }
+            else if (move.isCastle === 'Q') { board[from.r][3] = board[from.r][0]; board[from.r][0] = null; }
 
-            // Update Hak Rokade
             if (piece === 'wK') { castlingRights.wK = false; castlingRights.wQ = false; }
             if (piece === 'bK') { castlingRights.bK = false; castlingRights.bQ = false; }
             if (from.r === 7 && from.c === 0) castlingRights.wQ = false;
@@ -995,12 +1099,7 @@
             if (from.r === 0 && from.c === 0) castlingRights.bQ = false;
             if (from.r === 0 && from.c === 7) castlingRights.bK = false;
 
-            // Update Target En Passant
-            if (move.isDoublePawn) {
-                enPassantTarget = { r: (from.r + move.r) / 2, c: from.c };
-            } else {
-                enPassantTarget = null;
-            }
+            enPassantTarget = move.isDoublePawn ? { r: (from.r + move.r) / 2, c: from.c } : null;
 
             lastMove = { from, to: { r: move.r, c: move.c } };
             selectedSq = null;
@@ -1008,38 +1107,39 @@
             hintMove = null;
             turn = turn === 'w' ? 'b' : 'w';
 
-            // Kirim langkah ke pasangan jika mode P2P
             if (broadcast && gameMode === 'p2p' && conn && conn.open) {
                 conn.send({ type: 'MOVE', from, move, promoChoice });
             }
 
-            // Cek kondisi Skak, Skakmat, atau Remis (Stalemate)
+            // Animasi partikel bintang lucu di petak tujuan!
+            spawnCuteSparkles(move.r, move.c, !!capturedPiece);
+
             const nextLegalMoves = getAllLegalMovesForColor(board, turn, castlingRights, enPassantTarget);
             const inCheck = isKingInCheck(board, turn);
 
             if (nextLegalMoves.length === 0) {
                 gameOver = true;
-                renderBoard();
+                renderBoard({ r: move.r, c: move.c });
                 if (inCheck) {
                     playSound('win');
-                    const winnerName = turn === 'w' ? 'Hitam' : 'Putih';
-                    openGameOverDialog('👑', `Skakmat! ${winnerName} Menang!`, `Permainan seru banget! Mau tanding ulang lagi berdua?`);
+                    const winnerName = turn === 'w' ? 'Sagittarius (Hitam) ♐' : 'Virgo (Putih) ♍';
+                    openGameOverDialog('👑', `Skakmat! ${winnerName} Menang!`, `Permainan kosmik yang manis banget! Mau tanding ulang lagi berdua?`);
                 } else {
                     playSound('move');
-                    openGameOverDialog('🤝', 'Seri (Stalemate)!', 'Raja tidak sedang skak tapi tidak ada langkah tersisa. Seimbang banget!');
+                    openGameOverDialog('🤝', 'Seri (Stalemate)!', 'Seimbang banget antara Virgo & Sagittarius! Main lagi yuk?');
                 }
                 return;
             }
 
             if (inCheck) {
                 playSound('check');
-                setCoachMessage('⚠️', 'AWAS SKAK!', 'Raja sedang terancam! Lindungi Raja dengan menutup jalan, memakan penyerang, atau menggeser Raja.', true);
+                setCoachMessage('😱', 'Raja Kaget (Skak)!', 'Rajanya lagi goyang panik karena diincar! Geser Raja atau tutup jalannya ya.', true);
             } else {
                 playSound(capturedPiece ? 'capture' : 'move');
                 resetCoachText();
             }
 
-            renderBoard();
+            renderBoard({ r: move.r, c: move.c });
         }
 
         function completePromotion(choice) {
@@ -1051,22 +1151,23 @@
         }
 
         /* =====================================================================
-           6. FITUR PELATIH ANTI-BINGUNG, SARAN LANGKAH (HINT) & UNDO
+           7. PELATIH ANTI-BINGUNG, SARAN & UNDO
            ===================================================================== */
         function toggleCoachMode() {
+            resetIdleTimer();
             coachMode = !coachMode;
             const btn = document.getElementById('btnToggleCoach');
             const card = document.getElementById('coachCard');
             if (coachMode) {
-                btn.textContent = '✨ Mode Santai';
-                btn.className = 'px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 transition active:scale-95';
+                btn.textContent = '✨ Santai';
+                btn.className = 'px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-emerald-500/20 text-virgoMint border border-emerald-400/40 transition active:scale-95';
                 card.classList.remove('hidden');
-                showToast('Mode Santai Aktif: Peringatan bahaya & pelatih nyala');
+                showToast('Mode Santai: Pelatih Anti-Bingung aktif ✨');
             } else {
-                btn.textContent = '♟️ Mode Klasik';
-                btn.className = 'px-2.5 py-1.5 rounded-xl text-xs font-bold bg-stone-200 text-stone-700 border border-stone-300 transition active:scale-95';
+                btn.textContent = '♟️ Klasik';
+                btn.className = 'px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-white/10 text-slate-300 border border-white/20 transition active:scale-95';
                 card.classList.add('hidden');
-                showToast('Mode Klasik Aktif: Tanpa bantuan indikator bahaya');
+                showToast('Mode Klasik: Indikator bahaya disembunyikan');
             }
             renderBoard();
         }
@@ -1079,13 +1180,9 @@
             const dangerCount = moves.filter(m => m.isDanger).length;
 
             let extraTip = '';
-            if (moves.length === 0) {
-                extraTip = ' Bidak ini sedang terkunci / belum punya jalan.';
-            } else if (dangerCount > 0 && safeCount > 0) {
-                extraTip = ` Ada ${safeCount} petak aman (hijau) & ${dangerCount} petak berisiko (garis putus-putus).`;
-            } else if (dangerCount > 0 && safeCount === 0) {
-                extraTip = ' Hati-hati! Semua langkah bidak ini sedang dijaga lawan.';
-            }
+            if (moves.length === 0) extraTip = ' Bidak ini belum punya jalan keluar.';
+            else if (dangerCount > 0 && safeCount > 0) extraTip = ` Ada ${safeCount} petak aman (hijau) & ${dangerCount} petak berisiko (putus-putus).`;
+            else if (dangerCount > 0 && safeCount === 0) extraTip = ' Hati-hati! Semua petak tujuannya sedang dijaga lawan.';
 
             setCoachMessage(guide.icon, guide.name, guide.desc + extraTip, false);
         }
@@ -1096,91 +1193,76 @@
             document.getElementById('coachTitle').textContent = title;
             document.getElementById('coachDesc').textContent = desc;
             if (isAlert) {
-                card.classList.add('border-red-400', 'bg-red-50');
-                card.classList.remove('border-[#E6D9C8]', 'bg-warmCard');
+                card.style.borderColor = '#FB7185';
+                card.style.background = 'rgba(136, 19, 55, 0.55)';
             } else {
-                card.classList.remove('border-red-400', 'bg-red-50');
-                card.classList.add('border-[#E6D9C8]', 'bg-warmCard');
+                card.style.borderColor = 'rgba(255, 215, 130, 0.24)';
+                card.style.background = 'rgba(18, 23, 52, 0.84)';
             }
         }
 
         function resetCoachText() {
-            const turnText = turn === 'w' ? 'Putih' : 'Hitam';
+            const turnText = turn === 'w' ? 'Virgo (Putih)' : 'Sagittarius (Hitam)';
             setCoachMessage(
-                '💡',
-                `Giliran ${turnText} — Sentuh bidak untuk melihat jalan`,
-                'Titik hijau = aman. Lingkaran merah = makan bidak lawan. Garis putus-putus = petak sedang diincar lawan!',
+                '🌟',
+                `Giliran ${turnText} — Sentuh bidakmu!`,
+                'Titik hijau = aman. Lingkaran pink = tangkap bidak. Garis putus-putus = petak sedang diincar!',
                 false
             );
         }
 
-        // AI Sederhana untuk Memberi Saran Langkah Ramah Pemula
         function requestHint() {
+            resetIdleTimer();
             if (gameOver) return;
             if (gameMode === 'p2p' && turn !== myColor) {
                 showToast('Tunggu giliranmu dulu untuk minta saran ya!');
                 return;
             }
-
             const allMoves = getAllLegalMovesForColor(board, turn, castlingRights, enPassantTarget);
             if (allMoves.length === 0) return;
 
-            let bestMove = null;
-            let bestScore = -9999;
-            let bestReason = '';
-
+            let bestMove = null, bestScore = -9999, bestReason = '';
             for (const item of allMoves) {
-                let score = Math.random() * 4; // Variasi ringan
-                let reason = 'Langkah rapi untuk membuka ruang gerak.';
+                let score = Math.random() * 4;
+                let reason = 'Langkah cantik untuk membuka ruang gerak bidakmu.';
                 const targetPiece = board[item.to.r][item.to.c];
 
-                // Prioritas 1: Makan bidak lawan yang menguntungkan
                 if (targetPiece) {
                     const gain = PIECE_VALUES[getPieceType(targetPiece)];
                     const selfVal = PIECE_VALUES[getPieceType(item.piece)];
                     if (!item.to.isDanger) {
                         score += gain * 2;
-                        reason = `Bisa makan ${PIECE_GUIDE[getPieceType(targetPiece)].name} lawan dengan aman!`;
+                        reason = `Bisa menangkap ${PIECE_GUIDE[getPieceType(targetPiece)].name} dengan aman!`;
                     } else if (gain >= selfVal) {
                         score += gain;
-                        reason = `Tukar bidak yang menguntungkan dengan ${PIECE_GUIDE[getPieceType(targetPiece)].name} lawan.`;
+                        reason = `Tukar bidak yang sepadan dengan ${PIECE_GUIDE[getPieceType(targetPiece)].name}.`;
                     } else {
                         score -= 15;
                     }
                 }
-
-                // Prioritas 2: Hindari melangkah ke petak bahaya
-                if (item.to.isDanger && !targetPiece) {
-                    score -= PIECE_VALUES[getPieceType(item.piece)];
-                }
-
-                // Prioritas 3: Kontrol tengah papan & rokade
+                if (item.to.isDanger && !targetPiece) score -= PIECE_VALUES[getPieceType(item.piece)];
                 if (item.to.isCastle) {
                     score += 25;
                     reason = 'Rokade! Mengamankan Raja ke pojok sekaligus mengaktifkan Benteng.';
                 } else if ((item.to.r === 3 || item.to.r === 4) && (item.to.c === 3 || item.to.c === 4) && !item.to.isDanger) {
                     score += 12;
-                    reason = 'Menguasai area tengah papan bikin bidakmu lebih leluasa!';
+                    reason = 'Menguasai pusat galaksi papan bikin bidakmu makin bebas!';
                 }
-
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = item;
-                    bestReason = reason;
-                }
+                if (score > bestScore) { bestScore = score; bestMove = item; bestReason = reason; }
             }
 
             if (bestMove) {
                 hintMove = { from: bestMove.from, to: bestMove.to, reason: bestReason };
                 selectedSq = bestMove.from;
                 validMovesForSelected = getLegalMoves(board, bestMove.from.r, bestMove.from.c, castlingRights, enPassantTarget);
+                playSound('boing');
                 setCoachMessage('🧭', `Saran: Gerakkan ${PIECE_GUIDE[getPieceType(bestMove.piece)].name}`, bestReason, false);
                 renderBoard();
             }
         }
 
-        // Fitur Minta Ulang Langkah (Undo)
         function requestUndo() {
+            resetIdleTimer();
             if (historyStack.length === 0) {
                 showToast('Belum ada langkah yang bisa diulang');
                 return;
@@ -1190,7 +1272,7 @@
                 showToast('Langkah terakhir diulang ↩️');
             } else if (gameMode === 'p2p' && conn && conn.open) {
                 conn.send({ type: 'UNDO_REQUEST' });
-                showToast('Meminta izin pasangan untuk mengulang langkah...');
+                showToast('Meminta izin pasangan untuk mengulang langkah 🥺');
             }
         }
 
@@ -1213,66 +1295,72 @@
         }
 
         /* =====================================================================
-           7. MULTIPLAYER P2P (PEERJS) & SUIT BATU GUNTING KERTAS
+           8. SISTEM ROOM PERMANEN (VIRSAGI) & TOMBOL EXIT BERSIHKAN ROOM
            ===================================================================== */
-        function createP2PRoom() {
-            const btn = document.getElementById('btnCreateRoom');
+        function connectPermanentRoom() {
+            const btn = document.getElementById('btnJoinPermanent');
+            const statusEl = document.getElementById('permanentRoomStatus');
             btn.disabled = true;
-            btn.textContent = 'Menyiapkan Room...';
+            btn.innerHTML = '⏳ Menghubungkan ke Room VirSagi...';
+            statusEl.classList.remove('hidden');
 
-            if (peer) peer.destroy();
-            const shortId = 'catur-' + Math.random().toString(36).substring(2, 7);
-            peer = new Peer(shortId);
+            destroyPeerSession();
 
-            peer.on('open', (id) => {
-                const url = new URL(window.location.href);
-                url.searchParams.set('room', id);
-                document.getElementById('shareLinkInput').value = url.toString();
-                document.getElementById('roomShareBox').classList.remove('hidden');
-                btn.textContent = 'Room Aktif ✓';
-                updateConnectionBadge('Menunggu pasangan...', 'bg-amber-400');
-                copyRoomLink();
+            // Langkah 1: Coba daftar sebagai Host pada ID Room Permanen
+            peer = new Peer(PERMANENT_ROOM_ID);
+
+            peer.on('open', () => {
+                // Berhasil menjadi Host (orang pertama yang masuk ke room permanen)
+                gameMode = 'p2p';
+                myColor = 'w';
+                statusEl.textContent = 'Room VirSagi siap! Menunggu pasangan klik Gabung... 💕';
+                updateConnectionBadge('Menunggu pasangan di Room...', 'bg-amber-400');
+                startIdleWatchdog();
             });
 
             peer.on('connection', (connection) => {
+                // Pasangan masuk sebagai Tamu!
                 conn = connection;
                 gameMode = 'p2p';
-                myColor = 'w'; // Pembuat room default Putih
+                myColor = 'w';
                 setupConnectionHandlers();
                 initBoardState();
                 renderBoard();
                 closeLobbyModal();
-                showToast('Pasangan sudah bergabung! Kamu pegang Putih 💕');
-                updateConnectionBadge('Terhubung Berdua (Putih)', 'bg-emerald-500');
+                startIdleWatchdog();
+                showToast('Pasangan sudah masuk! Permainan dimulai 💕');
+                updateConnectionBadge('VirSagi Terhubung (Putih ♍)', 'bg-emerald-400');
             });
 
-            peer.on('error', () => {
-                btn.disabled = false;
-                btn.textContent = 'Coba Buat Room Lagi';
-                showToast('Gagal membuat koneksi P2P, coba lagi ya.');
-            });
-        }
-
-        function joinP2PRoom(roomId) {
-            updateConnectionBadge('Menghubungkan ke pasangan...', 'bg-amber-400');
-            peer = new Peer();
-            peer.on('open', () => {
-                conn = peer.connect(roomId);
-                gameMode = 'p2p';
-                myColor = 'b'; // Yang join default Hitam
-                setupConnectionHandlers();
-                conn.on('open', () => {
-                    initBoardState();
-                    renderBoard();
-                    closeLobbyModal();
-                    showToast('Berhasil terhubung! Kamu pegang Hitam 💕');
-                    updateConnectionBadge('Terhubung Berdua (Hitam)', 'bg-emerald-500');
-                });
+            peer.on('error', (err) => {
+                // Jika ID Room Permanen sudah dipakai (berarti pasangan sudah menunggu di dalam), langsung gabung!
+                if (err.type === 'unavailable-id') {
+                    peer.destroy();
+                    peer = new Peer();
+                    peer.on('open', () => {
+                        conn = peer.connect(PERMANENT_ROOM_ID);
+                        gameMode = 'p2p';
+                        myColor = 'b';
+                        setupConnectionHandlers();
+                        conn.on('open', () => {
+                            initBoardState();
+                            renderBoard();
+                            closeLobbyModal();
+                            startIdleWatchdog();
+                            showToast('Berhasil gabung dengan pasangan! Permainan dimulai 💕');
+                            updateConnectionBadge('VirSagi Terhubung (Hitam ♐)', 'bg-emerald-400');
+                        });
+                    });
+                } else {
+                    resetLobbyButton();
+                    showToast('Koneksi terganggu, coba klik Gabung lagi ya.');
+                }
             });
         }
 
         function setupConnectionHandlers() {
             conn.on('data', (data) => {
+                resetIdleTimer();
                 if (data.type === 'MOVE') {
                     executeMove(data.from, data.move, false, data.promoChoice);
                 } else if (data.type === 'STICKER') {
@@ -1287,71 +1375,107 @@
                     initBoardState();
                     renderBoard();
                     closeCustomDialog();
-                    showToast('Permainan baru dimulai!');
-                    updateConnectionBadge(`Terhubung Berdua (${myColor === 'w' ? 'Putih' : 'Hitam'})`, 'bg-emerald-500');
+                    showToast('Permainan baru dimulai! ✨');
+                    updateConnectionBadge(`VirSagi Terhubung (${myColor === 'w' ? 'Putih ♍' : 'Hitam ♐'})`, 'bg-emerald-400');
                 } else if (data.type === 'RPS') {
                     partnerRpsChoice = data.choice;
                     evaluateRps();
+                } else if (data.type === 'EXIT_ROOM') {
+                    destroyPeerSession();
+                    initBoardState();
+                    renderBoard();
+                    openLobbyModal();
+                    showToast('Pasangan keluar & room telah dibersihkan 🧹✨');
                 }
             });
 
             conn.on('close', () => {
-                updateConnectionBadge('Koneksi terputus', 'bg-red-500');
-                showToast('Koneksi dengan pasangan terputus');
+                destroyPeerSession();
+                initBoardState();
+                renderBoard();
+                openLobbyModal();
+                showToast('Sesi selesai & room dibersihkan ✨');
             });
         }
 
-        function copyRoomLink() {
-            const input = document.getElementById('shareLinkInput');
-            input.select();
-            input.setSelectionRange(0, 99999);
-            try {
-                document.execCommand('copy');
-                showToast('Link undangan disalin! Kirim ke chat pasanganmu 💌');
-            } catch (e) {
-                showToast('Silakan salin link secara manual');
+        // Fungsi Exit: Mengirim sinyal bersih-bersih ke pasangan, menghapus Peer ID permanen, dan reset papan
+        function exitAndCleanRoom() {
+            if (conn && conn.open) {
+                try { conn.send({ type: 'EXIT_ROOM' }); } catch (e) {}
             }
+            setTimeout(() => {
+                destroyPeerSession();
+                initBoardState();
+                renderBoard();
+                openLobbyModal();
+                showToast('Room sudah dibersihkan & siap dipakai lagi kapan saja 🧹💖');
+            }, 120);
+        }
+
+        function destroyPeerSession() {
+            stopIdleWatchdog();
+            if (conn) {
+                try { conn.close(); } catch (e) {}
+                conn = null;
+            }
+            if (peer) {
+                try { peer.destroy(); } catch (e) {}
+                peer = null;
+            }
+            gameMode = 'local';
+            resetLobbyButton();
+            updateConnectionBadge('Menunggu di Portal', 'bg-amber-400');
+        }
+
+        function resetLobbyButton() {
+            const btn = document.getElementById('btnJoinPermanent');
+            const statusEl = document.getElementById('permanentRoomStatus');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="text-lg">🚀</span> Gabung Room Permanen Berdua';
+            }
+            if (statusEl) statusEl.classList.add('hidden');
         }
 
         function startLocalMode() {
+            destroyPeerSession();
             gameMode = 'local';
-            if (conn) { conn.close(); conn = null; }
             initBoardState();
             renderBoard();
             closeLobbyModal();
-            updateConnectionBadge('1 HP Berdua (Pass & Play)', 'bg-emerald-500');
-            showToast('Mode 1 Layar Berdua dimulai! Putih jalan duluan');
+            startIdleWatchdog();
+            updateConnectionBadge('1 Layar Berdua ✨', 'bg-emerald-400');
+            showToast('Mode 1 Layar dimulai! Virgo (Putih) jalan duluan');
         }
 
         /* =====================================================================
-           8. LOGIKA SUIT BATU GUNTING KERTAS (RPS)
+           9. LOGIKA SUIT BATU GUNTING KERTAS (RPS)
            ===================================================================== */
         function openRpsModal() {
+            resetIdleTimer();
             myRpsChoice = null;
             partnerRpsChoice = null;
             document.getElementById('rpsResultBox').classList.add('hidden');
             document.getElementById('rpsModal').classList.remove('hidden');
         }
-        function closeRpsModal() {
-            document.getElementById('rpsModal').classList.add('hidden');
-        }
+        function closeRpsModal() { document.getElementById('rpsModal').classList.add('hidden'); }
 
         function playRps(choice) {
+            resetIdleTimer();
             myRpsChoice = choice;
             const resBox = document.getElementById('rpsResultBox');
             resBox.classList.remove('hidden');
 
             if (gameMode === 'local') {
-                // Suit lawan virtual / acak adil untuk 1 HP
                 const opts = ['batu', 'gunting', 'kertas'];
                 const bot = opts[Math.floor(Math.random() * 3)];
-                resBox.innerHTML = `Kamu pilih <b>${choice.toUpperCase()}</b> vs Pasangan <b>${bot.toUpperCase()}</b>.<br>Siapa menang pegang bidak Putih ya! 😊`;
+                resBox.innerHTML = `Kamu pilih <b>${choice.toUpperCase()}</b> vs Pasangan <b>${bot.toUpperCase()}</b>.<br>Yang menang pegang bidak Putih ya! 😊`;
             } else if (gameMode === 'p2p' && conn && conn.open) {
                 conn.send({ type: 'RPS', choice });
-                resBox.textContent = `Kamu memilih ${choice.toUpperCase()}. Menunggu pilihan pasangan...`;
+                resBox.textContent = `Kamu pilih ${choice.toUpperCase()}. Menunggu pilihan pasangan...`;
                 evaluateRps();
             } else {
-                resBox.textContent = 'Hubungkan dulu di mode Online P2P atau main 1 HP berdua!';
+                resBox.textContent = 'Gabung Room Permanen dulu untuk suit online!';
             }
         }
 
@@ -1383,18 +1507,20 @@
 
             initBoardState();
             renderBoard();
-            updateConnectionBadge(`Terhubung Berdua (${myColor === 'w' ? 'Putih' : 'Hitam'})`, 'bg-emerald-500');
+            updateConnectionBadge(`VirSagi Terhubung (${myColor === 'w' ? 'Putih ♍' : 'Hitam ♐'})`, 'bg-emerald-400');
             setTimeout(() => { closeRpsModal(); closeLobbyModal(); }, 1800);
         }
 
         /* =====================================================================
-           9. REAKSI EMOJI, UPDATE UI BAR PEMAIN & DIALOG KUSTOM
+           10. STIKER REAKSI, STATUS PEMAIN & DIALOG
            ===================================================================== */
         function toggleStickerDrawer() {
+            resetIdleTimer();
             document.getElementById('stickerDrawer').classList.toggle('hidden');
         }
 
         function sendSticker(emoji, text) {
+            resetIdleTimer();
             document.getElementById('stickerDrawer').classList.add('hidden');
             displayFloatingSticker(emoji, text);
             if (gameMode === 'p2p' && conn && conn.open) {
@@ -1406,8 +1532,8 @@
             playSound('sticker');
             const overlay = document.getElementById('stickerOverlay');
             const el = document.createElement('div');
-            el.className = 'sticker-pop bg-warmCard/95 border-2 border-terracotta px-5 py-3 rounded-3xl shadow-xl flex flex-col items-center';
-            el.innerHTML = `<span class="text-4xl">${emoji}</span><span class="text-xs font-extrabold text-ink mt-1">${text}</span>`;
+            el.className = 'sticker-pop glass-panel border-2 border-pink-400 px-5 py-3 rounded-3xl flex flex-col items-center';
+            el.innerHTML = `<span class="text-4xl">${emoji}</span><span class="text-xs font-extrabold text-cosmicGold mt-1">${text}</span>`;
             overlay.innerHTML = '';
             overlay.appendChild(el);
             setTimeout(() => { if (overlay.contains(el)) el.remove(); }, 2800);
@@ -1418,27 +1544,24 @@
             const topColor = isFlipped ? 'w' : 'b';
             const bottomColor = isFlipped ? 'b' : 'w';
 
-            // Nama & Avatar
-            document.getElementById('topPlayerName').textContent = topColor === 'w' ? 'Pemain Putih' : 'Pemain Hitam';
-            document.getElementById('bottomPlayerName').textContent = bottomColor === 'w' ? 'Pemain Putih' : 'Pemain Hitam';
+            document.getElementById('topPlayerName').textContent = topColor === 'w' ? 'Virgo (Putih) ♍' : 'Sagittarius (Hitam) ♐';
+            document.getElementById('bottomPlayerName').textContent = bottomColor === 'w' ? 'Virgo (Putih) ♍' : 'Sagittarius (Hitam) ♐';
             document.getElementById('topAvatar').textContent = topColor === 'w' ? '♔' : '♚';
             document.getElementById('bottomAvatar').textContent = bottomColor === 'w' ? '♔' : '♚';
 
             document.getElementById('topAvatar').className = topColor === 'w'
-                ? 'w-8 h-8 rounded-full bg-[#F3E9DC] border-2 border-stone-400 text-ink flex items-center justify-center font-bold text-sm'
-                : 'w-8 h-8 rounded-full bg-stone-800 text-white flex items-center justify-center font-bold text-sm';
+                ? 'w-8 h-8 rounded-full bg-amber-100 border-2 border-cosmicGold text-slate-900 flex items-center justify-center font-bold text-sm'
+                : 'w-8 h-8 rounded-full bg-purple-950 border border-pink-400/50 text-sagiPink flex items-center justify-center font-bold text-sm';
 
             document.getElementById('bottomAvatar').className = bottomColor === 'w'
-                ? 'w-8 h-8 rounded-full bg-[#F3E9DC] border-2 border-stone-400 text-ink flex items-center justify-center font-bold text-sm'
-                : 'w-8 h-8 rounded-full bg-stone-800 text-white flex items-center justify-center font-bold text-sm';
+                ? 'w-8 h-8 rounded-full bg-amber-100 border-2 border-cosmicGold text-slate-900 flex items-center justify-center font-bold text-sm'
+                : 'w-8 h-8 rounded-full bg-purple-950 border border-pink-400/50 text-sagiPink flex items-center justify-center font-bold text-sm';
 
-            // Badge Giliran
             document.getElementById('topTurnBadge').classList.toggle('hidden', turn !== topColor);
             document.getElementById('bottomTurnBadge').classList.toggle('hidden', turn !== bottomColor);
 
-            // Daftar Bidak Termakan
             const formatCaptured = (arr) => arr.length === 0
-                ? '<span class="text-[11px] italic text-stone-400">Belum ada bidak termakan</span>'
+                ? '<span class="text-[11px] italic text-slate-400">Belum ada tangkapan ✨</span>'
                 : arr.map(p => `<span class="w-4 h-4 inline-block">${PIECE_SVGS[p]}</span>`).join('');
 
             document.getElementById('topCaptured').innerHTML = formatCaptured(topColor === 'w' ? capturedByWhite : capturedByBlack);
@@ -1458,8 +1581,8 @@
             document.getElementById('dialogTitle').textContent = 'Pasangan Minta Ulang Langkah';
             document.getElementById('dialogMessage').textContent = 'Pasanganmu salah pencet atau ingin menarik langkah terakhirnya. Boleh diulang?';
             document.getElementById('dialogActions').innerHTML = `
-                <button onclick="acceptPartnerUndo()" class="px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs">Boleh Dong 💕</button>
-                <button onclick="closeCustomDialog()" class="px-4 py-2.5 rounded-xl bg-stone-200 text-stone-700 font-bold text-xs">Jangan ah</button>
+                <button onclick="acceptPartnerUndo()" class="px-4 py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs">Boleh Dong 💕</button>
+                <button onclick="closeCustomDialog()" class="px-4 py-2.5 rounded-xl bg-white/10 text-slate-200 font-bold text-xs">Jangan ah</button>
             `;
             document.getElementById('customDialogModal').classList.remove('hidden');
         }
@@ -1475,47 +1598,45 @@
             document.getElementById('dialogTitle').textContent = title;
             document.getElementById('dialogMessage').textContent = msg;
             document.getElementById('dialogActions').innerHTML = `
-                <button onclick="restartMatch()" class="px-5 py-2.5 rounded-xl bg-terracotta text-white font-bold text-xs">Main Lagi Berdua</button>
-                <button onclick="closeCustomDialog()" class="px-4 py-2.5 rounded-xl bg-stone-200 text-stone-700 font-bold text-xs">Lihat Papan</button>
+                <button onclick="restartMatch()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 to-amber-400 text-slate-950 font-extrabold text-xs">Main Lagi Berdua</button>
+                <button onclick="closeCustomDialog()" class="px-4 py-2.5 rounded-xl bg-white/10 text-slate-200 font-bold text-xs">Lihat Papan</button>
             `;
             document.getElementById('customDialogModal').classList.remove('hidden');
         }
 
         function restartMatch() {
+            resetIdleTimer();
             closeCustomDialog();
             initBoardState();
             renderBoard();
-            if (gameMode === 'p2p' && conn && conn.open) {
-                conn.send({ type: 'RESTART' });
-            }
+            if (gameMode === 'p2p' && conn && conn.open) conn.send({ type: 'RESTART' });
         }
 
         function showToast(msg) {
             const box = document.getElementById('toastBox');
             const t = document.createElement('div');
-            t.className = 'bg-ink/90 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg transition-opacity duration-300';
+            t.className = 'glass-panel border-pink-400/60 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-lg transition-opacity duration-300 text-center';
             t.textContent = msg;
             box.appendChild(t);
             setTimeout(() => {
                 t.style.opacity = '0';
                 setTimeout(() => t.remove(), 300);
-            }, 2400);
+            }, 2600);
         }
 
-        /* =====================================================================
-           10. INISIALISASI SAAT HALAMAN DIMUAT
-           ===================================================================== */
+        // Bersihkan koneksi otomatis jika tab browser ditutup
+        window.addEventListener('beforeunload', () => {
+            if (conn && conn.open) {
+                try { conn.send({ type: 'EXIT_ROOM' }); } catch (e) {}
+            }
+            if (peer) {
+                try { peer.destroy(); } catch (e) {}
+            }
+        });
+
         window.onload = function() {
             initBoardState();
             renderBoard();
-
-            // Cek apakah dibuka dari link undangan (?room=...)
-            const params = new URLSearchParams(window.location.search);
-            const roomParam = params.get('room');
-            if (roomParam) {
-                closeLobbyModal();
-                joinP2PRoom(roomParam);
-            }
         };
     </script>
 </body>
