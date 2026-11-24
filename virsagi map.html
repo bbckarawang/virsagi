@@ -34,8 +34,8 @@
             -webkit-text-fill-color: transparent;
         }
         #map {
-            height: calc(100vh - 175px);
-            min-height: 450px;
+            height: calc(100vh - 180px);
+            min-height: 440px;
             width: 100%;
             z-index: 1;
         }
@@ -52,7 +52,7 @@
             border: 1px solid rgba(56, 189, 248, 0.4);
             border-radius: 14px !important;
         }
-        /* Pulse Marker untuk Titik Awal */
+        /* Pulse Marker untuk Saung Kebon */
         .home-pulse {
             width: 22px;
             height: 22px;
@@ -80,16 +80,23 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold font-['Playfair_Display'] gradient-text leading-tight">Virsagi Travel Radar</h1>
-                    <p class="text-[11px] text-gray-400">Titik Awal: <span class="text-pink-400 font-semibold">-6.332382, 107.351776</span></p>
+                    <p class="text-[11px] text-gray-400">Titik Awal: <span class="text-pink-400 font-bold">Saung Kebon</span> <span class="text-gray-500">(-6.332382, 107.351776)</span></p>
                 </div>
             </div>
 
             <!-- Controls & Filter -->
             <div class="flex items-center gap-2 flex-wrap">
+                <!-- Filter Bulan -->
+                <select id="filterBulan" onchange="onMonthChange()" class="bg-slate-900 border border-cyan-500/40 text-xs text-cyan-200 font-semibold rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-400">
+                    <option value="ALL">🗓️ Semua Bulan</option>
+                </select>
+
+                <!-- Filter Tanggal Spesifik (Tersaring otomatis sesuai bulan) -->
                 <select id="filterTanggal" onchange="applyFilter()" class="bg-slate-900 border border-white/20 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-400">
                     <option value="ALL">📅 Semua Tanggal</option>
                 </select>
 
+                <!-- Filter Kategori -->
                 <select id="filterKategori" onchange="applyFilter()" class="bg-slate-900 border border-white/20 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-400">
                     <option value="ALL">🏷️ Semua Kategori</option>
                     <option value="Kuliner">Kuliner</option>
@@ -114,7 +121,7 @@
                 <span class="text-sm font-extrabold text-cyan-400" id="statTotalTitik">0 Lokasi</span>
             </div>
             <div class="bg-slate-900/80 border border-white/5 rounded-xl p-2">
-                <span class="text-[10px] text-gray-400 uppercase block">Titik Terjauh (Dari Awal)</span>
+                <span class="text-[10px] text-gray-400 uppercase block">Titik Terjauh (Dari Saung Kebon)</span>
                 <span class="text-sm font-extrabold text-pink-400" id="statTerjauh">0 km</span>
             </div>
             <div class="bg-slate-900/80 border border-white/5 rounded-xl p-2">
@@ -129,11 +136,11 @@
         <div id="map"></div>
 
         <!-- Legend / Info Overlay -->
-        <div class="absolute bottom-4 left-4 z-10 glass-panel p-3 rounded-2xl text-[11px] space-y-1.5 max-w-[230px] shadow-2xl">
+        <div class="absolute bottom-4 left-4 z-10 glass-panel p-3 rounded-2xl text-[11px] space-y-1.5 max-w-[235px] shadow-2xl">
             <div class="font-bold text-cyan-300 border-b border-white/10 pb-1 mb-1">Keterangan Peta</div>
             <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-pink-500 border border-white inline-block shrink-0"></span>
-                <span>Titik Awal (Home Base)</span>
+                <span>Saung Kebon (Titik Awal)</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-cyan-400 border border-white inline-block shrink-0"></span>
@@ -154,15 +161,19 @@
         const ORIGIN = {
             lat: -6.332382,
             lng: 107.351776,
-            name: "Titik Awal Virsagi (Home Base)"
+            name: "Saung Kebon"
         };
+
+        const NAMA_BULAN = [
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
 
         let map;
         let markersLayer = L.layerGroup();
         let linesLayer = L.layerGroup();
         let allTravelData = [];
 
-        // Inisialisasi Peta
         function initMap() {
             map = L.map('map', { zoomControl: false }).setView([ORIGIN.lat, ORIGIN.lng], 11);
             L.control.zoom({ position: 'topright' }).addTo(map);
@@ -176,11 +187,9 @@
             linesLayer.addTo(map);
 
             fetchSpreadsheetData(false);
-            // Auto-sync setiap 60 detik mengikuti update spreadsheet
             setInterval(() => fetchSpreadsheetData(false), 60000);
         }
 
-        // Ambil Data Langsung dari Google Spreadsheet via GViz JSON
         function fetchSpreadsheetData(manual = false) {
             const icon = document.getElementById('refreshIcon');
             if (icon) icon.classList.add('fa-spin');
@@ -190,7 +199,6 @@
             fetch(url)
                 .then(res => res.text())
                 .then(text => {
-                    // Bersihkan pembungkus JSONP google.visualization.Query.setResponse(...)
                     const jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
                     const json = JSON.parse(jsonStr);
                     const rows = json.table.rows || [];
@@ -198,7 +206,6 @@
                     allTravelData = [];
                     rows.forEach((r, idx) => {
                         const c = r.c || [];
-                        // Kolom: 0:Timestamp, 1:Tanggal, 2:Nama_Tempat, 3:Kategori, 4:Biaya, 5:Catatan, 6:Lat, 7:Lng
                         const tanggal = c[1] ? (c[1].f || c[1].v || '') : '';
                         const nama = c[2] ? (c[2].v || '') : '';
                         const kategori = c[3] ? (c[3].v || 'Lainnya') : 'Lainnya';
@@ -208,9 +215,11 @@
                         const lng = c[7] ? parseFloat(c[7].v) : NaN;
 
                         if (!isNaN(lat) && !isNaN(lng) && nama) {
+                            const tglClean = formatGvizDate(tanggal);
                             allTravelData.push({
                                 id: idx + 1,
-                                tanggal: formatGvizDate(tanggal),
+                                tanggal: tglClean,
+                                bulanKey: tglClean.length >= 7 ? tglClean.substring(0, 7) : '', // Format YYYY-MM
                                 nama: String(nama),
                                 kategori: String(kategori),
                                 biaya: Number(biaya) || 0,
@@ -221,6 +230,7 @@
                         }
                     });
 
+                    populateMonthFilter();
                     populateDateFilter();
                     applyFilter();
 
@@ -249,27 +259,68 @@
             return str.split('T')[0];
         }
 
-        function populateDateFilter() {
-            const select = document.getElementById('filterTanggal');
-            const currentVal = select.value;
-            const uniqueDates = [...new Set(allTravelData.map(item => item.tanggal))].sort().reverse();
+        function formatMonthLabel(yyyyMm) {
+            const parts = yyyyMm.split('-');
+            if (parts.length !== 2) return yyyyMm;
+            const year = parts[0];
+            const monthIdx = parseInt(parts[1], 10) - 1;
+            return `${NAMA_BULAN[monthIdx] || parts[1]} ${year}`;
+        }
 
-            select.innerHTML = '<option value="ALL">📅 Semua Tanggal (' + allTravelData.length + ')</option>';
+        // Isi Dropdown Bulan (Misal: Agustus 2026)
+        function populateMonthFilter() {
+            const selectBulan = document.getElementById('filterBulan');
+            const currentVal = selectBulan.value;
+            const uniqueMonths = [...new Set(allTravelData.map(item => item.bulanKey).filter(Boolean))].sort().reverse();
+
+            selectBulan.innerHTML = `<option value="ALL">🗓️ Semua Bulan (${allTravelData.length})</option>`;
+            uniqueMonths.forEach(mKey => {
+                const count = allTravelData.filter(d => d.bulanKey === mKey).length;
+                const opt = document.createElement('option');
+                opt.value = mKey;
+                opt.textContent = `🗓️ ${formatMonthLabel(mKey)} (${count})`;
+                selectBulan.appendChild(opt);
+            });
+
+            if ([...selectBulan.options].some(o => o.value === currentVal)) {
+                selectBulan.value = currentVal;
+            }
+        }
+
+        // Isi Dropdown Tanggal berdasarkan Bulan yang sedang dipilih
+        function populateDateFilter() {
+            const bulanVal = document.getElementById('filterBulan').value;
+            const selectTgl = document.getElementById('filterTanggal');
+            const currentTgl = selectTgl.value;
+
+            const filteredByMonth = bulanVal === 'ALL'
+                ? allTravelData
+                : allTravelData.filter(item => item.bulanKey === bulanVal);
+
+            const uniqueDates = [...new Set(filteredByMonth.map(item => item.tanggal))].sort().reverse();
+
+            selectTgl.innerHTML = `<option value="ALL">📅 Semua Tgl${bulanVal !== 'ALL' ? ' di Bulan Ini' : ''}</option>`;
             uniqueDates.forEach(tgl => {
                 if (tgl && tgl !== '-') {
                     const opt = document.createElement('option');
                     opt.value = tgl;
                     opt.textContent = `📆 ${tgl}`;
-                    select.appendChild(opt);
+                    selectTgl.appendChild(opt);
                 }
             });
 
-            if ([...select.options].some(o => o.value === currentVal)) {
-                select.value = currentVal;
+            if ([...selectTgl.options].some(o => o.value === currentTgl)) {
+                selectTgl.value = currentTgl;
+            } else {
+                selectTgl.value = 'ALL';
             }
         }
 
-        // Rumus Haversine untuk menghitung jarak (km) antar koordinat
+        function onMonthChange() {
+            populateDateFilter();
+            applyFilter();
+        }
+
         function hitungJarakKm(lat1, lon1, lat2, lon2) {
             const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -282,13 +333,15 @@
         }
 
         function applyFilter() {
+            const bulanFilter = document.getElementById('filterBulan').value;
             const tglFilter = document.getElementById('filterTanggal').value;
             const katFilter = document.getElementById('filterKategori').value;
 
             const filtered = allTravelData.filter(item => {
+                const matchBulan = (bulanFilter === 'ALL') || (item.bulanKey === bulanFilter);
                 const matchTgl = (tglFilter === 'ALL') || (item.tanggal === tglFilter);
                 const matchKat = (katFilter === 'ALL') || (item.kategori.toLowerCase() === katFilter.toLowerCase());
-                return matchTgl && matchKat;
+                return matchBulan && matchTgl && matchKat;
             });
 
             renderMapData(filtered, tglFilter !== 'ALL');
@@ -300,7 +353,7 @@
 
             const bounds = [[ORIGIN.lat, ORIGIN.lng]];
 
-            // 1. Marker Titik Awal
+            // 1. Marker Saung Kebon (Titik Awal)
             const homeIcon = L.divIcon({
                 className: 'custom-home-icon',
                 html: '<div class="home-pulse"></div>',
@@ -321,11 +374,9 @@
             let maxDistance = 0;
             let totalDistance = 0;
             let maxItem = null;
-
-            // Jika filter 1 hari dipilih, gambar rute berurutan dari Titik Awal -> Tujuan 1 -> Tujuan 2 ... -> Kembali
             let routeCoords = [[ORIGIN.lat, ORIGIN.lng]];
 
-            data.forEach((item, index) => {
+            data.forEach((item) => {
                 const jarakDariAwal = hitungJarakKm(ORIGIN.lat, ORIGIN.lng, item.lat, item.lng);
                 totalDistance += jarakDariAwal;
                 if (jarakDariAwal > maxDistance) {
@@ -336,7 +387,6 @@
                 bounds.push([item.lat, item.lng]);
                 routeCoords.push([item.lat, item.lng]);
 
-                // Warna marker berdasarkan kategori
                 let badgeColor = '#38BDF8';
                 if (item.kategori === 'Kuliner') badgeColor = '#F59E0B';
                 if (item.kategori === 'Hotel') badgeColor = '#A855F7';
@@ -350,7 +400,7 @@
                 });
 
                 const popupHtml = `
-                    <div class="text-xs font-sans p-1 min-w-[180px]">
+                    <div class="text-xs font-sans p-1 min-w-[185px]">
                         <div class="flex justify-between items-center gap-2 mb-1">
                             <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-blue-950 text-cyan-300 border border-cyan-500/30">${item.kategori}</span>
                             <span class="text-[10px] text-gray-400">${item.tanggal}</span>
@@ -358,7 +408,7 @@
                         <strong class="text-sm text-white block mb-1">${item.nama}</strong>
                         ${item.catatan ? `<p class="text-[11px] text-gray-300 italic mb-1.5">"${item.catatan}"</p>` : ''}
                         <div class="border-t border-white/10 pt-1.5 mt-1 flex justify-between items-center text-[10px]">
-                            <span class="text-pink-400 font-bold">📏 ${jarakDariAwal.toFixed(2)} km dari awal</span>
+                            <span class="text-pink-400 font-bold">📏 ${jarakDariAwal.toFixed(2)} km dari Saung Kebon</span>
                             <a href="https://www.google.com/maps?q=${item.lat},${item.lng}" target="_blank" class="text-cyan-400 hover:underline font-bold">Maps ↗</a>
                         </div>
                     </div>
@@ -368,7 +418,6 @@
                     .bindPopup(popupHtml)
                     .addTo(markersLayer);
 
-                // Tarik garis jangkauan dari Titik Awal ke setiap lokasi
                 L.polyline([[ORIGIN.lat, ORIGIN.lng], [item.lat, item.lng]], {
                     color: isSingleDay ? '#64748B' : badgeColor,
                     weight: isSingleDay ? 1.5 : 2,
@@ -377,7 +426,6 @@
                 }).addTo(linesLayer);
             });
 
-            // Jika filter tanggal harian aktif, hubungkan jalur perjalanan harian secara berurutan
             if (isSingleDay && routeCoords.length > 1) {
                 L.polyline(routeCoords, {
                     color: '#38BDF8',
@@ -386,7 +434,6 @@
                 }).addTo(linesLayer);
             }
 
-            // Lingkaran radar sejauh titik terjauh dari titik awal
             if (maxDistance > 0) {
                 L.circle([ORIGIN.lat, ORIGIN.lng], {
                     radius: maxDistance * 1000,
@@ -398,7 +445,6 @@
                 }).addTo(linesLayer);
             }
 
-            // Update Statistik Atas
             document.getElementById('statTotalTitik').innerText = `${data.length} Lokasi`;
             document.getElementById('statTerjauh').innerText = maxItem ? `${maxDistance.toFixed(1)} km (${maxItem.nama})` : '0 km';
             document.getElementById('statTotalJarak').innerText = `${totalDistance.toFixed(1)} km`;
