@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Virsagi Travel Radar - Peta Perjalanan</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            background-color: #030008;
+            color: #F8FAFC;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #60A5FA 0%, #38BDF8 50%, #818CF8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        #map {
+            height: calc(100vh - 175px);
+            min-height: 450px;
+            width: 100%;
+            z-index: 1;
+        }
+        /* Custom Dark Map Tile Filter */
+        .leaflet-layer,
+        .leaflet-control-zoom-in,
+        .leaflet-control-zoom-out,
+        .leaflet-control-attribution {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: #0F172A !important;
+            color: #F8FAFC !important;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 14px !important;
+        }
+        /* Pulse Marker untuk Titik Awal */
+        .home-pulse {
+            width: 22px;
+            height: 22px;
+            background: #EC4899;
+            border: 3px solid #FFFFFF;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #EC4899, 0 0 30px #EC4899;
+            animation: pulseRing 2s infinite;
+        }
+        @keyframes pulseRing {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 14px rgba(236, 72, 153, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <!-- Top Header -->
+    <header class="glass-panel px-4 py-3 z-20 border-b border-white/10">
+        <div class="max-w-5xl mx-auto flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-route text-white text-base"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold font-['Playfair_Display'] gradient-text leading-tight">Virsagi Travel Radar</h1>
+                    <p class="text-[11px] text-gray-400">Titik Awal: <span class="text-pink-400 font-semibold">-6.332382, 107.351776</span></p>
+                </div>
+            </div>
+
+            <!-- Controls & Filter -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <select id="filterTanggal" onchange="applyFilter()" class="bg-slate-900 border border-white/20 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-400">
+                    <option value="ALL">📅 Semua Tanggal</option>
+                </select>
+
+                <select id="filterKategori" onchange="applyFilter()" class="bg-slate-900 border border-white/20 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-400">
+                    <option value="ALL">🏷️ Semua Kategori</option>
+                    <option value="Kuliner">Kuliner</option>
+                    <option value="Hotel">Hotel</option>
+                    <option value="Jalan-Jalan">Jalan-Jalan</option>
+                    <option value="Bioskop">Bioskop</option>
+                </select>
+
+                <button onclick="fetchSpreadsheetData(true)" id="btnRefresh" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 transition cursor-pointer shadow-lg shadow-blue-600/30">
+                    <i class="fa-solid fa-rotate" id="refreshIcon"></i>
+                    <span>Sync</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="bg-slate-950/90 border-b border-white/10 px-4 py-2.5 z-20">
+        <div class="max-w-5xl mx-auto grid grid-cols-3 gap-2 text-center">
+            <div class="bg-slate-900/80 border border-white/5 rounded-xl p-2">
+                <span class="text-[10px] text-gray-400 uppercase block">Total Titik Tujuan</span>
+                <span class="text-sm font-extrabold text-cyan-400" id="statTotalTitik">0 Lokasi</span>
+            </div>
+            <div class="bg-slate-900/80 border border-white/5 rounded-xl p-2">
+                <span class="text-[10px] text-gray-400 uppercase block">Titik Terjauh (Dari Awal)</span>
+                <span class="text-sm font-extrabold text-pink-400" id="statTerjauh">0 km</span>
+            </div>
+            <div class="bg-slate-900/80 border border-white/5 rounded-xl p-2">
+                <span class="text-[10px] text-gray-400 uppercase block">Total Radius / Jarak</span>
+                <span class="text-sm font-extrabold text-blue-400" id="statTotalJarak">0 km</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div class="relative flex-grow">
+        <div id="map"></div>
+
+        <!-- Legend / Info Overlay -->
+        <div class="absolute bottom-4 left-4 z-10 glass-panel p-3 rounded-2xl text-[11px] space-y-1.5 max-w-[230px] shadow-2xl">
+            <div class="font-bold text-cyan-300 border-b border-white/10 pb-1 mb-1">Keterangan Peta</div>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-pink-500 border border-white inline-block shrink-0"></span>
+                <span>Titik Awal (Home Base)</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-cyan-400 border border-white inline-block shrink-0"></span>
+                <span>Lokasi Kencan / Tujuan</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-4 h-0.5 bg-cyan-400 inline-block shrink-0"></span>
+                <span>Garis Jangkauan & Rute</span>
+            </div>
+            <div class="text-[9px] text-gray-400 pt-1" id="lastSyncText">Memuat data...</div>
+        </div>
+    </div>
+
+    <script>
+        // KONFIGURASI SPREADSHEET & TITIK AWAL
+        const SPREADSHEET_ID = "1drfcDjZwc4i4PBVCi7ZwmG0ty3nAiuK4cTXr5ALNjYE";
+        const SHEET_NAME = "Jalan_Jalan";
+        const ORIGIN = {
+            lat: -6.332382,
+            lng: 107.351776,
+            name: "Titik Awal Virsagi (Home Base)"
+        };
+
+        let map;
+        let markersLayer = L.layerGroup();
+        let linesLayer = L.layerGroup();
+        let allTravelData = [];
+
+        // Inisialisasi Peta
+        function initMap() {
+            map = L.map('map', { zoomControl: false }).setView([ORIGIN.lat, ORIGIN.lng], 11);
+            L.control.zoom({ position: 'topright' }).addTo(map);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            markersLayer.addTo(map);
+            linesLayer.addTo(map);
+
+            fetchSpreadsheetData(false);
+            // Auto-sync setiap 60 detik mengikuti update spreadsheet
+            setInterval(() => fetchSpreadsheetData(false), 60000);
+        }
+
+        // Ambil Data Langsung dari Google Spreadsheet via GViz JSON
+        function fetchSpreadsheetData(manual = false) {
+            const icon = document.getElementById('refreshIcon');
+            if (icon) icon.classList.add('fa-spin');
+
+            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}&t=${Date.now()}`;
+
+            fetch(url)
+                .then(res => res.text())
+                .then(text => {
+                    // Bersihkan pembungkus JSONP google.visualization.Query.setResponse(...)
+                    const jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+                    const json = JSON.parse(jsonStr);
+                    const rows = json.table.rows || [];
+
+                    allTravelData = [];
+                    rows.forEach((r, idx) => {
+                        const c = r.c || [];
+                        // Kolom: 0:Timestamp, 1:Tanggal, 2:Nama_Tempat, 3:Kategori, 4:Biaya, 5:Catatan, 6:Lat, 7:Lng
+                        const tanggal = c[1] ? (c[1].f || c[1].v || '') : '';
+                        const nama = c[2] ? (c[2].v || '') : '';
+                        const kategori = c[3] ? (c[3].v || 'Lainnya') : 'Lainnya';
+                        const biaya = c[4] ? (c[4].v || 0) : 0;
+                        const catatan = c[5] ? (c[5].v || '') : '';
+                        const lat = c[6] ? parseFloat(c[6].v) : NaN;
+                        const lng = c[7] ? parseFloat(c[7].v) : NaN;
+
+                        if (!isNaN(lat) && !isNaN(lng) && nama) {
+                            allTravelData.push({
+                                id: idx + 1,
+                                tanggal: formatGvizDate(tanggal),
+                                nama: String(nama),
+                                kategori: String(kategori),
+                                biaya: Number(biaya) || 0,
+                                catatan: String(catatan),
+                                lat: lat,
+                                lng: lng
+                            });
+                        }
+                    });
+
+                    populateDateFilter();
+                    applyFilter();
+
+                    const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    document.getElementById('lastSyncText').innerText = `Terakhir sinkron: ${now}`;
+                })
+                .catch(err => {
+                    console.error("Gagal memuat spreadsheet:", err);
+                    document.getElementById('lastSyncText').innerHTML = `<span class="text-rose-400">Gagal akses sheet. Pastikan Share = Anyone with link (Viewer).</span>`;
+                })
+                .finally(() => {
+                    if (icon) setTimeout(() => icon.classList.remove('fa-spin'), 500);
+                });
+        }
+
+        function formatGvizDate(val) {
+            if (!val) return '-';
+            const str = String(val);
+            if (str.startsWith('Date(')) {
+                const nums = str.replace('Date(', '').replace(')', '').split(',');
+                const y = nums[0];
+                const m = String(parseInt(nums[1], 10) + 1).padStart(2, '0');
+                const d = String(parseInt(nums[2], 10)).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+            return str.split('T')[0];
+        }
+
+        function populateDateFilter() {
+            const select = document.getElementById('filterTanggal');
+            const currentVal = select.value;
+            const uniqueDates = [...new Set(allTravelData.map(item => item.tanggal))].sort().reverse();
+
+            select.innerHTML = '<option value="ALL">📅 Semua Tanggal (' + allTravelData.length + ')</option>';
+            uniqueDates.forEach(tgl => {
+                if (tgl && tgl !== '-') {
+                    const opt = document.createElement('option');
+                    opt.value = tgl;
+                    opt.textContent = `📆 ${tgl}`;
+                    select.appendChild(opt);
+                }
+            });
+
+            if ([...select.options].some(o => o.value === currentVal)) {
+                select.value = currentVal;
+            }
+        }
+
+        // Rumus Haversine untuk menghitung jarak (km) antar koordinat
+        function hitungJarakKm(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        function applyFilter() {
+            const tglFilter = document.getElementById('filterTanggal').value;
+            const katFilter = document.getElementById('filterKategori').value;
+
+            const filtered = allTravelData.filter(item => {
+                const matchTgl = (tglFilter === 'ALL') || (item.tanggal === tglFilter);
+                const matchKat = (katFilter === 'ALL') || (item.kategori.toLowerCase() === katFilter.toLowerCase());
+                return matchTgl && matchKat;
+            });
+
+            renderMapData(filtered, tglFilter !== 'ALL');
+        }
+
+        function renderMapData(data, isSingleDay) {
+            markersLayer.clearLayers();
+            linesLayer.clearLayers();
+
+            const bounds = [[ORIGIN.lat, ORIGIN.lng]];
+
+            // 1. Marker Titik Awal
+            const homeIcon = L.divIcon({
+                className: 'custom-home-icon',
+                html: '<div class="home-pulse"></div>',
+                iconSize: [22, 22],
+                iconAnchor: [11, 11]
+            });
+
+            L.marker([ORIGIN.lat, ORIGIN.lng], { icon: homeIcon })
+                .bindPopup(`
+                    <div class="text-xs font-sans p-1">
+                        <span class="text-[10px] font-bold text-pink-400 uppercase block">Titik Awal</span>
+                        <strong class="text-sm text-white block mb-1">${ORIGIN.name}</strong>
+                        <span class="text-gray-400 text-[10px]">${ORIGIN.lat}, ${ORIGIN.lng}</span>
+                    </div>
+                `)
+                .addTo(markersLayer);
+
+            let maxDistance = 0;
+            let totalDistance = 0;
+            let maxItem = null;
+
+            // Jika filter 1 hari dipilih, gambar rute berurutan dari Titik Awal -> Tujuan 1 -> Tujuan 2 ... -> Kembali
+            let routeCoords = [[ORIGIN.lat, ORIGIN.lng]];
+
+            data.forEach((item, index) => {
+                const jarakDariAwal = hitungJarakKm(ORIGIN.lat, ORIGIN.lng, item.lat, item.lng);
+                totalDistance += jarakDariAwal;
+                if (jarakDariAwal > maxDistance) {
+                    maxDistance = jarakDariAwal;
+                    maxItem = item;
+                }
+
+                bounds.push([item.lat, item.lng]);
+                routeCoords.push([item.lat, item.lng]);
+
+                // Warna marker berdasarkan kategori
+                let badgeColor = '#38BDF8';
+                if (item.kategori === 'Kuliner') badgeColor = '#F59E0B';
+                if (item.kategori === 'Hotel') badgeColor = '#A855F7';
+                if (item.kategori === 'Bioskop') badgeColor = '#F43F5E';
+
+                const destIcon = L.divIcon({
+                    className: 'custom-dest-icon',
+                    html: `<div style="background:${badgeColor}; width:16px; height:16px; border-radius:50%; border:2.5px solid #fff; box-shadow: 0 0 10px ${badgeColor};"></div>`,
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8]
+                });
+
+                const popupHtml = `
+                    <div class="text-xs font-sans p-1 min-w-[180px]">
+                        <div class="flex justify-between items-center gap-2 mb-1">
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-blue-950 text-cyan-300 border border-cyan-500/30">${item.kategori}</span>
+                            <span class="text-[10px] text-gray-400">${item.tanggal}</span>
+                        </div>
+                        <strong class="text-sm text-white block mb-1">${item.nama}</strong>
+                        ${item.catatan ? `<p class="text-[11px] text-gray-300 italic mb-1.5">"${item.catatan}"</p>` : ''}
+                        <div class="border-t border-white/10 pt-1.5 mt-1 flex justify-between items-center text-[10px]">
+                            <span class="text-pink-400 font-bold">📏 ${jarakDariAwal.toFixed(2)} km dari awal</span>
+                            <a href="https://www.google.com/maps?q=${item.lat},${item.lng}" target="_blank" class="text-cyan-400 hover:underline font-bold">Maps ↗</a>
+                        </div>
+                    </div>
+                `;
+
+                L.marker([item.lat, item.lng], { icon: destIcon })
+                    .bindPopup(popupHtml)
+                    .addTo(markersLayer);
+
+                // Tarik garis jangkauan dari Titik Awal ke setiap lokasi
+                L.polyline([[ORIGIN.lat, ORIGIN.lng], [item.lat, item.lng]], {
+                    color: isSingleDay ? '#64748B' : badgeColor,
+                    weight: isSingleDay ? 1.5 : 2,
+                    opacity: isSingleDay ? 0.4 : 0.65,
+                    dashArray: '5, 6'
+                }).addTo(linesLayer);
+            });
+
+            // Jika filter tanggal harian aktif, hubungkan jalur perjalanan harian secara berurutan
+            if (isSingleDay && routeCoords.length > 1) {
+                L.polyline(routeCoords, {
+                    color: '#38BDF8',
+                    weight: 3.5,
+                    opacity: 0.9
+                }).addTo(linesLayer);
+            }
+
+            // Lingkaran radar sejauh titik terjauh dari titik awal
+            if (maxDistance > 0) {
+                L.circle([ORIGIN.lat, ORIGIN.lng], {
+                    radius: maxDistance * 1000,
+                    color: '#EC4899',
+                    weight: 1,
+                    fillColor: '#EC4899',
+                    fillOpacity: 0.05,
+                    dashArray: '4, 4'
+                }).addTo(linesLayer);
+            }
+
+            // Update Statistik Atas
+            document.getElementById('statTotalTitik').innerText = `${data.length} Lokasi`;
+            document.getElementById('statTerjauh').innerText = maxItem ? `${maxDistance.toFixed(1)} km (${maxItem.nama})` : '0 km';
+            document.getElementById('statTotalJarak').innerText = `${totalDistance.toFixed(1)} km`;
+
+            if (bounds.length > 1) {
+                map.fitBounds(bounds, { padding: [45, 45] });
+            } else {
+                map.setView([ORIGIN.lat, ORIGIN.lng], 12);
+            }
+        }
+
+        window.onload = initMap;
+    </script>
+</body>
+</html>
