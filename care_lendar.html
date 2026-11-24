@@ -14,7 +14,6 @@
     :root {
       --bg-deep: #0b0c1e;
       --bg-card: rgba(24, 26, 54, 0.78);
-      --bg-card-solid: #181a36;
       --accent-pink: #ff7eb3;
       --accent-purple: #9d7bff;
       --accent-gold: #ffd166;
@@ -36,7 +35,6 @@
       position: relative;
     }
 
-    /* Starfield Background */
     .stars {
       position: fixed; inset: 0; pointer-events: none; z-index: 0;
       background-image:
@@ -54,40 +52,24 @@
     /* Cosmic Couple Banner */
     .cosmic-banner {
       background: linear-gradient(135deg, rgba(157, 123, 255, 0.22), rgba(255, 126, 179, 0.2));
-      border: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-      border-radius: 24px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: var(--glow);
+      border: 1px solid var(--border); backdrop-filter: blur(12px);
+      border-radius: 24px; padding: 14px 16px; margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between; box-shadow: var(--glow);
     }
-    .couple-avatars {
-      display: flex; align-items: center; gap: 10px;
-    }
+    .couple-avatars { display: flex; align-items: center; gap: 10px; }
     .zodiac-orb {
       width: 44px; height: 44px; border-radius: 50%;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      font-size: 1.15rem; font-weight: 800; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; font-weight: 800;
     }
-    .orb-virgo {
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
-    }
-    .orb-sagi {
-      background: linear-gradient(135deg, #ec4899, #f59e0b);
-      box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
-      margin-left: -12px; border: 2px solid #161836;
-    }
-    .couple-text h1 { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.2px; }
+    .orb-virgo { background: linear-gradient(135deg, #3b82f6, #8b5cf6); box-shadow: 0 0 15px rgba(139, 92, 246, 0.5); }
+    .orb-sagi { background: linear-gradient(135deg, #ec4899, #f59e0b); box-shadow: 0 0 15px rgba(236, 72, 153, 0.5); margin-left: -12px; border: 2px solid #161836; }
+    .couple-text h1 { font-size: 1.05rem; font-weight: 800; }
     .couple-text p { font-size: 0.74rem; color: var(--text-muted); margin-top: 2px; }
     .streak-badge {
       background: rgba(255, 209, 102, 0.16); color: var(--accent-gold);
       border: 1px solid rgba(255, 209, 102, 0.35);
-      font-weight: 800; font-size: 0.76rem; padding: 6px 11px; border-radius: 999px;
-      white-space: nowrap;
+      font-weight: 800; font-size: 0.76rem; padding: 6px 11px; border-radius: 999px; white-space: nowrap;
     }
 
     /* Countdown */
@@ -147,7 +129,7 @@
       background: radial-gradient(circle at 50% 65%, rgba(157, 123, 255, 0.2) 0%, rgba(11, 12, 30, 0.6) 75%);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 20px; display: flex; flex-direction: column;
-      align-items: center; justify-content: flex-end; padding-bottom: 18px;
+      align-items: center; justify-content: flex-end; padding-bottom: 18px; overflow: hidden;
     }
     .plant-emoji {
       font-size: 4.5rem; line-height: 1; z-index: 2;
@@ -155,11 +137,11 @@
       filter: drop-shadow(0 0 14px rgba(255, 209, 102, 0.35));
     }
     @keyframes sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
-    .plant-emoji.watered { animation: bounceGrow 0.6s ease; }
+    .plant-emoji.watered { animation: bounceGrow 0.9s ease; }
     @keyframes bounceGrow {
       0% { transform: scale(1); }
-      40% { transform: scale(1.28) rotate(5deg); }
-      70% { transform: scale(0.95) rotate(-3deg); }
+      35% { transform: scale(1.32) rotate(6deg); }
+      65% { transform: scale(0.92) rotate(-4deg); }
       100% { transform: scale(1); }
     }
 
@@ -178,18 +160,15 @@
     .pot-gold { background: linear-gradient(180deg, #fde047, #b45309); }
 
     .pot-selector { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; }
-    .pot-dot {
-      width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8);
-      cursor: pointer;
-    }
+    .pot-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); cursor: pointer; }
 
     .droplet {
-      position: absolute; top: 18px; font-size: 1.2rem; pointer-events: none;
-      animation: dropFall 0.85s ease-in forwards; z-index: 10;
+      position: absolute; top: 14px; font-size: 1.3rem; pointer-events: none;
+      animation: dropFall 1.1s ease-in forwards; z-index: 10;
     }
     @keyframes dropFall {
       0% { opacity: 1; transform: translateY(0) scale(0.8); }
-      100% { opacity: 0; transform: translateY(90px) scale(1.1); }
+      100% { opacity: 0; transform: translateY(105px) scale(1.15); }
     }
 
     .progress-labels {
@@ -227,7 +206,7 @@
       border: 1px solid var(--border); display: flex; align-items: center; gap: 12px;
     }
     .task-card.prayer { border-left: 3px solid var(--accent-gold); }
-    .task-card.done { opacity: 0.52; }
+    .task-card.approved { opacity: 0.55; }
     .task-time {
       background: rgba(157, 123, 255, 0.2); color: #ddd6fe; font-weight: 800;
       font-size: 0.76rem; padding: 6px 10px; border-radius: 12px; white-space: nowrap;
@@ -244,15 +223,21 @@
     .water-btn {
       background: rgba(74, 222, 128, 0.18); color: var(--accent-mint);
       border: 1px solid rgba(74, 222, 128, 0.35); padding: 9px 11px; border-radius: 14px;
-      font-weight: 800; font-size: 0.75rem; cursor: pointer; white-space: nowrap; font-family: inherit;
+      font-weight: 800; font-size: 0.74rem; cursor: pointer; white-space: nowrap; font-family: inherit;
     }
-    .water-btn.done { background: rgba(255,255,255,0.06); color: var(--text-muted); border-color: transparent; }
+    .water-btn.pending {
+      background: rgba(255, 209, 102, 0.16); color: var(--accent-gold);
+      border: 1px solid rgba(255, 209, 102, 0.4); cursor: default;
+    }
+    .water-btn.approved {
+      background: rgba(255,255,255,0.06); color: var(--text-muted); border-color: transparent; cursor: default;
+    }
 
     /* Cards & Our Time */
     .card-box {
       background: var(--bg-card); backdrop-filter: blur(12px);
       border-radius: 22px; padding: 18px; border: 1px solid var(--border);
-      box-shadow: var(--glow); margin-bottom: 16px;
+      box-shadow: var(--glow); margin-bottom: 16px; position: relative; overflow: hidden;
     }
     .mood-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
     .mood-btn {
@@ -277,17 +262,43 @@
       padding: 4px 10px; border-radius: 999px; font-weight: 700; font-size: 0.74rem;
     }
 
-    .spinner-display {
-      background: rgba(11, 12, 30, 0.65); border-radius: 18px; padding: 20px 14px;
-      text-align: center; margin: 12px 0; font-weight: 800; font-size: 1rem;
-      color: var(--accent-gold); min-height: 70px; display: flex; align-items: center;
-      justify-content: center; border: 1px dashed rgba(255, 209, 102, 0.35);
+    /* Animated Date Spinner */
+    .spinner-stage {
+      position: relative; background: rgba(11, 12, 30, 0.75); border-radius: 18px;
+      padding: 24px 14px; text-align: center; margin: 12px 0;
+      min-height: 88px; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; border: 1.5px dashed rgba(255, 209, 102, 0.4);
+      overflow: hidden; transition: transform 0.2s, border-color 0.3s;
+    }
+    .spinner-stage.spinning {
+      border-color: var(--accent-pink);
+      box-shadow: 0 0 22px rgba(255, 126, 179, 0.25) inset;
+    }
+    .spinner-stage.winner {
+      border-style: solid; border-color: var(--accent-gold);
+      animation: winnerPop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes winnerPop {
+      0% { transform: scale(0.92); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    .spinner-sub { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+    .spinner-display { font-weight: 800; font-size: 1.05rem; color: var(--accent-gold); transition: transform 0.1s; }
+    .confetti-piece {
+      position: absolute; font-size: 1.15rem; pointer-events: none;
+      animation: confettiFly 1.4s ease-out forwards;
+    }
+    @keyframes confettiFly {
+      0% { opacity: 1; transform: translate(0, 0) scale(0.6) rotate(0deg); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(360deg); }
     }
     .spin-btn {
-      width: 100%; padding: 12px; border: none; border-radius: 14px;
+      width: 100%; padding: 13px; border: none; border-radius: 14px;
       background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white;
-      font-family: inherit; font-weight: 700; font-size: 0.86rem; cursor: pointer;
+      font-family: inherit; font-weight: 800; font-size: 0.88rem; cursor: pointer;
     }
+    .spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* Greenhouse */
     .gh-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -449,9 +460,12 @@
 
       <div class="card-box">
         <h3 style="font-size:0.98rem; font-weight:800;">🎡 Date Idea Spinner</h3>
-        <p style="font-size:0.76rem; color:var(--text-muted); margin-top:3px;">Putar roda acak buat ide kencan atau makan berikutnya:</p>
-        <div class="spinner-display" id="spinnerResult">Klik tombol di bawah untuk memutar</div>
-        <button class="spin-btn" onclick="spinDateIdea()">🎲 Acak Ide Kencan Kita</button>
+        <p style="font-size:0.76rem; color:var(--text-muted); margin-top:3px;">Putar roda kosmik buat menentukan kencan kita berikutnya:</p>
+        <div class="spinner-stage" id="spinnerStage">
+          <div class="spinner-sub" id="spinnerSub">Siap mengacak takdir kencan ✨</div>
+          <div class="spinner-display" id="spinnerResult">Klik tombol di bawah untuk memutar</div>
+        </div>
+        <button class="spin-btn" id="spinBtn" onclick="spinDateIdea()">🎲 Putar Roda Kencan Kita</button>
       </div>
     </div>
 
@@ -506,9 +520,16 @@
         const res = await fetch(`${API_URL}?action=getDashboard`);
         const json = await res.json();
         if (json.status === 'success') {
+          const prevCoins = appData ? appData.garden.currentCoins : json.data.garden.currentCoins;
           appData = json.data;
           localStorage.setItem('carelendar_cosmic_cache', JSON.stringify(appData));
           renderAll(appData);
+
+          // Jika koin bertambah setelah disetujui Virgo Boy, putar animasi siram otomatis!
+          if (appData.garden.currentCoins > prevCoins) {
+            triggerWaterAnimation();
+            showToast(`✨ Virgo Boy menyetujui! Tanaman tumbuh +${appData.garden.currentCoins - prevCoins} Koin 🌱`);
+          }
         }
       } catch (err) {
         showToast("Gagal sinkronisasi, cek koneksi ya");
@@ -555,21 +576,38 @@
         : `<div class="clue-locked">🔒 Identitas Bunga & Surat Spesial terbuka di 1.000 Koin</div>`;
       document.getElementById('cluesContent').innerHTML = htmlClues;
 
-      // Jadwal & Sholat
+      // Jadwal & Sholat (3 status: open, pending, approved)
       const jadwalEl = document.getElementById('jadwalList');
-      jadwalEl.innerHTML = (data.jadwal || []).map(item => `
-        <div class="task-card ${item.isPrayer ? 'prayer' : ''} ${item.done ? 'done' : ''}">
-          <div class="task-time">${item.jam}</div>
-          <div class="task-info">
-            <h3>${item.judul}</h3>
-            <p>${item.pesan || ''}</p>
-            ${item.voiceNote ? `<button class="vn-btn" onclick="playVoiceNote('${item.voiceNote}')">🔊 Dengar Suaraku</button>` : ''}
+      jadwalEl.innerHTML = (data.jadwal || []).map(item => {
+        let btnClass = 'water-btn';
+        let btnText = `💧 +${item.koin}`;
+        let disabledAttr = '';
+
+        if (item.status === 'pending') {
+          btnClass = 'water-btn pending';
+          btnText = '⏳ Menunggu ♍';
+          disabledAttr = 'disabled';
+        } else if (item.status === 'approved') {
+          btnClass = 'water-btn approved';
+          btnText = 'Disetujui ✓';
+          disabledAttr = 'disabled';
+        }
+
+        const safeTitle = String(item.judul).replace(/'/g, "\\'");
+        return `
+          <div class="task-card ${item.isPrayer ? 'prayer' : ''} ${item.status === 'approved' ? 'approved' : ''}">
+            <div class="task-time">${item.jam}</div>
+            <div class="task-info">
+              <h3>${item.judul}</h3>
+              <p>${item.pesan || ''}</p>
+              ${item.voiceNote ? `<button class="vn-btn" onclick="playVoiceNote('${item.voiceNote}')">🔊 Dengar Suaraku</button>` : ''}
+            </div>
+            <button class="${btnClass}" ${disabledAttr} onclick="requestTask('${item.id}', '${safeTitle}', ${item.koin})">
+              ${btnText}
+            </button>
           </div>
-          <button class="water-btn ${item.done ? 'done' : ''}" ${item.done ? 'disabled' : ''} onclick="completeTask('${item.id}', ${item.koin})">
-            ${item.done ? 'Sudah ✓' : `💧 +${item.koin}`}
-          </button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       // Free Time Matcher
       const ftEl = document.getElementById('freeTimeList');
@@ -600,22 +638,24 @@
       }
     }
 
-    async function completeTask(taskId, coins) {
-      triggerWaterAnimation();
-      showToast(`💧 Menyiram tanaman (+${coins} Koin)...`);
+    // Kirim Permintaan Konfirmasi ke Telegram Virgo Boy
+    async function requestTask(taskId, taskTitle, coins) {
+      showToast("📨 Mengirim laporan ke Virgo Boy...");
       try {
-        const res = await fetch(`${API_URL}?action=completeTask`, {
+        const res = await fetch(`${API_URL}?action=requestTask`, {
           method: 'POST',
-          body: JSON.stringify({ taskId, coins })
+          body: JSON.stringify({ taskId, taskTitle, coins })
         });
         const json = await res.json();
         if (json.status === 'success' && json.data.garden) {
           appData = json.data;
           localStorage.setItem('carelendar_cosmic_cache', JSON.stringify(appData));
           renderAll(appData);
-          showToast(`Yeay! Tanaman kosmik tumbuh +${coins} koin 🌱`);
+          showToast("⏳ Terkirim! Menunggu persetujuan Virgo Boy ♍");
         }
-      } catch (e) { showToast("Koneksi terganggu"); }
+      } catch (e) {
+        showToast("Koneksi terganggu, coba lagi ya");
+      }
     }
 
     function triggerWaterAnimation() {
@@ -625,14 +665,14 @@
       void plant.offsetWidth;
       plant.classList.add('watered');
 
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 8; i++) {
         const drop = document.createElement('div');
         drop.className = 'droplet';
-        drop.textContent = '💧';
-        drop.style.left = `${30 + Math.random() * 40}%`;
+        drop.textContent = i % 2 === 0 ? '💧' : '✨';
+        drop.style.left = `${25 + Math.random() * 50}%`;
         drop.style.animationDelay = `${i * 0.08}s`;
         arena.appendChild(drop);
-        setTimeout(() => drop.remove(), 950);
+        setTimeout(() => drop.remove(), 1200);
       }
     }
 
@@ -667,18 +707,76 @@
       } catch (e) { showToast("Gagal mengirim mood"); }
     }
 
+    // Animasi Date Spinner Lebih Lama, Menegangkan & Lucu (3.5 Detik dengan Easing + Confetti)
     function spinDateIdea() {
       const ideas = (appData && appData.dateIdeas && appData.dateIdeas.length)
-        ? appData.dateIdeas : ["Makan Ramen Berdua", "Piknik Sore di Taman", "Coffee Shop Hopping"];
+        ? appData.dateIdeas
+        : ["Makan Ramen Berdua", "Piknik Sore di Taman", "Coffee Shop Hopping", "Nonton Film + Masak Bareng"];
+      const funnyEmojis = ["🍜", "🎡", "🍦", "🎬", "🧸", "✨", "🍕", "🌙", "☕", "💖"];
+      const teasingTexts = [
+        "Membaca rasi bintang Virgo & Sagittarius...",
+        "Mengocok ramuan kencan kosmik...",
+        "Hmm, pilih yang mana ya...",
+        "Dikit lagi berhenti nih...",
+        "Takdir kencan kalian adalah..."
+      ];
+
+      const stage = document.getElementById('spinnerStage');
       const display = document.getElementById('spinnerResult');
-      let count = 0;
-      const interval = setInterval(() => {
-        display.textContent = ideas[Math.floor(Math.random() * ideas.length)];
-        if (++count > 14) {
-          clearInterval(interval);
-          display.textContent = `🎉 ${ideas[Math.floor(Math.random() * ideas.length)]}`;
+      const sub = document.getElementById('spinnerSub');
+      const btn = document.getElementById('spinBtn');
+
+      btn.disabled = true;
+      stage.classList.remove('winner');
+      stage.classList.add('spinning');
+
+      const totalSteps = 32;
+      let step = 0;
+
+      function nextTick() {
+        const randIdea = ideas[Math.floor(Math.random() * ideas.length)];
+        const randEmoji = funnyEmojis[Math.floor(Math.random() * funnyEmojis.length)];
+        display.textContent = `${randEmoji} ${randIdea}`;
+        display.style.transform = `scale(${step % 2 === 0 ? 1.05 : 0.96})`;
+
+        const textIdx = Math.min(teasingTexts.length - 1, Math.floor((step / totalSteps) * teasingTexts.length));
+        sub.textContent = teasingTexts[textIdx];
+
+        step++;
+        if (step < totalSteps) {
+          // Melambat secara eksponensial di akhir agar menegangkan
+          const delay = 55 + Math.pow(step / totalSteps, 2.6) * 280;
+          setTimeout(nextTick, delay);
+        } else {
+          const finalChoice = ideas[Math.floor(Math.random() * ideas.length)];
+          stage.classList.remove('spinning');
+          stage.classList.add('winner');
+          sub.textContent = "🎉 Yeay! Ini jadwal kencan kita berikutnya:";
+          display.textContent = `💖 ${finalChoice} 💖`;
+          display.style.transform = "scale(1)";
+          btn.disabled = false;
+          spawnSpinnerConfetti(stage);
         }
-      }, 75);
+      }
+
+      nextTick();
+    }
+
+    function spawnSpinnerConfetti(container) {
+      const icons = ["✨", "💖", "🌟", "🎉", "♍", "♐", "🌸"];
+      for (let i = 0; i < 16; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.textContent = icons[i % icons.length];
+        el.style.left = '50%';
+        el.style.top = '50%';
+        const angle = (Math.PI * 2 * i) / 16;
+        const dist = 65 + Math.random() * 75;
+        el.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+        el.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
+        container.appendChild(el);
+        setTimeout(() => el.remove(), 1450);
+      }
     }
 
     function playVoiceNote(url) {
@@ -702,6 +800,8 @@
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(`tab-${tabName}`).classList.add('active');
       btn.classList.add('active');
+      // Refresh otomatis saat berpindah tab agar status approval terbaru langsung terlihat
+      fetchDashboard();
     }
 
     function openGreenhouseModal(idx) {
