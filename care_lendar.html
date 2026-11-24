@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f1024" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Care-lendar" />
+  <title>Care-lendar ✨ Virgo & Sagittarius</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #0b0c1e;
+      --bg-card: rgba(24, 26, 54, 0.78);
+      --bg-card-solid: #181a36;
+      --accent-pink: #ff7eb3;
+      --accent-purple: #9d7bff;
+      --accent-gold: #ffd166;
+      --accent-mint: #4ade80;
+      --text-main: #f8fafc;
+      --text-muted: #a5b4fc;
+      --border: rgba(165, 180, 252, 0.18);
+      --glow: 0 8px 30px rgba(157, 123, 255, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(ellipse at top, #1b1e48 0%, #0b0c1e 65%, #070814 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 92px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Starfield Background */
+    .stars {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        radial-gradient(1.5px 1.5px at 20px 30px, #ffffff, transparent),
+        radial-gradient(1px 1px at 90px 140px, #ffd166, transparent),
+        radial-gradient(1.5px 1.5px at 180px 80px, #ff7eb3, transparent),
+        radial-gradient(1px 1px at 260px 210px, #ffffff, transparent),
+        radial-gradient(2px 2px at 320px 50px, #a5b4fc, transparent);
+      background-size: 350px 300px;
+      opacity: 0.55;
+    }
+
+    .container { max-width: 480px; margin: 0 auto; padding: 16px; position: relative; z-index: 2; }
+
+    /* Cosmic Couple Banner */
+    .cosmic-banner {
+      background: linear-gradient(135deg, rgba(157, 123, 255, 0.22), rgba(255, 126, 179, 0.2));
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--glow);
+    }
+    .couple-avatars {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .zodiac-orb {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 1.15rem; font-weight: 800; position: relative;
+    }
+    .orb-virgo {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+    }
+    .orb-sagi {
+      background: linear-gradient(135deg, #ec4899, #f59e0b);
+      box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
+      margin-left: -12px; border: 2px solid #161836;
+    }
+    .couple-text h1 { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.2px; }
+    .couple-text p { font-size: 0.74rem; color: var(--text-muted); margin-top: 2px; }
+    .streak-badge {
+      background: rgba(255, 209, 102, 0.16); color: var(--accent-gold);
+      border: 1px solid rgba(255, 209, 102, 0.35);
+      font-weight: 800; font-size: 0.76rem; padding: 6px 11px; border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    /* Countdown */
+    .countdown-card {
+      background: linear-gradient(135deg, #6d28d9, #db2777);
+      border-radius: 20px; padding: 14px 18px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; box-shadow: 0 10px 25px rgba(219, 39, 119, 0.25);
+    }
+    .countdown-card .label { font-size: 0.72rem; opacity: 0.88; }
+    .countdown-card .title { font-size: 0.98rem; font-weight: 800; margin-top: 2px; }
+    .countdown-days {
+      background: rgba(11, 12, 30, 0.32); backdrop-filter: blur(6px);
+      padding: 7px 14px; border-radius: 14px; text-align: center;
+    }
+    .countdown-days span { display: block; font-size: 1.18rem; font-weight: 800; color: var(--accent-gold); }
+    .countdown-days small { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(15, 17, 38, 0.92); backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-around; padding: 10px 0 14px;
+      z-index: 50; max-width: 480px; margin: 0 auto;
+    }
+    .nav-btn {
+      background: none; border: none; color: var(--text-muted);
+      font-family: inherit; font-size: 0.7rem; font-weight: 600;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer; transition: 0.2s; padding: 4px 10px;
+    }
+    .nav-btn .icon { font-size: 1.25rem; transition: transform 0.2s; }
+    .nav-btn.active { color: var(--accent-pink); }
+    .nav-btn.active .icon { transform: translateY(-2px) scale(1.12); }
+
+    .tab-section { display: none; animation: fadeIn 0.25s ease; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Garden Card */
+    .garden-card {
+      background: var(--bg-card); backdrop-filter: blur(12px);
+      border-radius: 26px; padding: 20px; border: 1px solid var(--border);
+      text-align: center; position: relative; margin-bottom: 16px; box-shadow: var(--glow);
+    }
+    .gen-pill {
+      display: inline-block; background: rgba(74, 222, 128, 0.14); color: var(--accent-mint);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; margin-bottom: 6px;
+    }
+    .plant-title { font-size: 1.15rem; font-weight: 800; }
+    .plant-stage-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+    .plant-arena {
+      position: relative; height: 185px; margin: 14px 0;
+      background: radial-gradient(circle at 50% 65%, rgba(157, 123, 255, 0.2) 0%, rgba(11, 12, 30, 0.6) 75%);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px; display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end; padding-bottom: 18px;
+    }
+    .plant-emoji {
+      font-size: 4.5rem; line-height: 1; z-index: 2;
+      animation: sway 3.5s ease-in-out infinite; user-select: none;
+      filter: drop-shadow(0 0 14px rgba(255, 209, 102, 0.35));
+    }
+    @keyframes sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+    .plant-emoji.watered { animation: bounceGrow 0.6s ease; }
+    @keyframes bounceGrow {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.28) rotate(5deg); }
+      70% { transform: scale(0.95) rotate(-3deg); }
+      100% { transform: scale(1); }
+    }
+
+    .pot {
+      width: 84px; height: 40px; margin-top: -8px; z-index: 3;
+      border-radius: 6px 6px 22px 22px; position: relative;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+    }
+    .pot::before {
+      content: ""; position: absolute; top: -7px; left: -6px; right: -6px;
+      height: 10px; border-radius: 6px; background: inherit; filter: brightness(1.12);
+    }
+    .pot-terracotta { background: linear-gradient(180deg, #e07a5f, #9c3d24); }
+    .pot-sakura { background: linear-gradient(180deg, #ff7eb3, #be185d); }
+    .pot-mint { background: linear-gradient(180deg, #34d399, #047857); }
+    .pot-gold { background: linear-gradient(180deg, #fde047, #b45309); }
+
+    .pot-selector { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; }
+    .pot-dot {
+      width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8);
+      cursor: pointer;
+    }
+
+    .droplet {
+      position: absolute; top: 18px; font-size: 1.2rem; pointer-events: none;
+      animation: dropFall 0.85s ease-in forwards; z-index: 10;
+    }
+    @keyframes dropFall {
+      0% { opacity: 1; transform: translateY(0) scale(0.8); }
+      100% { opacity: 0; transform: translateY(90px) scale(1.1); }
+    }
+
+    .progress-labels {
+      display: flex; justify-content: space-between; font-size: 0.74rem;
+      font-weight: 700; color: var(--text-muted); margin-bottom: 6px;
+    }
+    .progress-bar { width: 100%; height: 11px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, #4ade80, #9d7bff, #ff7eb3);
+      border-radius: 999px; transition: width 0.6s ease;
+    }
+
+    .harvest-btn {
+      margin-top: 14px; width: 100%; padding: 13px; border: none; border-radius: 16px;
+      background: linear-gradient(135deg, #f59e0b, #ec4899); color: white;
+      font-family: inherit; font-weight: 800; font-size: 0.9rem; cursor: pointer;
+    }
+
+    .clues-box {
+      margin-top: 14px; text-align: left; background: rgba(11, 12, 30, 0.55);
+      border: 1px dashed rgba(255, 126, 179, 0.35); border-radius: 16px; padding: 12px;
+    }
+    .clues-box h4 { font-size: 0.76rem; color: var(--accent-gold); margin-bottom: 6px; }
+    .clue-item { font-size: 0.79rem; color: var(--text-main); margin-bottom: 6px; line-height: 1.4; }
+    .clue-locked { font-size: 0.74rem; color: var(--text-muted); font-style: italic; margin-bottom: 3px; }
+    .clue-photo { width: 100%; border-radius: 12px; margin-top: 8px; max-height: 200px; object-fit: cover; }
+
+    /* Schedule Cards */
+    .section-title { font-size: 0.92rem; font-weight: 800; margin: 16px 0 10px; display: flex; align-items: center; justify-content: space-between; }
+    .city-tag { font-size: 0.7rem; background: rgba(165, 180, 252, 0.14); padding: 3px 9px; border-radius: 999px; color: var(--text-muted); }
+
+    .task-card {
+      background: var(--bg-card); backdrop-filter: blur(10px);
+      border-radius: 18px; padding: 14px; margin-bottom: 10px;
+      border: 1px solid var(--border); display: flex; align-items: center; gap: 12px;
+    }
+    .task-card.prayer { border-left: 3px solid var(--accent-gold); }
+    .task-card.done { opacity: 0.52; }
+    .task-time {
+      background: rgba(157, 123, 255, 0.2); color: #ddd6fe; font-weight: 800;
+      font-size: 0.76rem; padding: 6px 10px; border-radius: 12px; white-space: nowrap;
+    }
+    .task-card.prayer .task-time { background: rgba(255, 209, 102, 0.16); color: var(--accent-gold); }
+    .task-info { flex: 1; }
+    .task-info h3 { font-size: 0.88rem; font-weight: 700; }
+    .task-info p { font-size: 0.76rem; color: var(--text-muted); margin-top: 3px; line-height: 1.35; }
+    .vn-btn {
+      margin-top: 6px; background: rgba(255, 126, 179, 0.2); color: var(--accent-pink);
+      border: 1px solid rgba(255, 126, 179, 0.35); padding: 5px 10px; border-radius: 999px;
+      font-size: 0.7rem; font-weight: 700; cursor: pointer;
+    }
+    .water-btn {
+      background: rgba(74, 222, 128, 0.18); color: var(--accent-mint);
+      border: 1px solid rgba(74, 222, 128, 0.35); padding: 9px 11px; border-radius: 14px;
+      font-weight: 800; font-size: 0.75rem; cursor: pointer; white-space: nowrap; font-family: inherit;
+    }
+    .water-btn.done { background: rgba(255,255,255,0.06); color: var(--text-muted); border-color: transparent; }
+
+    /* Cards & Our Time */
+    .card-box {
+      background: var(--bg-card); backdrop-filter: blur(12px);
+      border-radius: 22px; padding: 18px; border: 1px solid var(--border);
+      box-shadow: var(--glow); margin-bottom: 16px;
+    }
+    .mood-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+    .mood-btn {
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 16px;
+      padding: 12px; font-family: inherit; font-weight: 700; font-size: 0.8rem;
+      color: var(--text-main); cursor: pointer;
+    }
+    .mood-btn:active { background: rgba(255, 126, 179, 0.25); border-color: var(--accent-pink); }
+    .mood-input {
+      width: 100%; margin-top: 10px; padding: 10px 12px; border-radius: 12px;
+      background: rgba(11, 12, 30, 0.6); border: 1px solid var(--border);
+      color: white; font-family: inherit; font-size: 0.82rem; outline: none;
+    }
+
+    .freetime-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.8rem;
+    }
+    .freetime-row:last-child { border-bottom: none; }
+    .slot-pill {
+      background: rgba(74, 222, 128, 0.15); color: var(--accent-mint);
+      padding: 4px 10px; border-radius: 999px; font-weight: 700; font-size: 0.74rem;
+    }
+
+    .spinner-display {
+      background: rgba(11, 12, 30, 0.65); border-radius: 18px; padding: 20px 14px;
+      text-align: center; margin: 12px 0; font-weight: 800; font-size: 1rem;
+      color: var(--accent-gold); min-height: 70px; display: flex; align-items: center;
+      justify-content: center; border: 1px dashed rgba(255, 209, 102, 0.35);
+    }
+    .spin-btn {
+      width: 100%; padding: 12px; border: none; border-radius: 14px;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white;
+      font-family: inherit; font-weight: 700; font-size: 0.86rem; cursor: pointer;
+    }
+
+    /* Greenhouse */
+    .gh-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .gh-card {
+      background: var(--bg-card); border-radius: 20px; padding: 14px;
+      border: 1px solid var(--border); text-align: center; cursor: pointer;
+    }
+    .gh-card.rare { border: 1.5px solid var(--accent-gold); box-shadow: 0 0 18px rgba(255, 209, 102, 0.2); }
+    .gh-emoji { font-size: 2.6rem; margin-bottom: 6px; }
+    .gh-name { font-size: 0.84rem; font-weight: 800; }
+    .gh-date { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; }
+    .rare-tag {
+      display: inline-block; background: rgba(255, 209, 102, 0.2); color: var(--accent-gold);
+      font-size: 0.64rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; margin-bottom: 4px;
+    }
+
+    /* Toast & Modal */
+    .toast {
+      position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-80px);
+      background: #1e2144; color: white; border: 1px solid var(--accent-pink);
+      padding: 10px 18px; border-radius: 999px; font-size: 0.8rem; font-weight: 600;
+      z-index: 100; transition: transform 0.35s ease; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(7, 8, 20, 0.75);
+      backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center;
+      padding: 20px; z-index: 90;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: #181a36; border: 1px solid var(--border); border-radius: 24px;
+      padding: 22px; max-width: 400px; width: 100%; text-align: center;
+    }
+    .modal-box h3 { font-size: 1.08rem; font-weight: 800; margin-bottom: 8px; color: var(--accent-gold); }
+    .modal-box p { font-size: 0.85rem; color: var(--text-main); line-height: 1.5; white-space: pre-line; }
+    .modal-close {
+      margin-top: 16px; background: var(--accent-pink); color: #0b0c1e; border: none;
+      padding: 10px 22px; border-radius: 12px; font-weight: 800; cursor: pointer; font-family: inherit;
+    }
+
+    .loader-screen {
+      position: fixed; inset: 0; background: var(--bg-deep); display: flex;
+      flex-direction: column; align-items: center; justify-content: center; z-index: 200;
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <div class="loader-screen" id="loader">
+    <div style="font-size:3rem;">♍✨♐</div>
+    <div style="font-size:0.84rem; color:var(--text-muted); margin-top:10px;">Menyelaraskan rasi bintang & kebun kita...</div>
+  </div>
+
+  <div class="toast" id="toast">Tersimpan!</div>
+
+  <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div id="modalEmoji" style="font-size:2.8rem; margin-bottom:6px;">💌</div>
+      <h3 id="modalTitle">Surat Kosmik</h3>
+      <p id="modalBody"></p>
+      <button class="modal-close" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Cosmic Couple Header -->
+    <div class="cosmic-banner">
+      <div class="couple-avatars">
+        <div class="zodiac-orb orb-virgo" title="Virgo Boy">♍</div>
+        <div class="zodiac-orb orb-sagi" title="Sagittarius Girl">♐</div>
+        <div class="couple-text">
+          <h1 id="greetingTitle">Care-lendar ✨</h1>
+          <p id="todayDateText">Virgo Boy & Sagittarius Girl</p>
+        </div>
+      </div>
+      <div class="streak-badge">🔥 <span id="streakCount">0</span> Hari</div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="countdown-card">
+      <div>
+        <div class="label">Menuju Momen Spesial Kita</div>
+        <div class="title" id="cdTitle">Liburan Kita Berdua</div>
+      </div>
+      <div class="countdown-days">
+        <span id="cdDays">0</span>
+        <small>Hari Lagi</small>
+      </div>
+    </div>
+
+    <!-- TAB 1: CARE-LENDAR & KEBUN -->
+    <div id="tab-garden" class="tab-section active">
+      <div class="garden-card">
+        <div class="pot-selector" title="Ganti warna pot">
+          <div class="pot-dot" style="background:#e07a5f" onclick="setPot('terracotta')"></div>
+          <div class="pot-dot" style="background:#ff7eb3" onclick="setPot('sakura')"></div>
+          <div class="pot-dot" style="background:#34d399" onclick="setPot('mint')"></div>
+          <div class="pot-dot" style="background:#fde047" onclick="setPot('gold')"></div>
+        </div>
+
+        <div class="gen-pill" id="genBadge">Generasi #1 • Tahap 1/7</div>
+        <div class="plant-title" id="plantName">Tanaman Kosmik #1</div>
+        <div class="plant-stage-sub" id="plantStageName">Benih Kosmik</div>
+
+        <div class="plant-arena" id="plantArena">
+          <div class="plant-emoji" id="plantEmoji">🌰</div>
+          <div class="pot pot-terracotta" id="plantPot"></div>
+        </div>
+
+        <div>
+          <div class="progress-labels">
+            <span id="coinText">0 / 1.000 Koin</span>
+            <span id="nextStageText">Tahap Berikutnya: 60</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 5%"></div>
+          </div>
+        </div>
+
+        <button class="harvest-btn" id="harvestBtn" style="display:none;" onclick="harvestPlant()">
+          ✨ Panen & Simpan ke Greenhouse! ✨
+        </button>
+
+        <div class="clues-box">
+          <h4>🔭 Petunjuk & Hadiah Evolusi Tanaman</h4>
+          <div id="cluesContent"></div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <span>🌙 Jadwal & Sholat Hari Ini</span>
+        <span class="city-tag" id="cityTag">📍 Karawang</span>
+      </div>
+      <div id="jadwalList"></div>
+    </div>
+
+    <!-- TAB 2: OUR TIME & MOOD -->
+    <div id="tab-care" class="tab-section">
+      <div class="card-box">
+        <h3 style="font-size:0.98rem; font-weight:800;">💭 Mood & Energy Tracker</h3>
+        <p style="font-size:0.76rem; color:var(--text-muted); margin-top:3px;">Kirim sinyal ke Virgo Boy kalau kamu butuh sesuatu:</p>
+        <input type="text" class="mood-input" id="moodNote" placeholder="Tulis catatan singkat (opsional)..." />
+        <div class="mood-grid">
+          <button class="mood-btn" onclick="sendMood('Lagi Capek 😮‍💨')">😮‍💨 Lagi Capek</button>
+          <button class="mood-btn" onclick="sendMood('Butuh Ditemani 🥺')">🥺 Butuh Ditemani</button>
+          <button class="mood-btn" onclick="sendMood('Laper / Pengen Jajan 🍜')">🍜 Laper / Jajan</button>
+          <button class="mood-btn" onclick="sendMood('Semangat & Happy ✨')">✨ Semangat & Happy</button>
+        </div>
+      </div>
+
+      <div class="card-box">
+        <h3 style="font-size:0.98rem; font-weight:800;">⏳ Free-Time Matcher (♍ + ♐)</h3>
+        <p style="font-size:0.76rem; color:var(--text-muted); margin:3px 0 10px;">Slot waktu luang kita berdua minggu ini:</p>
+        <div id="freeTimeList"></div>
+      </div>
+
+      <div class="card-box">
+        <h3 style="font-size:0.98rem; font-weight:800;">🎡 Date Idea Spinner</h3>
+        <p style="font-size:0.76rem; color:var(--text-muted); margin-top:3px;">Putar roda acak buat ide kencan atau makan berikutnya:</p>
+        <div class="spinner-display" id="spinnerResult">Klik tombol di bawah untuk memutar</div>
+        <button class="spin-btn" onclick="spinDateIdea()">🎲 Acak Ide Kencan Kita</button>
+      </div>
+    </div>
+
+    <!-- TAB 3: GREENHOUSE -->
+    <div id="tab-greenhouse" class="tab-section">
+      <div class="card-box" style="text-align:center;">
+        <h3 style="font-size:1.02rem; font-weight:800;">🏡 Greenhouse Kosmik Kita</h3>
+        <p style="font-size:0.76rem; color:var(--text-muted); margin-top:4px;">Koleksi abadi setiap tanaman yang mekar sempurna (1.000 koin).</p>
+      </div>
+      <div class="gh-grid" id="greenhouseGrid"></div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('garden', this)">
+      <span class="icon">🪐</span>
+      <span>Care-lendar</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('care', this)">
+      <span class="icon">💫</span>
+      <span>Our Time</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('greenhouse', this)">
+      <span class="icon">🏡</span>
+      <span>Greenhouse</span>
+    </button>
+  </nav>
+
+  <audio id="vnAudio" preload="none"></audio>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzoCtaFdkPY_X6DZHFEL38dD2bvTIfMf0hILEAnrXzQcqh8J-s2JrB1-2Dk42ypIivq/exec";
+    let appData = null;
+
+    const optionsDate = { weekday: 'long', day: 'numeric', month: 'short' };
+    document.getElementById('todayDateText').textContent = `${new Date().toLocaleDateString('id-ID', optionsDate)} • ♍ & ♐`;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const cached = localStorage.getItem('carelendar_cosmic_cache');
+      if (cached) {
+        try {
+          appData = JSON.parse(cached);
+          renderAll(appData);
+          document.getElementById('loader').style.display = 'none';
+        } catch (e) {}
+      }
+      fetchDashboard();
+    });
+
+    async function fetchDashboard() {
+      try {
+        const res = await fetch(`${API_URL}?action=getDashboard`);
+        const json = await res.json();
+        if (json.status === 'success') {
+          appData = json.data;
+          localStorage.setItem('carelendar_cosmic_cache', JSON.stringify(appData));
+          renderAll(appData);
+        }
+      } catch (err) {
+        showToast("Gagal sinkronisasi, cek koneksi ya");
+      } finally {
+        document.getElementById('loader').style.display = 'none';
+      }
+    }
+
+    function renderAll(data) {
+      document.getElementById('greetingTitle').textContent = `Hai, ${data.config.partnerName} ✨`;
+      document.getElementById('streakCount').textContent = data.garden.streakDays;
+      document.getElementById('cdTitle').textContent = data.config.countdownTitle;
+      document.getElementById('cityTag').textContent = `📍 ${data.config.city || 'Karawang'}`;
+
+      const targetDate = new Date(data.config.countdownDate);
+      const diffDays = Math.max(0, Math.ceil((targetDate - new Date()) / (1000 * 60 * 60 * 24)));
+      document.getElementById('cdDays').textContent = diffDays;
+
+      const g = data.garden;
+      document.getElementById('genBadge').textContent = `Generasi #${g.currentGen} • Tahap ${g.stage}/7 ${g.isRare ? '✨ RARE' : ''}`;
+      document.getElementById('plantName').textContent = g.rewards.revealedName;
+      document.getElementById('plantStageName').textContent = g.stageName;
+      document.getElementById('plantEmoji').textContent = g.rewards.displayEmoji;
+      document.getElementById('plantPot').className = `pot pot-${g.potStyle}`;
+
+      document.getElementById('coinText').textContent = `${g.currentCoins} / 1.000 Koin`;
+      document.getElementById('nextStageText').textContent = g.canHarvest ? "Siap Dipanen!" : `Tahap Berikutnya: ${g.nextStageCoins}`;
+      document.getElementById('progressFill').style.width = `${Math.min(100, Math.max(4, (g.currentCoins / 1000) * 100))}%`;
+      document.getElementById('harvestBtn').style.display = g.canHarvest ? 'block' : 'none';
+
+      // Clues
+      let htmlClues = '';
+      htmlClues += g.rewards.clue2
+        ? `<div class="clue-item">🌱 <b>Petunjuk 1:</b> "${g.rewards.clue2}"</div>`
+        : `<div class="clue-locked">🔒 Petunjuk 1 terbuka di 60 Koin</div>`;
+      htmlClues += g.rewards.clue4
+        ? `<div class="clue-item">🌿 <b>Petunjuk 2:</b> "${g.rewards.clue4}"</div>`
+        : `<div class="clue-locked">🔒 Petunjuk 2 terbuka di 300 Koin</div>`;
+      htmlClues += g.rewards.foto5
+        ? `<div class="clue-item">📸 <b>Kenangan Terbuka:</b><img class="clue-photo" src="${convertDriveUrl(g.rewards.foto5, 'image')}" alt="Kenangan" /></div>`
+        : `<div class="clue-locked">🔒 Foto Rahasia terbuka di 500 Koin</div>`;
+      htmlClues += g.rewards.surat7
+        ? `<div class="clue-item" style="margin-top:8px;">💌 <b>Surat Akhir:</b> "${g.rewards.surat7}"</div>`
+        : `<div class="clue-locked">🔒 Identitas Bunga & Surat Spesial terbuka di 1.000 Koin</div>`;
+      document.getElementById('cluesContent').innerHTML = htmlClues;
+
+      // Jadwal & Sholat
+      const jadwalEl = document.getElementById('jadwalList');
+      jadwalEl.innerHTML = (data.jadwal || []).map(item => `
+        <div class="task-card ${item.isPrayer ? 'prayer' : ''} ${item.done ? 'done' : ''}">
+          <div class="task-time">${item.jam}</div>
+          <div class="task-info">
+            <h3>${item.judul}</h3>
+            <p>${item.pesan || ''}</p>
+            ${item.voiceNote ? `<button class="vn-btn" onclick="playVoiceNote('${item.voiceNote}')">🔊 Dengar Suaraku</button>` : ''}
+          </div>
+          <button class="water-btn ${item.done ? 'done' : ''}" ${item.done ? 'disabled' : ''} onclick="completeTask('${item.id}', ${item.koin})">
+            ${item.done ? 'Sudah ✓' : `💧 +${item.koin}`}
+          </button>
+        </div>
+      `).join('');
+
+      // Free Time Matcher
+      const ftEl = document.getElementById('freeTimeList');
+      if (data.freeTime && data.freeTime.length) {
+        ftEl.innerHTML = data.freeTime.map(f => `
+          <div class="freetime-row">
+            <span style="font-weight:700;">${f.hari}</span>
+            <span class="slot-pill">${f.slots.join(', ')}</span>
+          </div>
+        `).join('');
+      } else {
+        ftEl.innerHTML = `<p style="font-size:0.78rem; color:var(--text-muted);">Isi tab Free_Time di Sheets untuk melihat jam kosong bersama.</p>`;
+      }
+
+      // Greenhouse
+      const ghEl = document.getElementById('greenhouseGrid');
+      if (!data.greenhouse || data.greenhouse.length === 0) {
+        ghEl.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:24px; color:var(--text-muted); font-size:0.8rem;">Belum ada tanaman yang dipanen. Siram terus tanaman pertamamu sampai 1.000 koin! 🌱</div>`;
+      } else {
+        ghEl.innerHTML = data.greenhouse.map((p, idx) => `
+          <div class="gh-card ${String(p.isRare).includes('RARE') ? 'rare' : ''}" onclick="openGreenhouseModal(${idx})">
+            ${String(p.isRare).includes('RARE') ? '<div class="rare-tag">✨ RARE</div>' : ''}
+            <div class="gh-emoji">${p.emoji}</div>
+            <div class="gh-name">${p.nama}</div>
+            <div class="gh-date">Gen #${p.gen} • ${formatShortDate(p.tglPanen)}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    async function completeTask(taskId, coins) {
+      triggerWaterAnimation();
+      showToast(`💧 Menyiram tanaman (+${coins} Koin)...`);
+      try {
+        const res = await fetch(`${API_URL}?action=completeTask`, {
+          method: 'POST',
+          body: JSON.stringify({ taskId, coins })
+        });
+        const json = await res.json();
+        if (json.status === 'success' && json.data.garden) {
+          appData = json.data;
+          localStorage.setItem('carelendar_cosmic_cache', JSON.stringify(appData));
+          renderAll(appData);
+          showToast(`Yeay! Tanaman kosmik tumbuh +${coins} koin 🌱`);
+        }
+      } catch (e) { showToast("Koneksi terganggu"); }
+    }
+
+    function triggerWaterAnimation() {
+      const arena = document.getElementById('plantArena');
+      const plant = document.getElementById('plantEmoji');
+      plant.classList.remove('watered');
+      void plant.offsetWidth;
+      plant.classList.add('watered');
+
+      for (let i = 0; i < 6; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'droplet';
+        drop.textContent = '💧';
+        drop.style.left = `${30 + Math.random() * 40}%`;
+        drop.style.animationDelay = `${i * 0.08}s`;
+        arena.appendChild(drop);
+        setTimeout(() => drop.remove(), 950);
+      }
+    }
+
+    async function harvestPlant() {
+      showToast("✨ Memanen tanaman ke Greenhouse...");
+      try {
+        const res = await fetch(`${API_URL}?action=harvestPlant`, { method: 'POST', body: JSON.stringify({}) });
+        const json = await res.json();
+        if (json.status === 'success' && json.data.garden) {
+          const last = json.data.greenhouse[json.data.greenhouse.length - 1];
+          appData = json.data;
+          localStorage.setItem('carelendar_cosmic_cache', JSON.stringify(appData));
+          renderAll(appData);
+          if (last) openModal(last.emoji, `Selamat Panen: ${last.nama}!`, last.surat);
+        }
+      } catch (e) { showToast("Gagal memanen"); }
+    }
+
+    async function setPot(style) {
+      document.getElementById('plantPot').className = `pot pot-${style}`;
+      showToast("Warna pot kosmik diganti 🎨");
+      await fetch(`${API_URL}?action=changePot`, { method: 'POST', body: JSON.stringify({ potStyle: style }) });
+    }
+
+    async function sendMood(mood) {
+      const note = document.getElementById('moodNote').value.trim();
+      showToast("Mengirim sinyal ke Virgo Boy... 💌");
+      try {
+        await fetch(`${API_URL}?action=logMood`, { method: 'POST', body: JSON.stringify({ mood, note }) });
+        document.getElementById('moodNote').value = '';
+        showToast("Terkirim ke grup Virsagi Memo ❤️");
+      } catch (e) { showToast("Gagal mengirim mood"); }
+    }
+
+    function spinDateIdea() {
+      const ideas = (appData && appData.dateIdeas && appData.dateIdeas.length)
+        ? appData.dateIdeas : ["Makan Ramen Berdua", "Piknik Sore di Taman", "Coffee Shop Hopping"];
+      const display = document.getElementById('spinnerResult');
+      let count = 0;
+      const interval = setInterval(() => {
+        display.textContent = ideas[Math.floor(Math.random() * ideas.length)];
+        if (++count > 14) {
+          clearInterval(interval);
+          display.textContent = `🎉 ${ideas[Math.floor(Math.random() * ideas.length)]}`;
+        }
+      }, 75);
+    }
+
+    function playVoiceNote(url) {
+      const audio = document.getElementById('vnAudio');
+      audio.src = convertDriveUrl(url, 'audio');
+      audio.play().then(() => showToast("🔊 Memutar pesan suara...")).catch(() => window.open(url, '_blank'));
+    }
+
+    function convertDriveUrl(url, type) {
+      const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        return type === 'image'
+          ? `https://drive.google.com/uc?export=view&id=${match[1]}`
+          : `https://drive.google.com/uc?export=download&id=${match[1]}`;
+      }
+      return url;
+    }
+
+    function switchTab(tabName, btn) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    function openGreenhouseModal(idx) {
+      const item = appData.greenhouse[idx];
+      if (item) openModal(item.emoji, `${item.nama} (Gen #${item.gen})`, item.surat);
+    }
+
+    function openModal(emoji, title, body) {
+      document.getElementById('modalEmoji').textContent = emoji;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').textContent = body;
+      document.getElementById('modalBackdrop').classList.add('open');
+    }
+
+    function closeModal() { document.getElementById('modalBackdrop').classList.remove('open'); }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    function formatShortDate(val) {
+      if (!val) return '';
+      const d = new Date(val);
+      return isNaN(d) ? String(val).slice(0, 10) : d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+    }
+  </script>
+</body>
+</html>
