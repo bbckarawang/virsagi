@@ -47,10 +47,7 @@
       opacity: 0.55;
       animation: twinkleStars 6s ease-in-out infinite alternate;
     }
-    @keyframes twinkleStars {
-      0% { opacity: 0.4; }
-      100% { opacity: 0.75; }
-    }
+    @keyframes twinkleStars { 0% { opacity: 0.4; } 100% { opacity: 0.75; } }
 
     .container { max-width: 480px; margin: 0 auto; padding: 16px; position: relative; z-index: 2; }
 
@@ -131,7 +128,7 @@
 
     /* Interactive Animated Plant Arena & Dynamic Sky Themes */
     .plant-arena {
-      position: relative; height: 215px; margin: 14px 0;
+      position: relative; height: 220px; margin: 14px 0;
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 22px; display: flex; flex-direction: column;
       align-items: center; justify-content: flex-end; padding-bottom: 18px; overflow: hidden;
@@ -154,16 +151,42 @@
       background: linear-gradient(180deg, #1e1b4b 0%, #7e22ce 40%, #ea580c 82%, #facc15 100%);
       box-shadow: inset 0 0 35px rgba(234, 88, 12, 0.3);
     }
+    .plant-arena.sky-rain {
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 48%, #334155 88%, #475569 100%);
+      box-shadow: inset 0 0 40px rgba(56, 189, 248, 0.25);
+    }
 
-    /* Celestial Orb (Sun / Moon) & Shooting Star */
+    .sky-mode-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(11, 12, 30, 0.55); backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #e2e8f0; font-size: 0.62rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 999px; z-index: 5;
+    }
+
     .sky-celestial {
-      position: absolute; top: 14px; right: 16px; font-size: 1.55rem;
-      animation: floatOrb 4s ease-in-out infinite; pointer-events: none; z-index: 1;
+      position: absolute; top: 12px; right: 14px; font-size: 1.55rem;
+      animation: floatOrb 4s ease-in-out infinite; pointer-events: none; z-index: 2;
       filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
     }
     @keyframes floatOrb {
       0%, 100% { transform: translateY(0) rotate(-4deg); }
       50% { transform: translateY(-6px) rotate(6deg); }
+    }
+
+    /* Raindrops Layer when Raining */
+    .rain-layer {
+      position: absolute; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; display: none;
+    }
+    .plant-arena.sky-rain .rain-layer { display: block; }
+    .raindrop-streak {
+      position: absolute; top: -25px; width: 1.5px; height: 18px;
+      background: linear-gradient(180deg, transparent, rgba(186, 230, 253, 0.8));
+      animation: rainFall linear infinite;
+    }
+    @keyframes rainFall {
+      0% { transform: translateY(0) translateX(0); opacity: 0.8; }
+      100% { transform: translateY(250px) translateX(-18px); opacity: 0.1; }
     }
 
     .shooting-star {
@@ -179,7 +202,6 @@
       100% { opacity: 0; }
     }
 
-    /* Ambient Fireflies */
     .firefly {
       position: absolute; width: 5px; height: 5px; border-radius: 50%;
       background: #fde047; box-shadow: 0 0 10px #fde047, 0 0 18px #ff7eb3;
@@ -192,7 +214,6 @@
       100% { transform: translate(var(--tx, 25px), var(--ty, -30px)) scale(1.25); opacity: 0.35; }
     }
 
-    /* Glowing Aura Behind Plant */
     .plant-aura {
       position: absolute; bottom: 38px; width: 120px; height: 120px; border-radius: 50%;
       background: radial-gradient(circle, rgba(255, 209, 102, 0.35) 0%, rgba(255, 126, 179, 0.12) 55%, transparent 75%);
@@ -203,28 +224,30 @@
       50% { transform: scale(1.18); opacity: 1; }
     }
 
-    /* Cute Speech Bubble when tapped */
+    /* Random Scattered Speech Bubble */
     .plant-bubble {
-      position: absolute; top: 38px; left: 50%; transform: translateX(-50%) scale(0.8);
-      background: rgba(15, 17, 38, 0.88); color: #fff;
-      border: 1px solid rgba(255, 209, 102, 0.55);
-      padding: 6px 13px; border-radius: 16px; font-size: 0.72rem; font-weight: 700;
-      white-space: nowrap; opacity: 0; pointer-events: none; z-index: 12;
-      transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+      position: absolute;
+      background: rgba(15, 17, 38, 0.9); color: #fff;
+      border: 1px solid rgba(255, 209, 102, 0.65);
+      padding: 6px 12px; border-radius: 16px; font-size: 0.71rem; font-weight: 700;
+      max-width: 210px; line-height: 1.3; text-align: center;
+      opacity: 0; pointer-events: none; z-index: 12;
+      transform: scale(0.75);
+      transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
     }
     .plant-bubble.show {
-      opacity: 1; transform: translateX(-50%) translateY(-4px) scale(1);
+      opacity: 1; transform: scale(1);
     }
 
     .tap-hint {
       position: absolute; bottom: 6px; right: 10px;
-      font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.65);
-      background: rgba(11, 12, 30, 0.35); padding: 2px 8px; border-radius: 999px;
+      font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.75);
+      background: rgba(11, 12, 30, 0.45); padding: 2px 8px; border-radius: 999px;
       pointer-events: none; z-index: 4;
     }
 
-    /* Lively Plant Character Animation */
+    /* Lively Plant Character & 3x Tap Jump Animation */
     .plant-emoji {
       font-size: 4.6rem; line-height: 1; z-index: 3;
       transform-origin: bottom center;
@@ -238,14 +261,24 @@
       75% { transform: rotate(-2deg) scaleY(1.03) scaleX(0.98); }
     }
     .plant-emoji.poked {
-      animation: jellyPoke 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+      animation: jellyPoke 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
     }
     @keyframes jellyPoke {
       0% { transform: scale(1, 1); }
-      25% { transform: scale(1.25, 0.78) rotate(-8deg); }
-      50% { transform: scale(0.84, 1.24) rotate(8deg); }
-      75% { transform: scale(1.08, 0.94) rotate(-3deg); }
+      30% { transform: scale(1.2, 0.82) rotate(-6deg); }
+      65% { transform: scale(0.88, 1.18) rotate(6deg); }
       100% { transform: scale(1, 1) rotate(0deg); }
+    }
+    .plant-emoji.triple-jump {
+      animation: superJump 0.85s cubic-bezier(0.28, 0.84, 0.42, 1) !important;
+    }
+    @keyframes superJump {
+      0% { transform: translateY(0) scale(1, 1); }
+      18% { transform: translateY(6px) scale(1.28, 0.72); }
+      48% { transform: translateY(-48px) scale(0.88, 1.18) rotate(12deg); }
+      72% { transform: translateY(0) scale(1.22, 0.8) rotate(-6deg); }
+      88% { transform: translateY(-12px) scale(0.95, 1.06); }
+      100% { transform: translateY(0) scale(1, 1) rotate(0deg); }
     }
     .plant-emoji.watered { animation: bounceGrow 0.95s ease !important; }
     @keyframes bounceGrow {
@@ -255,7 +288,6 @@
       100% { transform: scale(1); }
     }
 
-    /* Ground Shadow & Pot */
     .pot-shadow {
       width: 96px; height: 12px; border-radius: 50%;
       background: rgba(0, 0, 0, 0.42); margin-top: -5px; z-index: 2;
@@ -274,15 +306,19 @@
     .pot-mint { background: linear-gradient(180deg, #34d399, #047857); }
     .pot-gold { background: linear-gradient(180deg, #fde047, #b45309); }
 
-    /* Top Corner Controls: Sky Theme Switcher (Left) & Pot Switcher (Right) */
-    .sky-selector { position: absolute; top: 12px; left: 12px; display: flex; gap: 5px; z-index: 5; }
+    /* Top Corner Controls */
+    .sky-selector { position: absolute; top: 12px; left: 12px; display: flex; gap: 4px; z-index: 5; }
     .sky-dot {
       width: 22px; height: 22px; border-radius: 50%;
       background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.22);
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.72rem; cursor: pointer; transition: transform 0.2s;
+      font-size: 0.7rem; cursor: pointer; transition: transform 0.2s;
     }
-    .sky-dot:active { transform: scale(1.2); }
+    .sky-dot.active-sky {
+      border-color: var(--accent-gold);
+      background: rgba(255, 209, 102, 0.22);
+      transform: scale(1.12);
+    }
 
     .pot-selector { position: absolute; top: 14px; right: 12px; display: flex; gap: 6px; z-index: 5; }
     .pot-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); cursor: pointer; }
@@ -302,7 +338,7 @@
     }
     @keyframes floatHeart {
       0% { opacity: 1; transform: translate(0, 0) scale(0.6); }
-      100% { opacity: 0; transform: translate(var(--hx), -75px) scale(1.3); }
+      100% { opacity: 0; transform: translate(var(--hx), -80px) scale(1.35); }
     }
 
     .progress-labels {
@@ -329,6 +365,23 @@
     .clue-item { font-size: 0.79rem; color: var(--text-main); margin-bottom: 6px; line-height: 1.4; }
     .clue-locked { font-size: 0.74rem; color: var(--text-muted); font-style: italic; margin-bottom: 3px; }
     .clue-photo { width: 100%; border-radius: 12px; margin-top: 8px; max-height: 200px; object-fit: cover; }
+
+    /* Special Condition Mode Bar (Normal / Haid / Puasa) */
+    .mode-bar {
+      display: flex; gap: 6px; margin-bottom: 12px;
+      background: rgba(15, 17, 38, 0.7); padding: 5px;
+      border-radius: 16px; border: 1px solid var(--border);
+    }
+    .mode-pill {
+      flex: 1; padding: 7px 6px; border: none; border-radius: 12px;
+      background: transparent; color: var(--text-muted);
+      font-family: inherit; font-size: 0.72rem; font-weight: 700;
+      cursor: pointer; transition: 0.2s;
+    }
+    .mode-pill.active {
+      background: linear-gradient(135deg, rgba(157, 123, 255, 0.35), rgba(255, 126, 179, 0.35));
+      color: #fff; border: 1px solid rgba(255, 126, 179, 0.45);
+    }
 
     /* Schedule Cards */
     .section-title { font-size: 0.92rem; font-weight: 800; margin: 16px 0 10px; display: flex; align-items: center; justify-content: space-between; }
@@ -529,12 +582,14 @@
     <!-- TAB 1: CARE-LENDAR & KEBUN -->
     <div id="tab-garden" class="tab-section active">
       <div class="garden-card">
-        <!-- Ganti Suasana Langit -->
-        <div class="sky-selector" title="Ganti suasana langit">
-          <div class="sky-dot" onclick="setSkyTheme('dawn')">🌅</div>
-          <div class="sky-dot" onclick="setSkyTheme('day')">☀️</div>
-          <div class="sky-dot" onclick="setSkyTheme('sunset')">🌆</div>
-          <div class="sky-dot" onclick="setSkyTheme('night')">🌌</div>
+        <!-- Ganti Suasana Langit (Sementara / Preview) -->
+        <div class="sky-selector" title="Preview suasana langit">
+          <div class="sky-dot" id="sky-btn-auto" onclick="resetAutoSky()" title="Otomatis Jam & Cuaca">🔄</div>
+          <div class="sky-dot" id="sky-btn-dawn" onclick="setSkyTheme('dawn', true)">🌅</div>
+          <div class="sky-dot" id="sky-btn-day" onclick="setSkyTheme('day', true)">☀️</div>
+          <div class="sky-dot" id="sky-btn-sunset" onclick="setSkyTheme('sunset', true)">🌆</div>
+          <div class="sky-dot" id="sky-btn-night" onclick="setSkyTheme('night', true)">🌌</div>
+          <div class="sky-dot" id="sky-btn-rain" onclick="setSkyTheme('rain', true)">🌧️</div>
         </div>
 
         <!-- Ganti Warna Pot -->
@@ -551,7 +606,9 @@
 
         <!-- Interactive Animated Plant Arena -->
         <div class="plant-arena sky-night" id="plantArena" onclick="pokePlant()">
+          <div class="sky-mode-badge" id="skyModeBadge">🕒 Langit Otomatis</div>
           <div class="sky-celestial" id="skyCelestial">🌙</div>
+          <div class="rain-layer" id="rainLayer"></div>
           <div class="shooting-star"></div>
           <div class="plant-aura"></div>
           <div class="plant-bubble" id="plantBubble">Penasaran ya aku jadi bunga apa? 👀</div>
@@ -559,7 +616,7 @@
           <div class="plant-emoji" id="plantEmoji">🌰</div>
           <div class="pot pot-terracotta" id="plantPot"></div>
           <div class="pot-shadow"></div>
-          <div class="tap-hint">👆 Tap aku!</div>
+          <div class="tap-hint" id="tapHintText">👆 Tap 3x biar lompat!</div>
         </div>
 
         <div>
@@ -586,6 +643,14 @@
         <span>🌙 Jadwal & Sholat Hari Ini</span>
         <span class="city-tag" id="cityTag">📍 Karawang</span>
       </div>
+
+      <!-- Saklar Kondisi Khusus: Normal / Sedang Haid / Sedang Puasa -->
+      <div class="mode-bar">
+        <button class="mode-pill active" id="mode-normal" onclick="changeSpecialMode('normal')">✨ Normal</button>
+        <button class="mode-pill" id="mode-haid" onclick="changeSpecialMode('haid')">🌸 Lagi Haid</button>
+        <button class="mode-pill" id="mode-puasa" onclick="changeSpecialMode('puasa')">🌙 Lagi Puasa</button>
+      </div>
+
       <div id="jadwalList"></div>
     </div>
 
@@ -651,14 +716,19 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzoCtaFdkPY_X6DZHFEL38dD2bvTIfMf0hILEAnrXzQcqh8J-s2JrB1-2Dk42ypIivq/exec";
     let appData = null;
     let isFetching = false;
+    let isManualSkyOverride = false;
+    let tapComboCount = 0;
+    let tapResetTimer = null;
     let bubbleTimer = null;
+    const requestingTasks = new Set();
 
     const optionsDate = { weekday: 'long', day: 'numeric', month: 'short' };
     document.getElementById('todayDateText').textContent = `${new Date().toLocaleDateString('id-ID', optionsDate)} • ♍ & ♐`;
 
     window.addEventListener('DOMContentLoaded', () => {
-      initSkyByTime();
       spawnAmbientFireflies();
+      spawnRaindrops();
+      applyAutoSky(null);
 
       const cached = localStorage.getItem('carelendar_cosmic_cache');
       if (cached) {
@@ -677,39 +747,75 @@
         }
       }, 8000);
 
-      // Auto-sync saat kembali ke browser/PWA
+      // Auto-sync & kembalikan langit otomatis saat kembali membuka aplikasi
       document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) fetchDashboard(true);
+        if (!document.hidden) {
+          isManualSkyOverride = false;
+          fetchDashboard(true);
+        }
       });
     });
 
-    // Atur langit otomatis sesuai jam lokal (bisa diganti manual kapan saja)
-    function initSkyByTime() {
-      const savedSky = localStorage.getItem('carelendar_sky_theme');
-      if (savedSky) {
-        setSkyTheme(savedSky, false);
+    // Otomatis deteksi Cuaca Hujan Real-time + Jam Lokal
+    function applyAutoSky(weatherObj) {
+      if (isManualSkyOverride) return;
+      const isRaining = weatherObj && weatherObj.isRaining;
+      if (isRaining) {
+        setSkyTheme('rain', false, `🌧️ Hujan (${weatherObj.temp}°C)`);
         return;
       }
+
       const hour = new Date().getHours();
-      if (hour >= 5 && hour < 8) setSkyTheme('dawn', false);
-      else if (hour >= 8 && hour < 16) setSkyTheme('day', false);
-      else if (hour >= 16 && hour < 19) setSkyTheme('sunset', false);
-      else setSkyTheme('night', false);
+      if (hour >= 5 && hour < 8) setSkyTheme('dawn', false, '🕒 Fajar Otomatis');
+      else if (hour >= 8 && hour < 16) setSkyTheme('day', false, '🕒 Siang Otomatis');
+      else if (hour >= 16 && hour < 19) setSkyTheme('sunset', false, '🕒 Senja Otomatis');
+      else setSkyTheme('night', false, '🕒 Malam Otomatis');
     }
 
-    function setSkyTheme(theme, notify = true) {
+    function resetAutoSky() {
+      isManualSkyOverride = false;
+      applyAutoSky(appData ? appData.weather : null);
+      showToast("Kembali ke langit otomatis (jam & cuaca) 🔄");
+    }
+
+    function setSkyTheme(theme, isManual = false, customBadge = null) {
+      if (isManual) isManualSkyOverride = true;
       const arena = document.getElementById('plantArena');
       const orb = document.getElementById('skyCelestial');
-      arena.className = `plant-arena sky-${theme}`;
+      const badge = document.getElementById('skyModeBadge');
 
-      const orbMap = { dawn: '🌅', day: '☀️', sunset: '🌇', night: '🌙' };
-      const labelMap = { dawn: 'Fajar Merah Muda', day: 'Langit Siang Cerah', sunset: 'Senja Galaksi', night: 'Malam Berbintang' };
+      arena.className = `plant-arena sky-${theme}`;
+      const orbMap = { dawn: '🌅', day: '☀️', sunset: '🌇', night: '🌙', rain: '⛈️' };
+      const labelMap = {
+        dawn: 'Preview: Fajar',
+        day: 'Preview: Siang',
+        sunset: 'Preview: Senja',
+        night: 'Preview: Malam',
+        rain: 'Preview: Hujan'
+      };
+
       orb.textContent = orbMap[theme] || '🌙';
-      localStorage.setItem('carelendar_sky_theme', theme);
-      if (notify) showToast(`Suasana langit: ${labelMap[theme]} ✨`);
+      badge.textContent = customBadge || labelMap[theme] || '🕒 Langit Otomatis';
+
+      document.querySelectorAll('.sky-dot').forEach(d => d.classList.remove('active-sky'));
+      const activeBtn = document.getElementById(isManual ? `sky-btn-${theme}` : 'sky-btn-auto');
+      if (activeBtn) activeBtn.classList.add('active-sky');
+
+      if (isManual) showToast(`${labelMap[theme]} (otomatis reset saat dibuka ulang)`);
     }
 
-    // Kunang-kunang kosmik melayang di arena tanaman
+    function spawnRaindrops() {
+      const layer = document.getElementById('rainLayer');
+      for (let i = 0; i < 24; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'raindrop-streak';
+        drop.style.left = `${Math.random() * 100}%`;
+        drop.style.animationDuration = `${0.55 + Math.random() * 0.45}s`;
+        drop.style.animationDelay = `${Math.random() * 1.5}s`;
+        layer.appendChild(drop);
+      }
+    }
+
     function spawnAmbientFireflies() {
       const arena = document.getElementById('plantArena');
       for (let i = 0; i < 10; i++) {
@@ -725,45 +831,84 @@
       }
     }
 
-    // Interaksi Lucu Saat Tanaman Di-Tap / Di-Colek
+    // 3x Tap = Tanaman Lompat + Bubble Acak Tersebar di Berbagai Titik
     function pokePlant() {
       const arena = document.getElementById('plantArena');
       const plant = document.getElementById('plantEmoji');
       const bubble = document.getElementById('plantBubble');
+      const tapHint = document.getElementById('tapHintText');
 
-      plant.classList.remove('poked');
+      tapComboCount++;
+      clearTimeout(tapResetTimer);
+      tapResetTimer = setTimeout(() => {
+        tapComboCount = 0;
+        tapHint.textContent = "👆 Tap 3x biar lompat!";
+      }, 1400);
+
+      const isTripleJump = (tapComboCount % 3 === 0);
+      plant.classList.remove('poked', 'triple-jump');
       void plant.offsetWidth;
-      plant.classList.add('poked');
+
+      if (isTripleJump) {
+        plant.classList.add('triple-jump');
+        tapHint.textContent = "🦘 Yeay lompat tinggi!";
+      } else {
+        plant.classList.add('poked');
+        const rem = 3 - (tapComboCount % 3);
+        tapHint.textContent = `👆 ${rem}x tap lagi biar lompat!`;
+      }
 
       const stage = appData ? appData.garden.stage : 1;
-      const whispers = stage < 4 ? [
+      const jumpWhispers = [
+        "Wihh aku lompat tinggi! Seru banget 🦘✨",
+        "Horeee! Makasih udah main sama aku 💖",
+        "Lompat sekali lagi biar makin semangat 🌸"
+      ];
+      const normalWhispers = stage < 4 ? [
         "Hihi geli tau! Siram aku lagi dong 💧",
         "Penasaran ya aku bakal jadi bunga apa? 👀",
         "Di dalamku ada rahasia dari Virgo Boy ♍✨",
-        "Rajin-rajin siram biar petunjukku terbuka! 🌱",
+        "Rajin siram biar petunjukku terbuka! 🌱",
         "Aku tumbuh dari perhatian kalian berdua 💖"
       ] : [
         "Wangi kelopakku mulai terasa nih~ 🌸",
         "Dikit lagi identitas asliku terbongkar! 🔮",
-        "Virgo Boy nyiapin surat spesial di tahap akhir 💌",
-        "Makasih udah rawat aku setiap hari 🥰",
-        "Tap-tap terus biar makin subur ✨"
+        "Virgo Boy nyiapin surat spesial di akhir 💌",
+        "Makasih udah rawat aku setiap hari 🥰"
       ];
 
-      bubble.textContent = whispers[Math.floor(Math.random() * whispers.length)];
+      const pool = isTripleJump ? jumpWhispers : normalWhispers;
+      bubble.textContent = pool[Math.floor(Math.random() * pool.length)];
+
+      // Posisi bubble tersebar acak di area arena (kiri atas, kanan tengah, kiri bawah, dll.)
+      const randomPositions = [
+        { top: '34px', left: '14px', right: 'auto', bottom: 'auto' },
+        { top: '38px', right: '14px', left: 'auto', bottom: 'auto' },
+        { top: '86px', left: '10px', right: 'auto', bottom: 'auto' },
+        { top: '84px', right: '10px', left: 'auto', bottom: 'auto' },
+        { bottom: '68px', left: '12px', top: 'auto', right: 'auto' },
+        { bottom: '68px', right: '12px', top: 'auto', left: 'auto' }
+      ];
+      const pos = randomPositions[Math.floor(Math.random() * randomPositions.length)];
+      bubble.style.top = pos.top;
+      bubble.style.left = pos.left;
+      bubble.style.right = pos.right;
+      bubble.style.bottom = pos.bottom;
+
       bubble.classList.add('show');
       clearTimeout(bubbleTimer);
-      bubbleTimer = setTimeout(() => bubble.classList.remove('show'), 2600);
+      bubbleTimer = setTimeout(() => bubble.classList.remove('show'), 2500);
 
-      // Ledakan hati & bintang kecil saat di-tap
-      const pops = ['💖', '✨', '🌸', '💫', '🥰'];
-      for (let i = 0; i < 5; i++) {
+      // Partikel hati & bintang (lebih banyak saat 3x tap lompat!)
+      const pops = ['💖', '✨', '🌸', '💫', '🥰', '🌟'];
+      const particleCount = isTripleJump ? 10 : 4;
+      for (let i = 0; i < particleCount; i++) {
         const h = document.createElement('div');
         h.className = 'love-pop';
         h.textContent = pops[i % pops.length];
-        h.style.left = `${42 + (Math.random() - 0.5) * 24}%`;
+        h.style.left = `${35 + Math.random() * 30}%`;
         h.style.bottom = '75px';
-        h.style.setProperty('--hx', `${(Math.random() - 0.5) * 80}px`);
+        h.style.setProperty('--hx', `${(Math.random() - 0.5) * 110}px`);
         arena.appendChild(h);
         setTimeout(() => h.remove(), 1150);
       }
@@ -798,7 +943,19 @@
       document.getElementById('greetingTitle').textContent = `Hai, ${data.config.partnerName} ✨`;
       document.getElementById('streakCount').textContent = data.garden.streakDays;
       document.getElementById('cdTitle').textContent = data.config.countdownTitle;
-      document.getElementById('cityTag').textContent = `📍 ${data.config.city || 'Karawang'}`;
+
+      const weatherTag = data.weather
+        ? (data.weather.isRaining ? ` • 🌧️ ${data.weather.temp}°C` : ` • 🌤️ ${data.weather.temp}°C`)
+        : '';
+      document.getElementById('cityTag').textContent = `📍 ${data.config.city || 'Karawang'}${weatherTag}`;
+
+      applyAutoSky(data.weather);
+
+      // Update highlight tombol mode kondisi (Normal / Haid / Puasa)
+      const activeMode = data.config.specialMode || 'normal';
+      document.querySelectorAll('.mode-pill').forEach(btn => btn.classList.remove('active'));
+      const activeModeBtn = document.getElementById(`mode-${activeMode}`);
+      if (activeModeBtn) activeModeBtn.classList.add('active');
 
       const targetDate = new Date(data.config.countdownDate);
       const diffDays = Math.max(0, Math.ceil((targetDate - new Date()) / (1000 * 60 * 60 * 24)));
@@ -839,7 +996,7 @@
         let btnText = `💧 +${item.koin}`;
         let disabledAttr = '';
 
-        if (item.status === 'pending') {
+        if (item.status === 'pending' || requestingTasks.has(item.id)) {
           btnClass = 'water-btn pending';
           btnText = '⏳ Menunggu ♍';
           disabledAttr = 'disabled';
@@ -858,7 +1015,7 @@
               <p>${item.pesan || ''}</p>
               ${item.voiceNote ? `<button class="vn-btn" onclick="playVoiceNote('${item.voiceNote}')">🔊 Dengar Suaraku</button>` : ''}
             </div>
-            <button class="${btnClass}" ${disabledAttr} onclick="requestTask('${item.id}', '${safeTitle}', ${item.koin})">
+            <button class="${btnClass}" ${disabledAttr} onclick="requestTask(this, '${item.id}', '${safeTitle}', ${item.koin})">
               ${btnText}
             </button>
           </div>
@@ -894,7 +1051,45 @@
       }
     }
 
-    async function requestTask(taskId, taskTitle, coins) {
+    // Ubah Mode Kondisi (Normal / Sedang Haid / Sedang Puasa)
+    async function changeSpecialMode(mode) {
+      document.querySelectorAll('.mode-pill').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`mode-${mode}`).classList.add('active');
+      showToast("Menyesuaikan jadwal harian...");
+
+      try {
+        const res = await fetch(`${API_URL}?action=setSpecialMode`, {
+          method: 'POST',
+          body: JSON.stringify({ mode })
+        });
+        const json = await res.json();
+        if (json.status === 'success' && json.data.jadwal) {
+          appData = json.data;
+          localStorage.setItem('carelendar_cosmic_cache', JSON.stringify(appData));
+          renderAll(appData);
+          const msgMap = {
+            normal: "Mode Normal aktif ✨",
+            haid: "Mode Haid aktif 🌸 Sholat diganti dzikir pengganti (+15 koin)",
+            puasa: "Mode Puasa aktif 🌙 Jadwal makan disesuaikan ke Sahur & Buka"
+          };
+          showToast(msgMap[mode]);
+        }
+      } catch (e) {
+        showToast("Gagal mengubah mode, coba lagi ya");
+      }
+    }
+
+    // Anti-Double-Tap: Tombol langsung terkunci seketika sebelum request dikirim
+    async function requestTask(btnEl, taskId, taskTitle, coins) {
+      if (requestingTasks.has(taskId)) return;
+      requestingTasks.add(taskId);
+
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.className = 'water-btn pending';
+        btnEl.textContent = '⏳ Menunggu ♍';
+      }
+
       showToast("📨 Mengirim laporan ke Virgo Boy...");
       try {
         const res = await fetch(`${API_URL}?action=requestTask`, {
@@ -910,13 +1105,15 @@
         }
       } catch (e) {
         showToast("Koneksi terganggu, coba lagi ya");
+      } finally {
+        requestingTasks.delete(taskId);
       }
     }
 
     function triggerWaterAnimation() {
       const arena = document.getElementById('plantArena');
       const plant = document.getElementById('plantEmoji');
-      plant.classList.remove('watered');
+      plant.classList.remove('watered', 'poked', 'triple-jump');
       void plant.offsetWidth;
       plant.classList.add('watered');
 
