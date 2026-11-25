@@ -1127,6 +1127,7 @@
         }
 
         const safeTitle = String(item.judul).replace(/'/g, "\'");
+        const safeId = String(item.id).replace(/'/g, "\'");
         const safeVnUrl = String(item.voiceNote || '').trim().replace(/'/g, "\'");
         return `
           <div class="task-card ${item.isPrayer ? 'prayer' : ''} ${item.status === 'approved' ? 'approved' : ''}">
@@ -1134,9 +1135,9 @@
             <div class="task-info">
               <h3>${item.judul}</h3>
               <p>${item.pesan || ''}</p>
-              ${safeVnUrl ? `<button class="vn-btn" onclick="playVoiceNote(this, '${safeVnUrl}')">🔊 Dengar Suaraku</button>` : ''}
+              ${safeVnUrl ? `<button class="vn-btn" onclick="playVoiceNote(this, '${safeId}', '${safeVnUrl}')">🔊 Dengar Suaraku</button>` : ''}
             </div>
-            <button class="${btnClass}" ${disabledAttr} onclick="requestTask(this, '${item.id}', '${safeTitle}', ${item.koin})">
+            <button class="${btnClass}" ${disabledAttr} onclick="requestTask(this, '${safeId}', '${safeTitle}', ${item.koin})">
               ${btnText}
             </button>
           </div>
@@ -1356,7 +1357,7 @@
       }
     }
 
-    // Pemutar Voice Note Random Pool (1 atau banyak link dipisahkan koma)
+    // Pemutar Voice Note: 1 Hari = 1 Audio Tetap, Besoknya Berubah (Tanpa Mengulang Kemarin)
     function resetVoiceNoteButton() {
       if (currentPlayingBtn) {
         currentPlayingBtn.classList.remove('playing');
@@ -1365,7 +1366,47 @@
       }
     }
 
-    function playVoiceNote(btnEl, rawUrls) {
+    function getLocalDateKey() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function getDailyVoiceNoteUrl(taskId, rawUrls) {
+      const urlList = String(rawUrls).split(',').map(u => u.trim()).filter(Boolean);
+      if (urlList.length === 0) return '';
+      if (urlList.length === 1) return urlList[0];
+
+      const todayKey = getLocalDateKey();
+      const storageKey = `carelendar_daily_vn_${taskId}`;
+      let saved = null;
+
+      try {
+        saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+      } catch (e) {}
+
+      // Jika sudah dipilih untuk hari ini dan linknya masih ada di daftar, tetap gunakan link yang sama
+      if (saved && saved.date === todayKey && urlList.includes(saved.url)) {
+        return saved.url;
+      }
+
+      // Saat hari berganti, pilih acak dari daftar sambil menghindari link yang diputar kemarin
+      const candidates = (saved && saved.url)
+        ? urlList.filter(u => u !== saved.url)
+        : urlList;
+      const pool = candidates.length > 0 ? candidates : urlList;
+      const chosenUrl = pool[Math.floor(Math.random() * pool.length)];
+
+      try {
+        localStorage.setItem(storageKey, JSON.stringify({ date: todayKey, url: chosenUrl }));
+      } catch (e) {}
+
+      return chosenUrl;
+    }
+
+    function playVoiceNote(btnEl, taskId, rawUrls) {
       const audio = document.getElementById('vnAudio');
       if (currentPlayingBtn === btnEl && !audio.paused) {
         audio.pause();
@@ -1374,9 +1415,8 @@
         return;
       }
 
-      const urlList = String(rawUrls).split(',').map(u => u.trim()).filter(Boolean);
-      if (urlList.length === 0) return;
-      const chosenUrl = urlList[Math.floor(Math.random() * urlList.length)];
+      const chosenUrl = getDailyVoiceNoteUrl(taskId, rawUrls);
+      if (!chosenUrl) return;
 
       resetVoiceNoteButton();
       currentPlayingBtn = btnEl;
