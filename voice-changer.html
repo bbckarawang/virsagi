@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Natural Gentleman Voice Studio v3</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f0f12;
+      color: #f4f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+    }
+    .card {
+      background: #1a1a20;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+      border: 1px solid #2a2a32;
+    }
+    h2 { margin-top: 0; color: #e2b714; letter-spacing: -0.5px; }
+    p.desc { font-size: 0.88rem; color: #a1a1aa; margin-bottom: 1.5rem; line-height: 1.4; }
+    .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 1.5rem; }
+    button {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+    }
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    
+    #btnRecord { background: #ef4444; color: white; flex: 1; }
+    #btnRecord.recording { animation: pulse 1.2s infinite; }
+    #btnStop { background: #3f3f46; color: white; flex: 1; }
+    
+    .sliders { text-align: left; background: #23232a; padding: 1.1rem; border-radius: 12px; margin-bottom: 1.5rem; }
+    .slider-group { margin-bottom: 14px; }
+    .slider-group:last-child { margin-bottom: 0; }
+    label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; color: #e4e4e7; }
+    input[type="range"] { width: 100%; accent-color: #e2b714; cursor: pointer; }
+    
+    .play-section { display: none; flex-direction: column; gap: 10px; }
+    #btnPlayGentleman { background: #e2b714; color: #121214; font-size: 0.95rem; }
+    #btnSaveMp3 { background: #10b981; color: #052e16; font-size: 0.95rem; }
+    .secondary-actions { display: flex; gap: 8px; }
+    #btnPlayOriginal { background: transparent; border: 1px solid #3f3f46; color: #d4d4d8; font-size: 0.83rem; flex: 1; }
+    #btnDelete { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; font-size: 0.83rem; flex: 1; }
+    #btnDelete:hover { background: rgba(239, 68, 68, 0.22); }
+    
+    #status { font-size: 0.83rem; color: #a1a1aa; margin-top: 14px; min-height: 20px; }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>🎙️ Studio Gentleman Voice</h2>
+  <p class="desc">Pemrosesan vokal natural dengan saturasi tabung hangat dan akustik ruangan studio.</p>
+
+  <div class="controls">
+    <button id="btnRecord">● Rekam Suara</button>
+    <button id="btnStop" disabled>■ Selesai</button>
+  </div>
+
+  <div class="sliders">
+    <div class="slider-group">
+      <label><span>Kedalaman Alami (Micro Pitch)</span> <span id="pitchVal">-0.8 Semitone</span></label>
+      <input type="range" id="pitchSlider" min="-2.0" max="0" step="0.1" value="-0.8">
+    </div>
+    <div class="slider-group">
+      <label><span>Kehangatan Dada (Sub-Vocal Bass)</span> <span id="bassVal">+5 dB</span></label>
+      <input type="range" id="bassSlider" min="0" max="12" step="0.5" value="5">
+    </div>
+    <div class="slider-group">
+      <label><span>Lembutkan Nada Tinggi (De-Harsh)</span> <span id="nasalVal">-3.5 dB</span></label>
+      <input type="range" id="nasalSlider" min="-8" max="0" step="0.5" value="-3.5">
+    </div>
+  </div>
+
+  <div class="play-section" id="playSection">
+    <button id="btnPlayGentleman">▶ Dengarkan Hasil Gentleman</button>
+    <button id="btnSaveMp3">⬇ Simpan Jadi MP3</button>
+    <div class="secondary-actions">
+      <button id="btnPlayOriginal">Suara Asli</button>
+      <button id="btnDelete">🗑️ Hapus Rekaman</button>
+    </div>
+  </div>
+
+  <div id="status">Siap merekam. Tekan tombol merah untuk mulai.</div>
+</div>
+
+<script>
+  let mediaRecorder;
+  let audioChunks = [];
+  let audioBuffer = null;
+  let audioCtx = null;
+  let currentSource = null;
+
+  const btnRecord = document.getElementById('btnRecord');
+  const btnStop = document.getElementById('btnStop');
+  const btnPlayGentleman = document.getElementById('btnPlayGentleman');
+  const btnSaveMp3 = document.getElementById('btnSaveMp3');
+  const btnPlayOriginal = document.getElementById('btnPlayOriginal');
+  const btnDelete = document.getElementById('btnDelete');
+  const playSection = document.getElementById('playSection');
+  const status = document.getElementById('status');
+
+  const pitchSlider = document.getElementById('pitchSlider');
+  const bassSlider = document.getElementById('bassSlider');
+  const nasalSlider = document.getElementById('nasalSlider');
+
+  pitchSlider.oninput = () => document.getElementById('pitchVal').textContent = pitchSlider.value + ' Semitone';
+  bassSlider.oninput = () => document.getElementById('bassVal').textContent = '+' + bassSlider.value + ' dB';
+  nasalSlider.oninput = () => document.getElementById('nasalVal').textContent = nasalSlider.value + ' dB';
+
+  function stopPlayback() {
+    if (currentSource) {
+      try { currentSource.stop(); } catch (e) {}
+      currentSource = null;
+    }
+  }
+
+  // Membuat kurva saturasi tabung analog lembut (menambah bobot harmonik alami tanpa distorsi)
+  function makeWarmTubeCurve(amount) {
+    const k = typeof amount === 'number' ? amount : 8;
+    const n_samples = 44100;
+    const curve = new Float32Array(n_samples);
+    const deg = Math.PI / 180;
+    for (let i = 0; i < n_samples; ++i) {
+      const x = (i * 2) / n_samples - 1;
+      curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+    }
+    return curve;
+  }
+
+  // Membuat gema ruangan studio mikro (agar tidak terdengar kering/buatan)
+  function createStudioRoomImpulse(context) {
+    const sampleRate = context.sampleRate;
+    const length = Math.floor(sampleRate * 0.18); // 180ms ruangan studio kecil
+    const impulse = context.createBuffer(1, length, sampleRate);
+    const data = impulse.getChannelData(0);
+    for (let i = 0; i < length; i++) {
+      // Decay eksponensial sangat cepat
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 4.5);
+    }
+    return impulse;
+  }
+
+  btnRecord.onclick = async () => {
+    stopPlayback();
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: false } 
+      });
+      audioChunks = [];
+      audioBuffer = null;
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = async () => {
+        status.textContent = 'Menyiapkan audio studio...';
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const arrayBuffer = await blob.arrayBuffer();
+        
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+        
+        playSection.style.display = 'flex';
+        btnRecord.textContent = '● Rekam Ulang';
+        status.textContent = 'Rekaman siap! Coba putar atau sesuaikan slider.';
+      };
+
+      mediaRecorder.start();
+      btnRecord.disabled = true;
+      btnRecord.classList.add('recording');
+      btnStop.disabled = false;
+      playSection.style.display = 'none';
+      status.textContent = 'Sedang merekam... bicaralah dengan santai.';
+    } catch (err) {
+      status.textContent = 'Gagal mengakses mikrofon. Pastikan izin mikrofon diberikan.';
+    }
+  };
+
+  btnStop.onclick = () => {
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    btnRecord.disabled = false;
+    btnRecord.classList.remove('recording');
+    btnStop.disabled = true;
+  };
+
+  // Fitur Hapus Rekaman
+  btnDelete.onclick = () => {
+    stopPlayback();
+    audioChunks = [];
+    audioBuffer = null;
+    playSection.style.display = 'none';
+    btnRecord.textContent = '● Rekam Suara';
+    status.textContent = 'Rekaman dihapus. Silakan rekam suara baru.';
+  };
+
+  function buildGentlemanGraph(context, buffer, useEffect) {
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+
+    if (!useEffect) {
+      source.connect(context.destination);
+      return source;
+    }
+
+    // 1. Pitch turun sangat halus (-0.8 semitone = ~0.954x, tidak terdeteksi sebagai efek)
+    const semitones = parseFloat(pitchSlider.value);
+    source.playbackRate.value = Math.pow(2, semitones / 12);
+
+    // 2. High-Pass Filter (bersihkan gemuruh rendah di bawah 70Hz)
+    const highPass = context.createBiquadFilter();
+    highPass.type = 'highpass';
+    highPass.frequency.value = 70;
+
+    // 3. Smooth Sub-Vocal Warmth (kurva lebar Q=0.75 di 115Hz agar bass menyatu mulus)
+    const chestBass = context.createBiquadFilter();
+    chestBass.type = 'peaking';
+    chestBass.frequency.value = 115;
+    chestBass.Q.value = 0.75;
+    chestBass.gain.value = parseFloat(bassSlider.value);
+
+    // 4. De-Harsh / Lembutkan nada cempreng secara halus (kurva lebar)
+    const nasalCut = context.createBiquadFilter();
+    nasalCut.type = 'peaking';
+    nasalCut.frequency.value = 480;
+    nasalCut.Q.value = 1.0;
+    nasalCut.gain.value = parseFloat(nasalSlider.value) * 0.7;
+
+    const sibilanceCut = context.createBiquadFilter();
+    sibilanceCut.type = 'peaking';
+    sibilanceCut.frequency.value = 3200;
+    sibilanceCut.Q.value = 1.2;
+    sibilanceCut.gain.value = parseFloat(nasalSlider.value);
+
+    // 5. Analog Tube Warmth (saturasi harmonik genap yang membuat vokal terasa "berisi")
+    const tubeWarmth = context.createWaveShaper();
+    tubeWarmth.curve = makeWarmTubeCurve(6);
+    tubeWarmth.oversample = '4x';
+
+    // 6. Gentle Studio Compressor (rasio 2.5:1 agar dinamika emosi bicara tetap hidup)
+    const compressor = context.createDynamicsCompressor();
+    compressor.threshold.value = -20;
+    compressor.knee.value = 24;
+    compressor.ratio.value = 2.5;
+    compressor.attack.value = 0.02;
+    compressor.release.value = 0.25;
+
+    // 7. Subtle Room Ambience (campuran dry 92% + wet room 8%)
+    const convolver = context.createConvolver();
+    convolver.buffer = createStudioRoomImpulse(context);
+    
+    const wetGain = context.createGain();
+    wetGain.gain.value = 0.08;
+
+    const dryGain = context.createGain();
+    dryGain.gain.value = 1.0;
+
+    const masterGain = context.createGain();
+    masterGain.gain.value = 1.15;
+
+    // Routing sinyal
+    source.connect(highPass);
+    highPass.connect(chestBass);
+    chestBass.connect(nasalCut);
+    nasalCut.connect(sibilanceCut);
+    sibilanceCut.connect(tubeWarmth);
+    tubeWarmth.connect(compressor);
+
+    // Jalur utama (Dry)
+    compressor.connect(dryGain);
+    dryGain.connect(masterGain);
+
+    // Jalur ruangan mikro (Wet)
+    compressor.connect(convolver);
+    convolver.connect(wetGain);
+    wetGain.connect(masterGain);
+
+    masterGain.connect(context.destination);
+
+    return source;
+  }
+
+  function playAudio(useEffect) {
+    if (!audioBuffer) return;
+    stopPlayback();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    currentSource = buildGentlemanGraph(audioCtx, audioBuffer, useEffect);
+    currentSource.start();
+    status.textContent = useEffect ? 'Memutar suara Gentleman...' : 'Memutar suara asli...';
+    currentSource.onended = () => {
+      status.textContent = 'Selesai diputar.';
+    };
+  }
+
+  btnPlayGentleman.onclick = () => playAudio(true);
+  btnPlayOriginal.onclick = () => playAudio(false);
+
+  // Render Offline & Encode ke MP3
+  btnSaveMp3.onclick = async () => {
+    if (!audioBuffer) return;
+    if (typeof lamejs === 'undefined') {
+      status.textContent = 'Library MP3 gagal dimuat. Pastikan internet aktif lalu refresh.';
+      return;
+    }
+
+    status.textContent = 'Merender & menyimpan ke MP3...';
+    btnSaveMp3.disabled = true;
+
+    try {
+      const semitones = parseFloat(pitchSlider.value);
+      const rate = Math.pow(2, semitones / 12);
+      const newLength = Math.ceil(audioBuffer.length / rate) + Math.floor(audioBuffer.sampleRate * 0.2);
+
+      const offlineCtx = new OfflineAudioContext(1, newLength, audioBuffer.sampleRate);
+      const source = buildGentlemanGraph(offlineCtx, audioBuffer, true);
+      source.start();
+
+      const renderedBuffer = await offlineCtx.startRendering();
+      const samples = renderedBuffer.getChannelData(0);
+
+      const int16Samples = new Int16Array(samples.length);
+      for (let i = 0; i < samples.length; i++) {
+        let s = Math.max(-1, Math.min(1, samples[i]));
+        int16Samples[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+      }
+
+      const mp3encoder = new lamejs.Mp3Encoder(1, renderedBuffer.sampleRate, 128);
+      const mp3Data = [];
+      const sampleBlockSize = 1152;
+
+      for (let i = 0; i < int16Samples.length; i += sampleBlockSize) {
+        const sampleChunk = int16Samples.subarray(i, i + sampleBlockSize);
+        const mp3buf = mp3encoder.encodeBuffer(sampleChunk);
+        if (mp3buf.length > 0) mp3Data.push(mp3buf);
+      }
+      const mp3buf = mp3encoder.flush();
+      if (mp3buf.length > 0) mp3Data.push(mp3buf);
+
+      const mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
+      const url = URL.createObjectURL(mp3Blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'suara-gentleman-' + Date.now() + '.mp3';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      status.textContent = 'Berhasil! File MP3 telah diunduh.';
+    } catch (err) {
+      status.textContent = 'Gagal membuat MP3: ' + err.message;
+    } finally {
+      btnSaveMp3.disabled = false;
+    }
+  };
+</script>
+
+</body>
+</html>
