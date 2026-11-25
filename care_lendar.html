@@ -499,6 +499,7 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzoCtaFdkPY_X6DZHFEL38dD2bvTIfMf0hILEAnrXzQcqh8J-s2JrB1-2Dk42ypIivq/exec";
     let appData = null;
+    let isFetching = false;
 
     const optionsDate = { weekday: 'long', day: 'numeric', month: 'short' };
     document.getElementById('todayDateText').textContent = `${new Date().toLocaleDateString('id-ID', optionsDate)} • ♍ & ♐`;
@@ -512,12 +513,28 @@
           document.getElementById('loader').style.display = 'none';
         } catch (e) {}
       }
-      fetchDashboard();
+      fetchDashboard(true);
+
+      // 1. Auto-polling setiap 8 detik HANYA saat ada tugas berstatus 'pending' (Menunggu persetujuan Virgo Boy)
+      setInterval(() => {
+        if (!document.hidden && appData && appData.jadwal && appData.jadwal.some(j => j.status === 'pending')) {
+          fetchDashboard(true);
+        }
+      }, 8000);
+
+      // 2. Otomatis sinkron ulang saat tab/aplikasi dibuka kembali dari background HP
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          fetchDashboard(true);
+        }
+      });
     });
 
-    async function fetchDashboard() {
+    async function fetchDashboard(silent = false) {
+      if (isFetching) return;
+      isFetching = true;
       try {
-        const res = await fetch(`${API_URL}?action=getDashboard`);
+        const res = await fetch(`${API_URL}?action=getDashboard&_t=${Date.now()}`);
         const json = await res.json();
         if (json.status === 'success') {
           const prevCoins = appData ? appData.garden.currentCoins : json.data.garden.currentCoins;
@@ -532,8 +549,9 @@
           }
         }
       } catch (err) {
-        showToast("Gagal sinkronisasi, cek koneksi ya");
+        if (!silent) showToast("Gagal sinkronisasi, cek koneksi ya");
       } finally {
+        isFetching = false;
         document.getElementById('loader').style.display = 'none';
       }
     }
@@ -703,7 +721,7 @@
       try {
         await fetch(`${API_URL}?action=logMood`, { method: 'POST', body: JSON.stringify({ mood, note }) });
         document.getElementById('moodNote').value = '';
-        showToast("Terkirim ke grup Virsagi Memo ❤️");
+        showToast("Sinyal terkirim ke Virgo Boy ❤️");
       } catch (e) { showToast("Gagal mengirim mood"); }
     }
 
@@ -744,7 +762,6 @@
 
         step++;
         if (step < totalSteps) {
-          // Melambat secara eksponensial di akhir agar menegangkan
           const delay = 55 + Math.pow(step / totalSteps, 2.6) * 280;
           setTimeout(nextTick, delay);
         } else {
@@ -800,8 +817,7 @@
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(`tab-${tabName}`).classList.add('active');
       btn.classList.add('active');
-      // Refresh otomatis saat berpindah tab agar status approval terbaru langsung terlihat
-      fetchDashboard();
+      fetchDashboard(true);
     }
 
     function openGreenhouseModal(idx) {
