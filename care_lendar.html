@@ -112,23 +112,53 @@
     .tab-section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Garden Card */
+    /* Garden Card & Fixed Non-Overlapping Top Bar */
     .garden-card {
       background: var(--bg-card); backdrop-filter: blur(12px);
-      border-radius: 26px; padding: 20px; border: 1px solid var(--border);
+      border-radius: 26px; padding: 16px 18px 20px; border: 1px solid var(--border);
       text-align: center; position: relative; margin-bottom: 16px; box-shadow: var(--glow);
     }
+
+    .garden-top-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+
+    .sky-selector { display: flex; gap: 5px; align-items: center; }
+    .sky-dot {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.22);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; cursor: pointer; transition: transform 0.2s;
+    }
+    .sky-dot.active-sky {
+      border-color: var(--accent-gold);
+      background: rgba(255, 209, 102, 0.24);
+      transform: scale(1.12);
+    }
+
+    .pot-selector { display: flex; gap: 6px; align-items: center; }
+    .pot-dot {
+      width: 19px; height: 19px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.85); cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .pot-dot:active { transform: scale(1.2); }
+
     .gen-pill {
       display: inline-block; background: rgba(74, 222, 128, 0.14); color: var(--accent-mint);
       border: 1px solid rgba(74, 222, 128, 0.3);
-      font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; margin-bottom: 6px;
+      font-size: 0.72rem; font-weight: 700; padding: 4px 13px; border-radius: 999px; margin-bottom: 6px;
     }
     .plant-title { font-size: 1.15rem; font-weight: 800; }
     .plant-stage-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
 
     /* Interactive Animated Plant Arena & Dynamic Sky Themes */
     .plant-arena {
-      position: relative; height: 220px; margin: 14px 0;
+      position: relative; height: 225px; margin: 14px 0;
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 22px; display: flex; flex-direction: column;
       align-items: center; justify-content: flex-end; padding-bottom: 18px; overflow: hidden;
@@ -224,26 +254,35 @@
       50% { transform: scale(1.18); opacity: 1; }
     }
 
-    /* Random Scattered Speech Bubble */
+    /* Round Pill Speech Bubble */
     .plant-bubble {
       position: absolute;
-      background: rgba(15, 17, 38, 0.9); color: #fff;
-      border: 1px solid rgba(255, 209, 102, 0.65);
-      padding: 6px 12px; border-radius: 16px; font-size: 0.71rem; font-weight: 700;
-      max-width: 210px; line-height: 1.3; text-align: center;
-      opacity: 0; pointer-events: none; z-index: 12;
-      transform: scale(0.75);
-      transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+      background: linear-gradient(135deg, rgba(22, 24, 52, 0.94), rgba(42, 28, 72, 0.94));
+      color: #fff;
+      border: 1.5px solid rgba(255, 209, 102, 0.72);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      max-width: 240px;
+      line-height: 1.3;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 12;
+      transform: scale(0.65) translateY(6px);
+      transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 0 12px rgba(255, 126, 179, 0.25);
     }
     .plant-bubble.show {
-      opacity: 1; transform: scale(1);
+      opacity: 1;
+      transform: scale(1) translateY(0);
     }
 
     .tap-hint {
       position: absolute; bottom: 6px; right: 10px;
-      font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.75);
-      background: rgba(11, 12, 30, 0.45); padding: 2px 8px; border-radius: 999px;
+      font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.78);
+      background: rgba(11, 12, 30, 0.48); padding: 2px 9px; border-radius: 999px;
       pointer-events: none; z-index: 4;
     }
 
@@ -265,26 +304,26 @@
     }
     @keyframes jellyPoke {
       0% { transform: scale(1, 1); }
-      30% { transform: scale(1.2, 0.82) rotate(-6deg); }
-      65% { transform: scale(0.88, 1.18) rotate(6deg); }
+      30% { transform: scale(1.22, 0.8) rotate(-7deg); }
+      65% { transform: scale(0.86, 1.2) rotate(7deg); }
       100% { transform: scale(1, 1) rotate(0deg); }
     }
     .plant-emoji.triple-jump {
-      animation: superJump 0.85s cubic-bezier(0.28, 0.84, 0.42, 1) !important;
+      animation: superJump 0.88s cubic-bezier(0.28, 0.84, 0.42, 1) !important;
     }
     @keyframes superJump {
       0% { transform: translateY(0) scale(1, 1); }
-      18% { transform: translateY(6px) scale(1.28, 0.72); }
-      48% { transform: translateY(-48px) scale(0.88, 1.18) rotate(12deg); }
-      72% { transform: translateY(0) scale(1.22, 0.8) rotate(-6deg); }
-      88% { transform: translateY(-12px) scale(0.95, 1.06); }
+      18% { transform: translateY(6px) scale(1.3, 0.7); }
+      48% { transform: translateY(-54px) scale(0.86, 1.2) rotate(14deg); }
+      72% { transform: translateY(0) scale(1.24, 0.78) rotate(-7deg); }
+      88% { transform: translateY(-14px) scale(0.94, 1.08); }
       100% { transform: translateY(0) scale(1, 1) rotate(0deg); }
     }
     .plant-emoji.watered { animation: bounceGrow 0.95s ease !important; }
     @keyframes bounceGrow {
       0% { transform: scale(1); }
-      35% { transform: scale(1.36) rotate(7deg); }
-      65% { transform: scale(0.9) rotate(-5deg); }
+      35% { transform: scale(1.38) rotate(8deg); }
+      65% { transform: scale(0.88) rotate(-6deg); }
       100% { transform: scale(1); }
     }
 
@@ -306,23 +345,6 @@
     .pot-mint { background: linear-gradient(180deg, #34d399, #047857); }
     .pot-gold { background: linear-gradient(180deg, #fde047, #b45309); }
 
-    /* Top Corner Controls */
-    .sky-selector { position: absolute; top: 12px; left: 12px; display: flex; gap: 4px; z-index: 5; }
-    .sky-dot {
-      width: 22px; height: 22px; border-radius: 50%;
-      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.22);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; cursor: pointer; transition: transform 0.2s;
-    }
-    .sky-dot.active-sky {
-      border-color: var(--accent-gold);
-      background: rgba(255, 209, 102, 0.22);
-      transform: scale(1.12);
-    }
-
-    .pot-selector { position: absolute; top: 14px; right: 12px; display: flex; gap: 6px; z-index: 5; }
-    .pot-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); cursor: pointer; }
-
     .droplet {
       position: absolute; top: 14px; font-size: 1.3rem; pointer-events: none;
       animation: dropFall 1.1s ease-in forwards; z-index: 10;
@@ -338,7 +360,7 @@
     }
     @keyframes floatHeart {
       0% { opacity: 1; transform: translate(0, 0) scale(0.6); }
-      100% { opacity: 0; transform: translate(var(--hx), -80px) scale(1.35); }
+      100% { opacity: 0; transform: translate(var(--hx), -85px) scale(1.35); }
     }
 
     .progress-labels {
@@ -366,7 +388,7 @@
     .clue-locked { font-size: 0.74rem; color: var(--text-muted); font-style: italic; margin-bottom: 3px; }
     .clue-photo { width: 100%; border-radius: 12px; margin-top: 8px; max-height: 200px; object-fit: cover; }
 
-    /* Special Condition Mode Bar (Normal / Haid / Puasa) */
+    /* Special Condition Mode Bar */
     .mode-bar {
       display: flex; gap: 6px; margin-bottom: 12px;
       background: rgba(15, 17, 38, 0.7); padding: 5px;
@@ -502,12 +524,13 @@
       font-size: 0.64rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; margin-bottom: 4px;
     }
 
-    /* Toast & Modal */
+    /* Custom In-App Toast & Modal (Zero Native Alerts) */
     .toast {
       position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-80px);
       background: #1e2144; color: white; border: 1px solid var(--accent-pink);
       padding: 10px 18px; border-radius: 999px; font-size: 0.8rem; font-weight: 600;
       z-index: 100; transition: transform 0.35s ease; white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
@@ -582,22 +605,23 @@
     <!-- TAB 1: CARE-LENDAR & KEBUN -->
     <div id="tab-garden" class="tab-section active">
       <div class="garden-card">
-        <!-- Ganti Suasana Langit (Sementara / Preview) -->
-        <div class="sky-selector" title="Preview suasana langit">
-          <div class="sky-dot" id="sky-btn-auto" onclick="resetAutoSky()" title="Otomatis Jam & Cuaca">🔄</div>
-          <div class="sky-dot" id="sky-btn-dawn" onclick="setSkyTheme('dawn', true)">🌅</div>
-          <div class="sky-dot" id="sky-btn-day" onclick="setSkyTheme('day', true)">☀️</div>
-          <div class="sky-dot" id="sky-btn-sunset" onclick="setSkyTheme('sunset', true)">🌆</div>
-          <div class="sky-dot" id="sky-btn-night" onclick="setSkyTheme('night', true)">🌌</div>
-          <div class="sky-dot" id="sky-btn-rain" onclick="setSkyTheme('rain', true)">🌧️</div>
-        </div>
+        <!-- Baris Kontrol Atas Terpisah Rapi (Bebas Bertumpuk) -->
+        <div class="garden-top-controls">
+          <div class="sky-selector" title="Preview suasana langit">
+            <div class="sky-dot" id="sky-btn-auto" onclick="resetAutoSky()" title="Otomatis Jam & Cuaca">🔄</div>
+            <div class="sky-dot" id="sky-btn-dawn" onclick="setSkyTheme('dawn', true)">🌅</div>
+            <div class="sky-dot" id="sky-btn-day" onclick="setSkyTheme('day', true)">☀️</div>
+            <div class="sky-dot" id="sky-btn-sunset" onclick="setSkyTheme('sunset', true)">🌆</div>
+            <div class="sky-dot" id="sky-btn-night" onclick="setSkyTheme('night', true)">🌌</div>
+            <div class="sky-dot" id="sky-btn-rain" onclick="setSkyTheme('rain', true)">🌧️</div>
+          </div>
 
-        <!-- Ganti Warna Pot -->
-        <div class="pot-selector" title="Ganti warna pot">
-          <div class="pot-dot" style="background:#e07a5f" onclick="setPot('terracotta')"></div>
-          <div class="pot-dot" style="background:#ff7eb3" onclick="setPot('sakura')"></div>
-          <div class="pot-dot" style="background:#34d399" onclick="setPot('mint')"></div>
-          <div class="pot-dot" style="background:#fde047" onclick="setPot('gold')"></div>
+          <div class="pot-selector" title="Ganti warna pot">
+            <div class="pot-dot" style="background:#e07a5f" onclick="setPot('terracotta')"></div>
+            <div class="pot-dot" style="background:#ff7eb3" onclick="setPot('sakura')"></div>
+            <div class="pot-dot" style="background:#34d399" onclick="setPot('mint')"></div>
+            <div class="pot-dot" style="background:#fde047" onclick="setPot('gold')"></div>
+          </div>
         </div>
 
         <div class="gen-pill" id="genBadge">Generasi #1 • Tahap 1/7</div>
@@ -722,6 +746,92 @@
     let bubbleTimer = null;
     const requestingTasks = new Set();
 
+    // ==========================================
+    // CUTE SYNTHESIZED SOUND EFFECTS (Web Audio)
+    // ==========================================
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playCuteSound(type) {
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      if (type === 'poke') {
+        // Suara "boing-pop" lucu saat tanaman ditap
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const pitch = 420 + Math.random() * 140;
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(pitch, now);
+        osc.frequency.exponentialRampToValueAtTime(pitch * 1.65, now + 0.11);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.15);
+      } else if (type === 'jump') {
+        // Suara lompat + kilauan bintang (3x tap)
+        const freqs = [523.25, 659.25, 783.99, 1046.5];
+        freqs.forEach((f, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, now + idx * 0.055);
+          osc.frequency.exponentialRampToValueAtTime(f * 1.2, now + idx * 0.055 + 0.16);
+          gain.gain.setValueAtTime(0.16, now + idx * 0.055);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.055 + 0.18);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now + idx * 0.055); osc.stop(now + idx * 0.055 + 0.19);
+        });
+      } else if (type === 'water') {
+        // Suara gemericik tetes air + melodi segar
+        const drops = [620, 740, 880, 1174.66];
+        drops.forEach((f, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          const t = now + idx * 0.09;
+          osc.frequency.setValueAtTime(f * 0.75, t);
+          osc.frequency.exponentialRampToValueAtTime(f * 1.35, t + 0.12);
+          gain.gain.setValueAtTime(0.18, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(t); osc.stop(t + 0.16);
+        });
+      } else if (type === 'tick') {
+        // Suara klik halus untuk roda spinner
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(750, now);
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now); osc.stop(now + 0.04);
+      } else if (type === 'win') {
+        // Fanfare ceria saat roda kencan berhenti
+        const notes = [523.25, 659.25, 783.99, 1046.5];
+        notes.forEach((f, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          const t = now + i * 0.1;
+          osc.frequency.setValueAtTime(f, t);
+          gain.gain.setValueAtTime(0.16, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(t); osc.stop(t + 0.26);
+        });
+      }
+    }
+
     const optionsDate = { weekday: 'long', day: 'numeric', month: 'short' };
     document.getElementById('todayDateText').textContent = `${new Date().toLocaleDateString('id-ID', optionsDate)} • ♍ & ♐`;
 
@@ -773,13 +883,17 @@
     }
 
     function resetAutoSky() {
+      playCuteSound('poke');
       isManualSkyOverride = false;
       applyAutoSky(appData ? appData.weather : null);
       showToast("Kembali ke langit otomatis (jam & cuaca) 🔄");
     }
 
     function setSkyTheme(theme, isManual = false, customBadge = null) {
-      if (isManual) isManualSkyOverride = true;
+      if (isManual) {
+        playCuteSound('poke');
+        isManualSkyOverride = true;
+      }
       const arena = document.getElementById('plantArena');
       const orb = document.getElementById('skyCelestial');
       const badge = document.getElementById('skyModeBadge');
@@ -801,7 +915,7 @@
       const activeBtn = document.getElementById(isManual ? `sky-btn-${theme}` : 'sky-btn-auto');
       if (activeBtn) activeBtn.classList.add('active-sky');
 
-      if (isManual) showToast(`${labelMap[theme]} (otomatis reset saat dibuka ulang)`);
+      if (isManual) showToast(`${labelMap[theme]} (reset otomatis saat dibuka ulang)`);
     }
 
     function spawnRaindrops() {
@@ -831,7 +945,7 @@
       }
     }
 
-    // 3x Tap = Tanaman Lompat + Bubble Acak Tersebar di Berbagai Titik
+    // 3x Tap = Tanaman Lompat + Bubble Bulat Acak + Efek Suara Lucu
     function pokePlant() {
       const arena = document.getElementById('plantArena');
       const plant = document.getElementById('plantEmoji');
@@ -850,9 +964,11 @@
       void plant.offsetWidth;
 
       if (isTripleJump) {
+        playCuteSound('jump');
         plant.classList.add('triple-jump');
         tapHint.textContent = "🦘 Yeay lompat tinggi!";
       } else {
+        playCuteSound('poke');
         plant.classList.add('poked');
         const rem = 3 - (tapComboCount % 3);
         tapHint.textContent = `👆 ${rem}x tap lagi biar lompat!`;
@@ -880,14 +996,14 @@
       const pool = isTripleJump ? jumpWhispers : normalWhispers;
       bubble.textContent = pool[Math.floor(Math.random() * pool.length)];
 
-      // Posisi bubble tersebar acak di area arena (kiri atas, kanan tengah, kiri bawah, dll.)
+      // Posisi bubble bulat tersebar acak di area arena
       const randomPositions = [
         { top: '34px', left: '14px', right: 'auto', bottom: 'auto' },
         { top: '38px', right: '14px', left: 'auto', bottom: 'auto' },
-        { top: '86px', left: '10px', right: 'auto', bottom: 'auto' },
-        { top: '84px', right: '10px', left: 'auto', bottom: 'auto' },
-        { bottom: '68px', left: '12px', top: 'auto', right: 'auto' },
-        { bottom: '68px', right: '12px', top: 'auto', left: 'auto' }
+        { top: '82px', left: '10px', right: 'auto', bottom: 'auto' },
+        { top: '80px', right: '10px', left: 'auto', bottom: 'auto' },
+        { bottom: '72px', left: '12px', top: 'auto', right: 'auto' },
+        { bottom: '72px', right: '12px', top: 'auto', left: 'auto' }
       ];
       const pos = randomPositions[Math.floor(Math.random() * randomPositions.length)];
       bubble.style.top = pos.top;
@@ -899,7 +1015,6 @@
       clearTimeout(bubbleTimer);
       bubbleTimer = setTimeout(() => bubble.classList.remove('show'), 2500);
 
-      // Partikel hati & bintang (lebih banyak saat 3x tap lompat!)
       const pops = ['💖', '✨', '🌸', '💫', '🥰', '🌟'];
       const particleCount = isTripleJump ? 10 : 4;
       for (let i = 0; i < particleCount; i++) {
@@ -951,7 +1066,6 @@
 
       applyAutoSky(data.weather);
 
-      // Update highlight tombol mode kondisi (Normal / Haid / Puasa)
       const activeMode = data.config.specialMode || 'normal';
       document.querySelectorAll('.mode-pill').forEach(btn => btn.classList.remove('active'));
       const activeModeBtn = document.getElementById(`mode-${activeMode}`);
@@ -1051,8 +1165,8 @@
       }
     }
 
-    // Ubah Mode Kondisi (Normal / Sedang Haid / Sedang Puasa)
     async function changeSpecialMode(mode) {
+      playCuteSound('poke');
       document.querySelectorAll('.mode-pill').forEach(btn => btn.classList.remove('active'));
       document.getElementById(`mode-${mode}`).classList.add('active');
       showToast("Menyesuaikan jadwal harian...");
@@ -1079,10 +1193,10 @@
       }
     }
 
-    // Anti-Double-Tap: Tombol langsung terkunci seketika sebelum request dikirim
     async function requestTask(btnEl, taskId, taskTitle, coins) {
       if (requestingTasks.has(taskId)) return;
       requestingTasks.add(taskId);
+      playCuteSound('water');
 
       if (btnEl) {
         btnEl.disabled = true;
@@ -1090,7 +1204,7 @@
         btnEl.textContent = '⏳ Menunggu ♍';
       }
 
-      showToast("📨 Mengirim laporan ke Virgo Boy...");
+      showToast("📨 Mengirim laporan siram ke Virgo Boy...");
       try {
         const res = await fetch(`${API_URL}?action=requestTask`, {
           method: 'POST',
@@ -1111,6 +1225,7 @@
     }
 
     function triggerWaterAnimation() {
+      playCuteSound('water');
       const arena = document.getElementById('plantArena');
       const plant = document.getElementById('plantEmoji');
       plant.classList.remove('watered', 'poked', 'triple-jump');
@@ -1129,6 +1244,7 @@
     }
 
     async function harvestPlant() {
+      playCuteSound('win');
       showToast("✨ Memanen tanaman ke Greenhouse...");
       try {
         const res = await fetch(`${API_URL}?action=harvestPlant`, { method: 'POST', body: JSON.stringify({}) });
@@ -1144,12 +1260,14 @@
     }
 
     async function setPot(style) {
+      playCuteSound('poke');
       document.getElementById('plantPot').className = `pot pot-${style}`;
       showToast("Warna pot kosmik diganti 🎨");
       await fetch(`${API_URL}?action=changePot`, { method: 'POST', body: JSON.stringify({ potStyle: style }) });
     }
 
     async function sendMood(mood) {
+      playCuteSound('jump');
       const note = document.getElementById('moodNote').value.trim();
       showToast("Mengirim sinyal ke Virgo Boy... 💌");
       try {
@@ -1185,6 +1303,7 @@
       let step = 0;
 
       function nextTick() {
+        playCuteSound('tick');
         const randIdea = ideas[Math.floor(Math.random() * ideas.length)];
         const randEmoji = funnyEmojis[Math.floor(Math.random() * funnyEmojis.length)];
         display.textContent = `${randEmoji} ${randIdea}`;
@@ -1198,6 +1317,7 @@
           const delay = 55 + Math.pow(step / totalSteps, 2.6) * 280;
           setTimeout(nextTick, delay);
         } else {
+          playCuteSound('win');
           const finalChoice = ideas[Math.floor(Math.random() * ideas.length)];
           stage.classList.remove('spinning');
           stage.classList.add('winner');
@@ -1246,6 +1366,7 @@
     }
 
     function switchTab(tabName, btn) {
+      playCuteSound('poke');
       document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(`tab-${tabName}`).classList.add('active');
@@ -1254,6 +1375,7 @@
     }
 
     function openGreenhouseModal(idx) {
+      playCuteSound('poke');
       const item = appData.greenhouse[idx];
       if (item) openModal(item.emoji, `${item.nama} (Gen #${item.gen})`, item.surat);
     }
