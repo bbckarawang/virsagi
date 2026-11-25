@@ -1356,7 +1356,7 @@
       }
     }
 
-    // Pemutar Voice Note dengan Toggle Play/Stop & Fallback Google Drive
+    // Pemutar Voice Note Random Pool (1 atau banyak link dipisahkan koma)
     function resetVoiceNoteButton() {
       if (currentPlayingBtn) {
         currentPlayingBtn.classList.remove('playing');
@@ -1365,7 +1365,7 @@
       }
     }
 
-    function playVoiceNote(btnEl, url) {
+    function playVoiceNote(btnEl, rawUrls) {
       const audio = document.getElementById('vnAudio');
       if (currentPlayingBtn === btnEl && !audio.paused) {
         audio.pause();
@@ -1374,18 +1374,22 @@
         return;
       }
 
+      const urlList = String(rawUrls).split(',').map(u => u.trim()).filter(Boolean);
+      if (urlList.length === 0) return;
+      const chosenUrl = urlList[Math.floor(Math.random() * urlList.length)];
+
       resetVoiceNoteButton();
       currentPlayingBtn = btnEl;
       btnEl.classList.add('playing');
       btnEl.textContent = '⏸️ Memutar...';
 
-      const directSrc = convertDriveUrl(url, 'audio');
+      const directSrc = convertDriveUrl(chosenUrl, 'audio');
       audio.src = directSrc;
       audio.play()
         .then(() => showToast("🔊 Memutar pesan suara dari Virgo Boy..."))
         .catch(() => {
           resetVoiceNoteButton();
-          window.open(url, '_blank');
+          window.open(chosenUrl, '_blank');
         });
     }
 
