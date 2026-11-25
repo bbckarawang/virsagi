@@ -254,17 +254,17 @@
       50% { transform: scale(1.18); opacity: 1; }
     }
 
-    /* Round Pill Speech Bubble */
+    /* Round Pill Speech Bubble (Posisi Samping Aman Tanpa Menutupi Tanaman) */
     .plant-bubble {
       position: absolute;
       background: linear-gradient(135deg, rgba(22, 24, 52, 0.94), rgba(42, 28, 72, 0.94));
       color: #fff;
       border: 1.5px solid rgba(255, 209, 102, 0.72);
-      padding: 8px 16px;
-      border-radius: 999px;
-      font-size: 0.72rem;
+      padding: 7px 12px;
+      border-radius: 18px;
+      font-size: 0.68rem;
       font-weight: 700;
-      max-width: 240px;
+      max-width: 158px;
       line-height: 1.3;
       text-align: center;
       opacity: 0;
@@ -273,6 +273,13 @@
       transform: scale(0.65) translateY(6px);
       transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
       box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 0 12px rgba(255, 126, 179, 0.25);
+    }
+    .plant-bubble.emoji-only {
+      font-size: 1.25rem;
+      padding: 6px 13px;
+      border-radius: 999px;
+      line-height: 1.1;
+      letter-spacing: 2px;
     }
     .plant-bubble.show {
       opacity: 1;
@@ -982,36 +989,66 @@
       }
 
       const stage = appData ? appData.garden.stage : 1;
-      const jumpWhispers = [
-        "Wihh aku lompat tinggi! Seru banget 🦘✨",
-        "Horeee! Makasih udah main sama aku 💖",
-        "Lompat sekali lagi biar makin semangat 🌸"
+
+      const jumpTextWhispers = [
+        "Wihh lompat tinggi! 🦘✨",
+        "Horeee! Seru banget 💖",
+        "Lompat lagi yuk 🌸"
       ];
-      const normalWhispers = stage < 4 ? [
-        "Hihi geli tau! Siram aku lagi dong 💧",
-        "Penasaran ya aku bakal jadi bunga apa? 👀",
-        "Di dalamku ada rahasia dari Virgo Boy ♍✨",
-        "Rajin siram biar petunjukku terbuka! 🌱",
-        "Aku tumbuh dari perhatian kalian berdua 💖"
+      const jumpEmojiWhispers = [
+        "🦘✨",
+        "🥳💖",
+        "🌟🎉",
+        "🚀💫"
+      ];
+
+      const normalTextWhispers = stage < 4 ? [
+        "Hihi geli! Siram lagi dong 💧",
+        "Penasaran jadi bunga apa? 👀",
+        "Ada rahasia Virgo Boy ♍✨",
+        "Siram terus biar tumbuh! 🌱",
+        "Tumbuh dari perhatian kalian 💖"
       ] : [
-        "Wangi kelopakku mulai terasa nih~ 🌸",
-        "Dikit lagi identitas asliku terbongkar! 🔮",
-        "Virgo Boy nyiapin surat spesial di akhir 💌",
-        "Makasih udah rawat aku setiap hari 🥰"
+        "Wangi kelopakku mulai terasa~ 🌸",
+        "Dikit lagi identitasku terbuka! 🔮",
+        "Ada surat spesial di akhir 💌",
+        "Makasih udah rawat aku 🥰"
+      ];
+      const normalEmojiWhispers = [
+        "🥰💖",
+        "👀🌱",
+        "🤭💫",
+        "🌸🎶",
+        "✨🫶",
+        "💧😋"
       ];
 
-      const pool = isTripleJump ? jumpWhispers : normalWhispers;
-      bubble.textContent = pool[Math.floor(Math.random() * pool.length)];
+      // 40% peluang muncul bubble khusus emoji agar terlihat bervariasi & ekspresif
+      const showEmojiOnly = Math.random() < 0.4;
+      let chosenBubble = "";
 
-      const randomPositions = [
-        { top: '34px', left: '14px', right: 'auto', bottom: 'auto' },
-        { top: '38px', right: '14px', left: 'auto', bottom: 'auto' },
-        { top: '82px', left: '10px', right: 'auto', bottom: 'auto' },
-        { top: '80px', right: '10px', left: 'auto', bottom: 'auto' },
-        { bottom: '72px', left: '12px', top: 'auto', right: 'auto' },
-        { bottom: '72px', right: '12px', top: 'auto', left: 'auto' }
+      if (showEmojiOnly) {
+        const emojiPool = isTripleJump ? jumpEmojiWhispers : normalEmojiWhispers;
+        chosenBubble = emojiPool[Math.floor(Math.random() * emojiPool.length)];
+        bubble.classList.add('emoji-only');
+      } else {
+        const textPool = isTripleJump ? jumpTextWhispers : normalTextWhispers;
+        chosenBubble = textPool[Math.floor(Math.random() * textPool.length)];
+        bubble.classList.remove('emoji-only');
+      }
+
+      bubble.textContent = chosenBubble;
+
+      // Posisi pinggir kiri & kanan atas/bawah yang steril dari jalur lompatan badan tanaman
+      const safeSidePositions = [
+        { top: '38px', left: '10px', right: 'auto', bottom: 'auto' },
+        { top: '44px', right: '10px', left: 'auto', bottom: 'auto' },
+        { bottom: '34px', left: '10px', top: 'auto', right: 'auto' },
+        { bottom: '36px', right: '10px', top: 'auto', left: 'auto' },
+        { top: '76px', left: '8px', right: 'auto', bottom: 'auto' },
+        { top: '76px', right: '8px', left: 'auto', bottom: 'auto' }
       ];
-      const pos = randomPositions[Math.floor(Math.random() * randomPositions.length)];
+      const pos = safeSidePositions[Math.floor(Math.random() * safeSidePositions.length)];
       bubble.style.top = pos.top;
       bubble.style.left = pos.left;
       bubble.style.right = pos.right;
