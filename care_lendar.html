@@ -386,7 +386,11 @@
     .clues-box h4 { font-size: 0.76rem; color: var(--accent-gold); margin-bottom: 6px; }
     .clue-item { font-size: 0.79rem; color: var(--text-main); margin-bottom: 6px; line-height: 1.4; }
     .clue-locked { font-size: 0.74rem; color: var(--text-muted); font-style: italic; margin-bottom: 3px; }
-    .clue-photo { width: 100%; border-radius: 12px; margin-top: 8px; max-height: 200px; object-fit: cover; }
+    .clue-photo {
+      width: 100%; border-radius: 12px; margin-top: 8px;
+      max-height: 240px; object-fit: cover; display: block;
+      border: 1px solid rgba(255, 209, 102, 0.35);
+    }
 
     /* Special Condition Mode Bar */
     .mode-bar {
@@ -426,8 +430,13 @@
     .task-info p { font-size: 0.76rem; color: var(--text-muted); margin-top: 3px; line-height: 1.35; }
     .vn-btn {
       margin-top: 6px; background: rgba(255, 126, 179, 0.2); color: var(--accent-pink);
-      border: 1px solid rgba(255, 126, 179, 0.35); padding: 5px 10px; border-radius: 999px;
-      font-size: 0.7rem; font-weight: 700; cursor: pointer;
+      border: 1px solid rgba(255, 126, 179, 0.35); padding: 5px 11px; border-radius: 999px;
+      font-size: 0.7rem; font-weight: 700; cursor: pointer; font-family: inherit;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .vn-btn.playing {
+      background: rgba(74, 222, 128, 0.22); color: var(--accent-mint);
+      border-color: rgba(74, 222, 128, 0.45);
     }
     .water-btn {
       background: rgba(74, 222, 128, 0.18); color: var(--accent-mint);
@@ -744,6 +753,7 @@
     let tapComboCount = 0;
     let tapResetTimer = null;
     let bubbleTimer = null;
+    let currentPlayingBtn = null;
     const requestingTasks = new Set();
 
     // ==========================================
@@ -765,7 +775,6 @@
       const now = ctx.currentTime;
 
       if (type === 'poke') {
-        // Suara "boing-pop" lucu saat tanaman ditap
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         const pitch = 420 + Math.random() * 140;
@@ -777,7 +786,6 @@
         osc.connect(gain); gain.connect(ctx.destination);
         osc.start(now); osc.stop(now + 0.15);
       } else if (type === 'jump') {
-        // Suara lompat + kilauan bintang (3x tap)
         const freqs = [523.25, 659.25, 783.99, 1046.5];
         freqs.forEach((f, idx) => {
           const osc = ctx.createOscillator();
@@ -791,7 +799,6 @@
           osc.start(now + idx * 0.055); osc.stop(now + idx * 0.055 + 0.19);
         });
       } else if (type === 'water') {
-        // Suara gemericik tetes air + melodi segar
         const drops = [620, 740, 880, 1174.66];
         drops.forEach((f, idx) => {
           const osc = ctx.createOscillator();
@@ -806,7 +813,6 @@
           osc.start(t); osc.stop(t + 0.16);
         });
       } else if (type === 'tick') {
-        // Suara klik halus untuk roda spinner
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
@@ -816,7 +822,6 @@
         osc.connect(gain); gain.connect(ctx.destination);
         osc.start(now); osc.stop(now + 0.04);
       } else if (type === 'win') {
-        // Fanfare ceria saat roda kencan berhenti
         const notes = [523.25, 659.25, 783.99, 1046.5];
         notes.forEach((f, i) => {
           const osc = ctx.createOscillator();
@@ -839,6 +844,10 @@
       spawnAmbientFireflies();
       spawnRaindrops();
       applyAutoSky(null);
+
+      const vnAudio = document.getElementById('vnAudio');
+      vnAudio.addEventListener('ended', resetVoiceNoteButton);
+      vnAudio.addEventListener('pause', resetVoiceNoteButton);
 
       const cached = localStorage.getItem('carelendar_cosmic_cache');
       if (cached) {
@@ -866,7 +875,6 @@
       });
     });
 
-    // Otomatis deteksi Cuaca Hujan Real-time + Jam Lokal
     function applyAutoSky(weatherObj) {
       if (isManualSkyOverride) return;
       const isRaining = weatherObj && weatherObj.isRaining;
@@ -945,7 +953,6 @@
       }
     }
 
-    // 3x Tap = Tanaman Lompat + Bubble Bulat Acak + Efek Suara Lucu
     function pokePlant() {
       const arena = document.getElementById('plantArena');
       const plant = document.getElementById('plantEmoji');
@@ -996,7 +1003,6 @@
       const pool = isTripleJump ? jumpWhispers : normalWhispers;
       bubble.textContent = pool[Math.floor(Math.random() * pool.length)];
 
-      // Posisi bubble bulat tersebar acak di area arena
       const randomPositions = [
         { top: '34px', left: '14px', right: 'auto', bottom: 'auto' },
         { top: '38px', right: '14px', left: 'auto', bottom: 'auto' },
@@ -1087,7 +1093,7 @@
       document.getElementById('progressFill').style.width = `${Math.min(100, Math.max(4, (g.currentCoins / 1000) * 100))}%`;
       document.getElementById('harvestBtn').style.display = g.canHarvest ? 'block' : 'none';
 
-      // Clues
+      // Clues & Foto Kenangan Tahap 5 (Menggunakan Thumbnail Google Drive Res-Tinggi + Fallback)
       let htmlClues = '';
       htmlClues += g.rewards.clue2
         ? `<div class="clue-item">🌱 <b>Petunjuk 1:</b> "${g.rewards.clue2}"</div>`
@@ -1096,7 +1102,7 @@
         ? `<div class="clue-item">🌿 <b>Petunjuk 2:</b> "${g.rewards.clue4}"</div>`
         : `<div class="clue-locked">🔒 Petunjuk 2 terbuka di 300 Koin</div>`;
       htmlClues += g.rewards.foto5
-        ? `<div class="clue-item">📸 <b>Kenangan Terbuka:</b><img class="clue-photo" src="${convertDriveUrl(g.rewards.foto5, 'image')}" alt="Kenangan" /></div>`
+        ? `<div class="clue-item">📸 <b>Kenangan Terbuka:</b><img class="clue-photo" src="${convertDriveUrl(g.rewards.foto5, 'image')}" alt="Kenangan" onerror="handleImageFallback(this, '${String(g.rewards.foto5).replace(/'/g, "\'")}')" /></div>`
         : `<div class="clue-locked">🔒 Foto Rahasia terbuka di 500 Koin</div>`;
       htmlClues += g.rewards.surat7
         ? `<div class="clue-item" style="margin-top:8px;">💌 <b>Surat Akhir:</b> "${g.rewards.surat7}"</div>`
@@ -1120,14 +1126,15 @@
           disabledAttr = 'disabled';
         }
 
-        const safeTitle = String(item.judul).replace(/'/g, "\\'");
+        const safeTitle = String(item.judul).replace(/'/g, "\'");
+        const safeVnUrl = String(item.voiceNote || '').trim().replace(/'/g, "\'");
         return `
           <div class="task-card ${item.isPrayer ? 'prayer' : ''} ${item.status === 'approved' ? 'approved' : ''}">
             <div class="task-time">${item.jam}</div>
             <div class="task-info">
               <h3>${item.judul}</h3>
               <p>${item.pesan || ''}</p>
-              ${item.voiceNote ? `<button class="vn-btn" onclick="playVoiceNote('${item.voiceNote}')">🔊 Dengar Suaraku</button>` : ''}
+              ${safeVnUrl ? `<button class="vn-btn" onclick="playVoiceNote(this, '${safeVnUrl}')">🔊 Dengar Suaraku</button>` : ''}
             </div>
             <button class="${btnClass}" ${disabledAttr} onclick="requestTask(this, '${item.id}', '${safeTitle}', ${item.koin})">
               ${btnText}
@@ -1349,20 +1356,63 @@
       }
     }
 
-    function playVoiceNote(url) {
+    // Pemutar Voice Note dengan Toggle Play/Stop & Fallback Google Drive
+    function resetVoiceNoteButton() {
+      if (currentPlayingBtn) {
+        currentPlayingBtn.classList.remove('playing');
+        currentPlayingBtn.textContent = '🔊 Dengar Suaraku';
+        currentPlayingBtn = null;
+      }
+    }
+
+    function playVoiceNote(btnEl, url) {
       const audio = document.getElementById('vnAudio');
-      audio.src = convertDriveUrl(url, 'audio');
-      audio.play().then(() => showToast("🔊 Memutar pesan suara...")).catch(() => window.open(url, '_blank'));
+      if (currentPlayingBtn === btnEl && !audio.paused) {
+        audio.pause();
+        audio.currentTime = 0;
+        resetVoiceNoteButton();
+        return;
+      }
+
+      resetVoiceNoteButton();
+      currentPlayingBtn = btnEl;
+      btnEl.classList.add('playing');
+      btnEl.textContent = '⏸️ Memutar...';
+
+      const directSrc = convertDriveUrl(url, 'audio');
+      audio.src = directSrc;
+      audio.play()
+        .then(() => showToast("🔊 Memutar pesan suara dari Virgo Boy..."))
+        .catch(() => {
+          resetVoiceNoteButton();
+          window.open(url, '_blank');
+        });
+    }
+
+    // Ekstrak ID Google Drive secara fleksibel (/d/ID atau ?id=ID)
+    function extractDriveId(url) {
+      if (!url) return null;
+      const str = String(url).trim();
+      const match = str.match(/\/d\/([a-zA-Z0-9_-]+)/) || str.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      return match ? match[1] : null;
     }
 
     function convertDriveUrl(url, type) {
-      const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) {
+      const id = extractDriveId(url);
+      if (id) {
         return type === 'image'
-          ? `https://drive.google.com/uc?export=view&id=${match[1]}`
-          : `https://drive.google.com/uc?export=download&id=${match[1]}`;
+          ? `https://drive.google.com/thumbnail?id=${id}&sz=w1000`
+          : `https://drive.google.com/uc?export=download&id=${id}`;
       }
       return url;
+    }
+
+    function handleImageFallback(imgEl, rawUrl) {
+      const id = extractDriveId(rawUrl);
+      if (id && !imgEl.dataset.retried) {
+        imgEl.dataset.retried = "1";
+        imgEl.src = `https://lh3.googleusercontent.com/d/${id}=w1000`;
+      }
     }
 
     function switchTab(tabName, btn) {
