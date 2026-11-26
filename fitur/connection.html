@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Virgo ♍ & Sagittarius ♐ — Genggaman Kita</title>
+  <style>
+    :root {
+      --bg-together-top: #151b29;
+      --bg-together-mid: #24172e;
+      --bg-together-bot: #090c14;
+      --bg-apart-top: #090f1c;
+      --bg-apart-bot: #04060c;
+      --virgo-emerald: #6ee7b7;
+      --sagi-gold: #fbbf24;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      min-height: 100dvh;
+      background: radial-gradient(circle at 50% 42%, var(--bg-together-mid) 0%, var(--bg-together-top) 48%, var(--bg-together-bot) 100%);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 16px 22px;
+      overflow-x: hidden;
+      position: relative;
+      transition: background 1.5s ease;
+    }
+
+    body.mode-pisah {
+      background: radial-gradient(circle at 50% 42%, #111b30 0%, var(--bg-apart-top) 55%, var(--bg-apart-bot) 100%);
+    }
+
+    #cosmos-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .header {
+      text-align: center;
+      z-index: 2;
+      width: 100%;
+      max-width: 430px;
+    }
+
+    .zodiac-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 6px 16px;
+      border-radius: 99px;
+      font-size: 0.82rem;
+      margin-bottom: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .tag-virgo { color: var(--virgo-emerald); font-weight: 600; }
+    .tag-sagi { color: var(--sagi-gold); font-weight: 600; }
+    .divider-dot { color: rgba(255, 255, 255, 0.3); }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      background: linear-gradient(90deg, #a7f3d0 0%, #ffffff 50%, #fde68a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      min-height: 20px;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      height: 255px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 4px 0;
+      z-index: 1;
+    }
+
+    #scene-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .zodiac-watermark {
+      position: absolute;
+      font-size: 1.35rem;
+      opacity: 0.36;
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+    }
+
+    .wm-virgo {
+      left: 6%;
+      bottom: 12%;
+      color: var(--virgo-emerald);
+      text-shadow: 0 0 14px rgba(110, 231, 183, 0.75);
+    }
+
+    .wm-sagi {
+      right: 6%;
+      top: 12%;
+      color: var(--sagi-gold);
+      text-shadow: 0 0 14px rgba(251, 191, 36, 0.75);
+    }
+
+    .particle {
+      position: absolute;
+      pointer-events: none;
+      font-size: 1.15rem;
+      animation: floatUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      z-index: 5;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(6px) scale(0.5); }
+      25% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-90px) scale(1.3); }
+    }
+
+    .controls {
+      width: 100%;
+      max-width: 390px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      z-index: 2;
+    }
+
+    input.note-input {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(15, 23, 42, 0.68);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      font-size: 0.88rem;
+      outline: none;
+      text-align: center;
+      transition: border-color 0.3s ease;
+    }
+
+    input.note-input:focus { border-color: rgba(251, 191, 36, 0.55); }
+    input.note-input::placeholder { color: rgba(148, 163, 184, 0.65); }
+
+    .btn {
+      width: 100%;
+      padding: 13px 18px;
+      border: none;
+      border-radius: 15px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.3s ease, opacity 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981 0%, #f59e0b 55%, #fb7185 100%);
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 8px 22px rgba(245, 158, 11, 0.28);
+    }
+
+    .btn-reunite {
+      background: linear-gradient(135deg, #34d399 0%, #fbbf24 100%);
+      color: #0f172a;
+      box-shadow: 0 8px 22px rgba(52, 211, 153, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+    }
+
+    .hidden { display: none !important; }
+
+    .history-box {
+      width: 100%;
+      max-width: 390px;
+      margin-top: 10px;
+      background: rgba(15, 23, 42, 0.62);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
+      padding: 11px 14px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      z-index: 2;
+    }
+
+    .history-title {
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-expand-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #fde68a;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 99px;
+      cursor: pointer;
+    }
+
+    #history-list {
+      max-height: 132px;
+      overflow-y: auto;
+      padding-right: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(251, 191, 36, 0.35) transparent;
+    }
+
+    #history-list.expanded {
+      max-height: 230px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .history-item:last-child { border-bottom: none; }
+
+    .history-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .history-time {
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+
+    .history-note {
+      color: #94a3b8;
+      font-size: 0.74rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .toast {
+      position: fixed;
+      top: 18px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #f8fafc;
+      padding: 10px 18px;
+      border-radius: 99px;
+      font-size: 0.84rem;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.35s ease;
+      z-index: 99;
+      pointer-events: none;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <canvas id="cosmos-canvas"></canvas>
+  <div id="toast" class="toast">Menyinkronkan kenangan...</div>
+
+  <div class="header">
+    <div class="zodiac-bar">
+      <span class="tag-virgo">♍ Virgo</span>
+      <span class="divider-dot">•</span>
+      <span id="meeting-counter" style="color:#f8fafc; font-weight:600;">Memuat...</span>
+      <span class="divider-dot">•</span>
+      <span class="tag-sagi">♐ Sagittarius</span>
+    </div>
+    <h1 id="status-title">Sedang Bersama</h1>
+    <p class="subtitle" id="status-subtitle">Bumi & Api saling menggenggam</p>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="zodiac-watermark wm-virgo">♍</div>
+    <div class="zodiac-watermark wm-sagi">♐</div>
+    <canvas id="scene-canvas"></canvas>
+  </div>
+
+  <div class="controls">
+    <input type="text" id="note-input" class="note-input" placeholder="Tulis momen hari ini (misal: ngopi sore, nonton)..." />
+
+    <button id="btn-tighten" class="btn btn-primary" onclick="tightenGrip()">
+      🫂 Eratkan Pegangan
+    </button>
+    <button id="btn-part" class="btn btn-secondary" onclick="partWays()">
+      🌙 Dia Pulang (Berpisah Sementara)
+    </button>
+
+    <button id="btn-reunite" class="btn btn-reunite hidden" onclick="reuniteHands()">
+      ✨ Ketemu Lagi! Genggam Tangannya
+    </button>
+  </div>
+
+  <div class="history-box">
+    <div class="history-title">
+      <span>Jejak Pertemuan</span>
+      <div class="history-actions">
+        <button id="btn-toggle-history" class="toggle-expand-btn" onclick="toggleHistoryExpand()">Perluas</button>
+        <span id="sync-status" style="font-weight:400; font-size:0.74rem; color:#6ee7b7;">● Live</span>
+      </div>
+    </div>
+    <div id="history-list">
+      <div class="history-item"><span>Belum ada catatan pertemuan...</span></div>
+    </div>
+  </div>
+
+  <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyhtM35HtjDwUgg3X8OtmDFT_Q9Rdsw_4Dtx8EgctGy2PdzcJTE0ioNz4ShmFF07alG/exec";
+    const MAX_WARMTH_LEVEL = 10;
+
+    let appState = {
+      status: 'TERPISAH',
+      timestamp: new Date().toISOString(),
+      skorErat: 1,
+      totalPertemuan: 0,
+      riwayat: []
+    };
+
+    let isSyncing = false;
+    let lastRemoteSignature = "";
+    let isHistoryExpanded = false;
+
+    let currentSeparation = 1.0;
+    let currentWarmthGlow = 0.2;
+    let squeezeBoost = 0;
+
+    function getWarmthLabel(level) {
+      if (level >= 10) return "Gugus Cinta Utuh (MAX)";
+      if (level >= 8) return "Hati Konstelasi Menyala";
+      if (level >= 5) return "Gugus Mulai Terbentuk";
+      if (level >= 3) return "Benang Harmoni Terjalin";
+      return "Tautan Awal";
+    }
+
+    function getTeaserHint(level) {
+      if (level >= 10) return "Puncak konstelasi cinta telah terkunci ✨";
+      const sisa = MAX_WARMTH_LEVEL - level;
+      if (level >= 7) return `Hampir utuh • ${sisa} langkah lagi menuju bentuk puncak`;
+      if (level >= 4) return `Gugus tengah mulai menenun pola • ${sisa} tahap lagi`;
+      return `Ada rahasia bentuk di tengah • ${sisa} tahap lagi ke MAX`;
+    }
+
+    function toggleHistoryExpand() {
+      isHistoryExpanded = !isHistoryExpanded;
+      const list = document.getElementById('history-list');
+      const btn = document.getElementById('btn-toggle-history');
+      list.classList.toggle('expanded', isHistoryExpanded);
+      btn.textContent = isHistoryExpanded ? "Ringkas" : "Perluas";
+    }
+
+    function setButtonsLocked(locked) {
+      ['btn-tighten', 'btn-part', 'btn-reunite'].forEach(id => {
+        document.getElementById(id).disabled = locked;
+      });
+    }
+
+    function triggerSqueezeAnimation() {
+      squeezeBoost = 1.0;
+    }
+
+    function initCosmosAndScene() {
+      const bgCanvas = document.getElementById('cosmos-canvas');
+      const bgCtx = bgCanvas.getContext('2d');
+      const fgCanvas = document.getElementById('scene-canvas');
+      const fgCtx = fgCanvas.getContext('2d');
+
+      let stars = [];
+      let dust = Array.from({ length: 48 }, () => ({
+        angle: Math.random() * Math.PI * 2,
+        radius: 16 + Math.random() * 84,
+        speed: (Math.random() - 0.5) * 0.018,
+        size: Math.random() * 2.1 + 0.8,
+        hue: Math.random() > 0.5 ? '110, 231, 183' : '251, 191, 36'
+      }));
+
+      let streamPackets = Array.from({ length: 16 }, (_, idx) => ({
+        phase: idx / 16,
+        speed: 0.25 + (idx % 3) * 0.07,
+        dir: idx % 2 === 0 ? 1 : -1,
+        hue: idx % 2 === 0 ? '110, 231, 183' : '251, 191, 36'
+      }));
+
+      // Rasi Virgo (kiri)
+      const virgoStars = [
+        { x: -0.78, y: -0.82, mag: 1.0 },
+        { x: -0.45, y: -0.72, mag: 1.1 },
+        { x: -0.25, y: -0.28, mag: 1.05 },
+        { x: -0.18, y:  0.02, mag: 1.55 },
+        { x: -0.58, y:  0.22, mag: 1.0 },
+        { x: -0.86, y:  0.34, mag: 1.05 },
+        { x:  0.18, y:  0.32, mag: 1.1 },
+        { x: -0.04, y:  0.66, mag: 1.0 },
+        { x:  0.54, y:  0.38, mag: 1.45 }
+      ];
+      const virgoEdges = [
+        [0, 1], [1, 2], [2, 3],
+        [3, 4], [4, 5],
+        [3, 6], [6, 7], [6, 8]
+      ];
+
+      // Rasi Sagittarius (kanan)
+      const sagiStars = [
+        { x: -0.84, y: -0.20, mag: 1.3 },
+        { x: -0.54, y: -0.34, mag: 1.0 },
+        { x: -0.16, y: -0.24, mag: 1.15 },
+        { x: -0.26, y: -0.66, mag: 1.3 },
+        { x: -0.38, y: -0.84, mag: 0.95 },
+        { x: -0.40, y: -1.00, mag: 0.95 },
+        { x:  0.00, y: -0.32, mag: 1.0 },
+        { x:  0.14, y: -0.28, mag: 1.1 },
+        { x: -0.02, y: -0.10, mag: 1.05 },
+        { x:  0.44, y: -0.34, mag: 1.1 },
+        { x:  0.62, y: -0.62, mag: 1.15 },
+        { x:  0.52, y:  0.02, mag: 1.2 },
+        { x:  0.72, y:  0.08, mag: 1.0 },
+        { x:  0.44, y:  0.26, mag: 1.0 },
+        { x:  0.54, y:  0.38, mag: 1.0 },
+        { x: -0.72, y:  0.32, mag: 1.0 },
+        { x: -0.60, y:  0.58, mag: 1.35 },
+        { x: -0.44, y:  0.46, mag: 0.95 },
+        { x: -0.34, y:  0.60, mag: 0.95 }
+      ];
+      const sagiEdges = [
+        [0, 1], [1, 2],
+        [2, 3], [3, 4], [4, 5],
+        [2, 6], [6, 7], [7, 8], [8, 2],
+        [7, 9], [9, 10],
+        [9, 11], [11, 12], [11, 13], [13, 14],
+        [0, 15], [15, 16], [16, 17], [16, 18]
+      ];
+
+      // Titik-titik "Gugus Cinta" (bentuk hati konstelasi di pusat pertemuan)
+      // Di level rendah posisinya masih tersebar dekat rasi asal; makin tinggi level makin menyatu jadi gugus hati!
+      const heartClusterNodes = [
+        { hx:  0.00, hy: -0.28, sx: -0.22, sy: -0.45, mag: 1.25 }, // 0: Lekukan atas hati
+        { hx: -0.26, hy: -0.50, sx: -0.58, sy: -0.52, mag: 1.2 },  // 1: Puncak cuping kiri
+        { hx: -0.50, hy: -0.36, sx: -0.72, sy: -0.15, mag: 1.15 }, // 2: Bahu kiri hati
+        { hx: -0.46, hy: -0.04, sx: -0.55, sy:  0.25, mag: 1.2 },  // 3: Sisi kiri hati
+        { hx: -0.22, hy:  0.24, sx: -0.32, sy:  0.55, mag: 1.15 }, // 4: Bawah kiri hati
+        { hx:  0.00, hy:  0.48, sx:  0.00, sy:  0.72, mag: 1.55 }, // 5: Ujung lancip bawah hati (inti cinta)
+        { hx:  0.22, hy:  0.24, sx:  0.32, sy:  0.55, mag: 1.15 }, // 6: Bawah kanan hati
+        { hx:  0.46, hy: -0.04, sx:  0.55, sy:  0.25, mag: 1.2 },  // 7: Sisi kanan hati
+        { hx:  0.50, hy: -0.36, sx:  0.72, sy: -0.15, mag: 1.15 }, // 8: Bahu kanan hati
+        { hx:  0.26, hy: -0.50, sx:  0.58, sy: -0.52, mag: 1.2 }   // 9: Puncak cuping kanan
+      ];
+      const heartClusterEdges = [
+        [0, 1], [1, 2], [2, 3], [3, 4], [4, 5],
+        [5, 6], [6, 7], [7, 8], [8, 9], [9, 0]
+      ];
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        bgCanvas.width = window.innerWidth * dpr;
+        bgCanvas.height = window.innerHeight * dpr;
+        bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const rect = fgCanvas.parentElement.getBoundingClientRect();
+        fgCanvas.width = rect.width * dpr;
+        fgCanvas.height = rect.height * dpr;
+        fgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        stars = Array.from({ length: 82 }, () => ({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          r: Math.random() * 1.5 + 0.3,
+          alpha: Math.random(),
+          speed: Math.random() * 0.015 + 0.005,
+          color: Math.random() > 0.5 ? '167, 243, 208' : '253, 230, 138'
+        }));
+      }
+
+      function computePoints(anchorX, anchorY, scale, starsList) {
+        return starsList.map(st => ({
+          x: anchorX + st.x * scale,
+          y: anchorY + st.y * scale,
+          mag: st.mag
+        }));
+      }
+
+      function drawConstellation(pts, edges, rgbLine, rgbStar, alphaBoost, pulse) {
+        fgCtx.save();
+        fgCtx.strokeStyle = `rgba(${rgbLine}, ${0.28 + alphaBoost * 0.45})`;
+        fgCtx.lineWidth = 1.35;
+        fgCtx.lineCap = 'round';
+        fgCtx.lineJoin = 'round';
+        for (const [a, b] of edges) {
+          fgCtx.beginPath();
+          fgCtx.moveTo(pts[a].x, pts[a].y);
+          fgCtx.lineTo(pts[b].x, pts[b].y);
+          fgCtx.stroke();
+        }
+
+        for (const pt of pts) {
+          const r = 2.1 * pt.mag;
+          const glow = fgCtx.createRadialGradient(pt.x, pt.y, 0.5, pt.x, pt.y, r * 3.1 * pulse);
+          glow.addColorStop(0, `rgba(${rgbStar}, ${0.75 + alphaBoost * 0.25})`);
+          glow.addColorStop(0.5, `rgba(${rgbLine}, ${0.22 + alphaBoost * 0.2})`);
+          glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          fgCtx.fillStyle = glow;
+          fgCtx.beginPath();
+          fgCtx.arc(pt.x, pt.y, r * 3.1 * pulse, 0, Math.PI * 2);
+          fgCtx.fill();
+
+          fgCtx.beginPath();
+          fgCtx.arc(pt.x, pt.y, r * 0.72, 0, Math.PI * 2);
+          fgCtx.fillStyle = '#ffffff';
+          fgCtx.fill();
+        }
+        fgCtx.restore();
+      }
+
+      function drawLoveCluster(meetX, meetY, scale, level, isTogether, pulse, t) {
+        // Progresi 0.0 (Lv.1) sampai 1.0 (Lv.10)
+        const progress = Math.max(0, Math.min(1, (level - 1) / (MAX_WARMTH_LEVEL - 1)));
+        // Saat terpisah, gugus hati meredup dan menyebar halus
+        const clusterVisibility = isTogether
+          ? Math.max(0.18, progress * 1.05)
+          : progress * 0.22;
+
+        if (clusterVisibility <= 0.03) return;
+
+        // Seberapa menyatu titik-titik hati (dari menyebar sx/sy -> presisi hx/hy)
+        const converge = isTogether ? Math.min(1, progress * 1.25) : 0.25;
+        const heartScale = scale * (0.48 + progress * 0.24);
+        const centerY = meetY - 4 * progress;
+
+        const pts = heartClusterNodes.map(node => {
+          const nx = node.sx + (node.hx - node.sx) * converge;
+          const ny = node.sy + (node.hy - node.sy) * converge;
+          return {
+            x: meetX + nx * heartScale + Math.sin(t * 2 + node.hx * 5) * 1.4,
+            y: centerY + ny * heartScale + Math.cos(t * 2 + node.hy * 5) * 1.4,
+            mag: node.mag * (0.8 + progress * 0.35)
+          };
+        });
+
+        fgCtx.save();
+
+        // Cahaya inti hati saat level >= 5
+        if (isTogether && level >= 5) {
+          const heartGlowR = (34 + progress * 44) * pulse;
+          const hGrad = fgCtx.createRadialGradient(meetX, centerY, 2, meetX, centerY, heartGlowR);
+          const warmRoseAlpha = ((level - 4) / 6) * 0.32;
+          hGrad.addColorStop(0, `rgba(255, 241, 242, ${0.35 * progress})`);
+          hGrad.addColorStop(0.5, `rgba(251, 113, 133, ${warmRoseAlpha})`);
+          hGrad.addColorStop(0.85, `rgba(251, 191, 36, ${0.18 * progress})`);
+          hGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          fgCtx.fillStyle = hGrad;
+          fgCtx.beginPath();
+          fgCtx.arc(meetX, centerY, heartGlowR, 0, Math.PI * 2);
+          fgCtx.fill();
+        }
+
+        // Garis gugus hati muncul bertahap mulai Lv.3 dan semakin lengkap hingga Lv.10
+        const visibleEdgesCount = level < 3
+          ? 0
+          : Math.min(heartClusterEdges.length, Math.ceil(((level - 2) / (MAX_WARMTH_LEVEL - 2)) * heartClusterEdges.length));
+
+        if (visibleEdgesCount > 0) {
+          fgCtx.strokeStyle = level >= 10
+            ? `rgba(253, 164, 175, ${0.55 + 0.35 * clusterVisibility})`
+            : `rgba(253, 230, 138, ${0.25 + 0.45 * clusterVisibility})`;
+          fgCtx.lineWidth = level >= 10 ? 1.8 : 1.1 + progress * 0.6;
+          if (level < 8) {
+            fgCtx.setLineDash([3, 3]);
+          }
+          for (let i = 0; i < visibleEdgesCount; i++) {
+            const [a, b] = heartClusterEdges[i];
+            fgCtx.beginPath();
+            fgCtx.moveTo(pts[a].x, pts[a].y);
+            fgCtx.lineTo(pts[b].x, pts[b].y);
+            fgCtx.stroke();
+          }
+          fgCtx.setLineDash([]);
+        }
+
+        // Bintang-bintang pembentuk gugus hati
+        const activeStarCount = Math.max(2, Math.round(2 + progress * (pts.length - 2)));
+        for (let i = 0; i < activeStarCount; i++) {
+          const pt = pts[i];
+          const r = 1.9 * pt.mag;
+          fgCtx.beginPath();
+          fgCtx.arc(pt.x, pt.y, r * 0.78, 0, Math.PI * 2);
+          fgCtx.fillStyle = level >= 10 ? '#fff1f2' : '#fef9c3';
+          fgCtx.globalAlpha = Math.min(1, clusterVisibility + 0.2);
+          fgCtx.fill();
+        }
+
+        fgCtx.restore();
+      }
+
+      function drawScene(time) {
+        const t = time * 0.001;
+        const w = fgCanvas.clientWidth || 360;
+        const h = fgCanvas.clientHeight || 255;
+        const cx = w / 2;
+        const cy = h / 2;
+
+        // 1. Background starfield
+        bgCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        for (const s of stars) {
+          s.alpha += s.speed;
+          const opacity = 0.25 + Math.abs(Math.sin(s.alpha)) * 0.65;
+          bgCtx.beginPath();
+          bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          bgCtx.fillStyle = `rgba(${s.color}, ${opacity})`;
+          bgCtx.fill();
+        }
+
+        const isTogether = appState.status === 'BERTEMU';
+
+        // 2. Interpolasi jarak pertemuan vs perpisahan
+        const targetSep = isTogether
+          ? 0
+          : Math.min(1, 0.42 + getHoursElapsed(appState.timestamp) * 0.03);
+        currentSeparation += (targetSep - currentSeparation) * 0.06;
+
+        const targetWarmth = isTogether
+          ? 0.4 + (appState.skorErat / MAX_WARMTH_LEVEL) * 0.6
+          : 0.14;
+        currentWarmthGlow += (targetWarmth - currentWarmthGlow) * 0.06;
+        squeezeBoost *= 0.92;
+
+        fgCtx.clearRect(0, 0, w, h);
+
+        const scale = Math.min(w * 0.21, h * 0.36);
+        const pulse = 1 + Math.sin(t * (isTogether ? 3.2 : 1.5)) * 0.05 + squeezeBoost * 0.16;
+
+        // Tiap level makin mendekat & merapat ke pusat pertemuan
+        const claspTightness = ((appState.skorErat - 1) / (MAX_WARMTH_LEVEL - 1)) * 16;
+        const virgoTogetherX = cx - scale * 0.62 + claspTightness;
+        const sagiTogetherX = cx + scale * 0.88 - claspTightness;
+
+        const apartOffset = currentSeparation * Math.min(54, w * 0.13);
+        const virgoX = virgoTogetherX - apartOffset + Math.sin(t * 1.1) * 2.2;
+        const sagiX = sagiTogetherX + apartOffset - Math.sin(t * 1.1) * 2.2;
+        const virgoY = cy + Math.sin(t * 1.3) * 2.5;
+        const sagiY = cy + 6 + Math.cos(t * 1.3) * 2.5;
+
+        const virgoPts = computePoints(virgoX, virgoY, scale, virgoStars);
+        const sagiPts = computePoints(sagiX, sagiY, scale, sagiStars);
+
+        const pLeft = virgoPts[8];
+        const pRight = sagiPts[0];
+        const meetX = (pLeft.x + pRight.x) / 2;
+        const meetY = (pLeft.y + pRight.y) / 2;
+
+        // 3. Cincin denyut (ripple rings) — makin banyak & besar seiring naik level
+        const ringCount = isTogether ? (appState.skorErat >= 8 ? 4 : 3) : 2;
+        for (let rIdx = 0; rIdx < ringCount; rIdx++) {
+          const cycle = ((t * (isTogether ? 0.45 + appState.skorErat * 0.03 : 0.22)) + rIdx / ringCount) % 1;
+          const ringRadius = 14 + cycle * (68 + appState.skorErat * 5.2) * pulse;
+          const ringAlpha = (1 - cycle) * (isTogether ? 0.28 * currentWarmthGlow : 0.09);
+          fgCtx.beginPath();
+          fgCtx.arc(meetX, meetY, ringRadius, 0, Math.PI * 2);
+          fgCtx.strokeStyle = rIdx % 2 === 0
+            ? `rgba(251, 191, 36, ${ringAlpha})`
+            : `rgba(110, 231, 183, ${ringAlpha})`;
+          fgCtx.lineWidth = appState.skorErat >= 10 ? 1.5 : 1.25;
+          fgCtx.stroke();
+        }
+
+        // 4. Cahaya hangat di titik tautan
+        const glowRadius = (72 + appState.skorErat * 7.5) * pulse;
+        const centerGrad = fgCtx.createRadialGradient(meetX, meetY, 3, meetX, meetY, glowRadius);
+        centerGrad.addColorStop(0, `rgba(255, 250, 224, ${0.46 * currentWarmthGlow + squeezeBoost * 0.3})`);
+        centerGrad.addColorStop(0.45, `rgba(251, 191, 36, ${0.26 * currentWarmthGlow})`);
+        centerGrad.addColorStop(0.75, `rgba(110, 231, 183, ${0.14 * currentWarmthGlow})`);
+        centerGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        fgCtx.fillStyle = centerGrad;
+        fgCtx.beginPath();
+        fgCtx.arc(meetX, meetY, glowRadius, 0, Math.PI * 2);
+        fgCtx.fill();
+
+        // 5. Gambar Rasi Virgo (kiri) & Sagittarius (kanan)
+        drawConstellation(virgoPts, virgoEdges, '110, 231, 183', '167, 243, 208', currentWarmthGlow, pulse);
+        drawConstellation(sagiPts, sagiEdges, '251, 191, 36', '254, 240, 138', currentWarmthGlow, pulse);
+
+        // 6. Jembatan Konstelasi utama
+        const ctrlX = meetX;
+        const ctrlY = meetY - currentSeparation * 16;
+
+        fgCtx.save();
+        fgCtx.beginPath();
+        fgCtx.moveTo(pLeft.x, pLeft.y);
+        fgCtx.quadraticCurveTo(ctrlX, ctrlY, pRight.x, pRight.y);
+        fgCtx.strokeStyle = isTogether
+          ? `rgba(254, 243, 199, ${0.65 + currentWarmthGlow * 0.35})`
+          : 'rgba(148, 163, 184, 0.38)';
+        fgCtx.lineWidth = isTogether ? 1.8 + appState.skorErat * 0.14 : 1.25;
+        if (!isTogether) {
+          fgCtx.setLineDash([4, 5]);
+        }
+        fgCtx.stroke();
+        fgCtx.restore();
+
+        // Garis harmoni kedua mulai Lv.3
+        if (isTogether && appState.skorErat >= 3) {
+          const harmonyAlpha = Math.min(0.45, (appState.skorErat - 2) * 0.055);
+          fgCtx.save();
+          fgCtx.beginPath();
+          fgCtx.moveTo(virgoPts[3].x, virgoPts[3].y);
+          fgCtx.quadraticCurveTo(cx, cy - 36, sagiPts[2].x, sagiPts[2].y);
+          fgCtx.strokeStyle = `rgba(253, 230, 138, ${harmonyAlpha})`;
+          fgCtx.lineWidth = 1.05;
+          fgCtx.setLineDash([3, 4]);
+          fgCtx.stroke();
+          fgCtx.restore();
+        }
+
+        // 7. Gugus Cinta progresif per level (Lv.1 -> Lv.10)
+        drawLoveCluster(meetX, meetY, scale, appState.skorErat, isTogether, pulse, t);
+
+        // 8. Partikel cahaya mengalir di jembatan penghubung
+        const activePackets = isTogether
+          ? Math.min(streamPackets.length, 5 + appState.skorErat)
+          : 4;
+
+        for (let i = 0; i < activePackets; i++) {
+          const sp = streamPackets[i];
+          let u = (t * sp.speed * (isTogether ? 1.45 : 0.6) + sp.phase) % 1;
+          if (sp.dir < 0) u = 1 - u;
+
+          const inv = 1 - u;
+          const qx = inv * inv * pLeft.x + 2 * inv * u * ctrlX + u * u * pRight.x;
+          const qy = inv * inv * pLeft.y + 2 * inv * u * ctrlY + u * u * pRight.y;
+
+          fgCtx.beginPath();
+          fgCtx.arc(qx, qy, isTogether ? 2.15 : 1.5, 0, Math.PI * 2);
+          fgCtx.fillStyle = `rgba(${sp.hue}, ${isTogether ? 0.9 : 0.45})`;
+          fgCtx.fill();
+        }
+
+        // 9. Partikel debu bintang lembut di sekitar titik tautan
+        for (const p of dust) {
+          p.angle += p.speed * (isTogether ? 1.55 : 0.65);
+          const dynamicR = p.radius * (isTogether ? 0.45 + (appState.skorErat / MAX_WARMTH_LEVEL) * 0.45 : 0.95);
+          const px = meetX + Math.cos(p.angle) * dynamicR;
+          const py = meetY + Math.sin(p.angle) * (dynamicR * 0.58);
+          fgCtx.beginPath();
+          fgCtx.arc(px, py, p.size * pulse, 0, Math.PI * 2);
+          fgCtx.fillStyle = `rgba(${p.hue}, ${0.3 + currentWarmthGlow * 0.42})`;
+          fgCtx.fill();
+        }
+
+        requestAnimationFrame(drawScene);
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+      requestAnimationFrame(drawScene);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    function spawnParticles(count = 7) {
+      const stage = document.getElementById('stage');
+      const symbols = ['✨', '🤍', '♍', '♐', '💫', '🌸', '🔥'];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'particle';
+        el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        el.style.left = (36 + Math.random() * 28) + '%';
+        el.style.top = (42 + Math.random() * 18) + '%';
+        stage.appendChild(el);
+        setTimeout(() => el.remove(), 1500);
+      }
+    }
+
+    function getHoursElapsed(isoString) {
+      const past = new Date(isoString).getTime();
+      const now = Date.now();
+      return Math.max(0, (now - past) / (1000 * 60 * 60));
+    }
+
+    function formatDuration(hours) {
+      const totalMins = Math.floor(hours * 60);
+      const days = Math.floor(totalMins / (60 * 24));
+      const remHours = Math.floor((totalMins % (60 * 24)) / 60);
+      const mins = totalMins % 60;
+
+      if (days > 0) return `${days} hari ${remHours} jam`;
+      if (remHours > 0) return `${remHours} jam ${mins} menit`;
+      return `${mins} menit`;
+    }
+
+    function formatDateTimeID(isoString) {
+      const d = new Date(isoString);
+      if (isNaN(d.getTime())) return isoString;
+      const tgl = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      const jam = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      return `${tgl} • ${jam} WIB`;
+    }
+
+    function renderVisuals() {
+      const btnTighten = document.getElementById('btn-tighten');
+      const btnPart = document.getElementById('btn-part');
+      const btnReunite = document.getElementById('btn-reunite');
+      const title = document.getElementById('status-title');
+      const subtitle = document.getElementById('status-subtitle');
+      const counter = document.getElementById('meeting-counter');
+
+      const clampedLevel = Math.min(MAX_WARMTH_LEVEL, Math.max(1, Number(appState.skorErat) || 1));
+      appState.skorErat = clampedLevel;
+
+      counter.textContent = `Pertemuan Ke-${appState.totalPertemuan}`;
+
+      if (appState.status === 'BERTEMU') {
+        document.body.classList.remove('mode-pisah');
+        btnTighten.classList.remove('hidden');
+        btnPart.classList.remove('hidden');
+        btnReunite.classList.add('hidden');
+
+        if (clampedLevel >= MAX_WARMTH_LEVEL) {
+          btnTighten.textContent = `💖 Gugus Cinta MAX (Lv.${MAX_WARMTH_LEVEL}/${MAX_WARMTH_LEVEL})`;
+          btnTighten.disabled = true;
+        } else {
+          btnTighten.textContent = `🫂 Eratkan Pegangan (Lv.${clampedLevel}/${MAX_WARMTH_LEVEL})`;
+          btnTighten.disabled = false || isSyncing;
+        }
+
+        const togetherDuration = formatDuration(getHoursElapsed(appState.timestamp));
+        title.textContent = clampedLevel >= MAX_WARMTH_LEVEL ? "Gugus Cinta Utuh ✨" : "Sedang Bersama 🤍";
+        subtitle.textContent = `${togetherDuration} • ${getWarmthLabel(clampedLevel)} — ${getTeaserHint(clampedLevel)}`;
+      } else {
+        document.body.classList.add('mode-pisah');
+        btnTighten.classList.add('hidden');
+        btnPart.classList.add('hidden');
+        btnReunite.classList.remove('hidden');
+
+        const hoursApart = getHoursElapsed(appState.timestamp);
+        title.textContent = "Sedang Berjauhan";
+        subtitle.textContent = `Terpisah ${formatDuration(hoursApart)} • Menanti temu berikutnya`;
+      }
+
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('history-list');
+      if (!appState.riwayat || appState.riwayat.length === 0) return;
+
+      list.innerHTML = appState.riwayat.map(item => {
+        const waktuStr = formatDateTimeID(item.tanggal);
+        const noteText = item.catatan ? `"${item.catatan}"` : "Pertemuan tercatat";
+        return `
+          <div class="history-item">
+            <div class="history-meta">
+              <span class="history-time">✨ ${waktuStr}</span>
+              <span class="history-note">${noteText}</span>
+            </div>
+            <span style="color:#fbbf24; font-weight:600; flex-shrink:0;">Lv.${item.skorErat}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function reuniteHands() {
+      if (isSyncing || appState.status === 'BERTEMU') return;
+      isSyncing = true;
+      setButtonsLocked(true);
+
+      const hoursApart = Math.round(getHoursElapsed(appState.timestamp) * 10) / 10;
+      const note = document.getElementById('note-input').value.trim();
+
+      appState.status = 'BERTEMU';
+      appState.timestamp = new Date().toISOString();
+      appState.skorErat = 1;
+      appState.totalPertemuan += 1;
+      appState.riwayat.unshift({
+        tanggal: appState.timestamp,
+        skorErat: 1,
+        catatan: note
+      });
+
+      document.getElementById('note-input').value = '';
+      renderVisuals();
+      triggerSqueezeAnimation();
+      spawnParticles(12);
+      if (navigator.vibrate) navigator.vibrate([45, 35, 75]);
+      showToast("Ketemu lagi! Mulai dari Lv.1 menuju Gugus Cinta MAX ✨");
+
+      await syncToSheet({
+        status: 'BERTEMU',
+        skorErat: 1,
+        durasiRinduJam: hoursApart,
+        catatan: note
+      });
+
+      setTimeout(() => {
+        isSyncing = false;
+        setButtonsLocked(false);
+        renderVisuals();
+      }, 1500);
+    }
+
+    async function tightenGrip() {
+      if (isSyncing || appState.status !== 'BERTEMU' || appState.skorErat >= MAX_WARMTH_LEVEL) return;
+      isSyncing = true;
+      setButtonsLocked(true);
+
+      const note = document.getElementById('note-input').value.trim();
+      appState.skorErat = Math.min(MAX_WARMTH_LEVEL, appState.skorErat + 1);
+
+      if (appState.riwayat.length > 0) {
+        appState.riwayat[0].skorErat = appState.skorErat;
+        if (note) appState.riwayat[0].catatan = note;
+      }
+
+      document.getElementById('note-input').value = '';
+      renderVisuals();
+      triggerSqueezeAnimation();
+      spawnParticles(appState.skorErat >= MAX_WARMTH_LEVEL ? 16 : 8);
+      if (navigator.vibrate) navigator.vibrate(appState.skorErat >= MAX_WARMTH_LEVEL ? [50, 30, 80] : 40);
+
+      showToast(
+        appState.skorErat >= MAX_WARMTH_LEVEL
+          ? `MAX Lv.${MAX_WARMTH_LEVEL}! Gugus Cinta konstelasi utuh bersinar 💖`
+          : `Lv.${appState.skorErat}/${MAX_WARMTH_LEVEL} • ${getWarmthLabel(appState.skorErat)} ✨`
+      );
+
+      await syncToSheet({
+        status: 'ERATKAN',
+        skorErat: appState.skorErat,
+        catatan: note
+      });
+
+      setTimeout(() => {
+        isSyncing = false;
+        setButtonsLocked(false);
+        renderVisuals();
+      }, 1200);
+    }
+
+    async function partWays() {
+      if (isSyncing || appState.status === 'TERPISAH') return;
+      isSyncing = true;
+      setButtonsLocked(true);
+
+      appState.status = 'TERPISAH';
+      appState.timestamp = new Date().toISOString();
+      renderVisuals();
+      showToast("Hati-hati di jalan... Bintang kita tetap terhubung 🌙");
+
+      await syncToSheet({
+        status: 'TERPISAH',
+        skorErat: appState.skorErat,
+        catatan: 'Pulang / Berpisah'
+      });
+
+      setTimeout(() => {
+        isSyncing = false;
+        setButtonsLocked(false);
+        renderVisuals();
+      }, 1500);
+    }
+
+    async function syncToSheet(payload) {
+      const syncLabel = document.getElementById('sync-status');
+      localStorage.setItem('genggaman_cache', JSON.stringify(appState));
+
+      syncLabel.textContent = "↻ Menyimpan...";
+      try {
+        await fetch(GAS_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        syncLabel.textContent = "● Tersimpan";
+      } catch (e) {
+        syncLabel.textContent = "⚠ Offline";
+      }
+    }
+
+    async function pullLatestState(notifyOnChange = false) {
+      if (isSyncing) return;
+      try {
+        const res = await fetch(`${GAS_URL}?t=${Date.now()}`);
+        const data = await res.json();
+        if (!data || !data.status) return;
+
+        const sig = `${data.status}|${data.timestamp}|${data.skorErat}|${data.totalPertemuan}`;
+        const changed = lastRemoteSignature && sig !== lastRemoteSignature;
+        lastRemoteSignature = sig;
+
+        appState = data;
+        localStorage.setItem('genggaman_cache', JSON.stringify(appState));
+        renderVisuals();
+
+        if (changed && notifyOnChange) {
+          showToast(
+            data.status === 'BERTEMU'
+              ? `Status diperbarui: Sedang bersama (Lv.${data.skorErat}) ✨`
+              : "Status diperbarui: Sedang berjauhan 🌙"
+          );
+        }
+      } catch (err) {
+        // Tetap gunakan cache bila offline
+      }
+    }
+
+    const cached = localStorage.getItem('genggaman_cache');
+    if (cached) {
+      appState = JSON.parse(cached);
+      renderVisuals();
+    }
+
+    initCosmosAndScene();
+    pullLatestState(false);
+
+    setInterval(() => {
+      if (!document.hidden) {
+        renderVisuals();
+      }
+    }, 30000);
+
+    setInterval(() => {
+      if (!document.hidden) {
+        pullLatestState(true);
+      }
+    }, 12000);
+  </script>
+</body>
+</html>
