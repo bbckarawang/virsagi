@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f1024" />
+  <title>Cosmic Mini-Games ✨ Virgo & Sagittarius</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #0b0c1e;
+      --bg-card: rgba(24, 26, 54, 0.82);
+      --accent-pink: #ff7eb3;
+      --accent-purple: #9d7bff;
+      --accent-gold: #ffd166;
+      --accent-mint: #4ade80;
+      --text-main: #f8fafc;
+      --text-muted: #a5b4fc;
+      --border: rgba(165, 180, 252, 0.2);
+      --glow: 0 8px 30px rgba(157, 123, 255, 0.2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(ellipse at top, #1b1e48 0%, #0b0c1e 65%, #070814 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 14px 14px 36px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .stars {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        radial-gradient(1.5px 1.5px at 24px 36px, #ffffff, transparent),
+        radial-gradient(1px 1px at 110px 140px, #ffd166, transparent),
+        radial-gradient(1.5px 1.5px at 200px 75px, #ff7eb3, transparent),
+        radial-gradient(1px 1px at 290px 210px, #ffffff, transparent),
+        radial-gradient(2px 2px at 350px 55px, #a5b4fc, transparent);
+      background-size: 380px 320px;
+      opacity: 0.6;
+      animation: twinkle 6s ease-in-out infinite alternate;
+    }
+    @keyframes twinkle { 0% { opacity: 0.4; } 100% { opacity: 0.8; } }
+
+    .container { max-width: 480px; margin: 0 auto; position: relative; z-index: 2; }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: linear-gradient(135deg, rgba(157, 123, 255, 0.22), rgba(255, 126, 179, 0.18));
+      border: 1px solid var(--border); backdrop-filter: blur(12px);
+      border-radius: 22px; padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--glow);
+    }
+    .back-btn {
+      background: rgba(11, 12, 30, 0.65); color: #fff; border: 1px solid var(--border);
+      border-radius: 14px; padding: 8px 12px; font-family: inherit; font-weight: 800;
+      font-size: 0.76rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+      text-decoration: none; transition: 0.2s;
+    }
+    .back-btn:active { transform: scale(0.96); }
+    .buddy-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(11, 12, 30, 0.5); padding: 6px 11px; border-radius: 999px;
+      border: 1px solid rgba(255, 209, 102, 0.3); font-size: 0.75rem; font-weight: 700;
+    }
+    .buddy-avatar { font-size: 1.25rem; line-height: 1; }
+
+    /* Game Selector */
+    .game-tabs {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px;
+    }
+    .g-tab {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 8px 4px; color: var(--text-muted); font-family: inherit; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      font-size: 0.64rem; font-weight: 700; transition: 0.2s; text-align: center;
+    }
+    .g-tab span.g-ico { font-size: 1.15rem; }
+    .g-tab.active {
+      background: linear-gradient(135deg, rgba(157, 123, 255, 0.35), rgba(255, 126, 179, 0.32));
+      color: #fff; border-color: var(--accent-gold); transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(255, 126, 179, 0.2);
+    }
+
+    /* Main Stage Card */
+    .stage-card {
+      background: var(--bg-card); border: 1px solid var(--border); backdrop-filter: blur(12px);
+      border-radius: 26px; padding: 16px; box-shadow: var(--glow);
+    }
+    .stage-header {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px;
+    }
+    .stage-title { font-size: 1.02rem; font-weight: 800; }
+    .stage-sub { font-size: 0.74rem; color: var(--text-muted); margin-top: 2px; line-height: 1.35; }
+    .hud-row {
+      display: flex; gap: 6px; margin-bottom: 10px;
+    }
+    .hud-box {
+      flex: 1; background: rgba(11, 12, 30, 0.65); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px; padding: 8px 10px; text-align: center;
+    }
+    .hud-box small { display: block; font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; }
+    .hud-box strong { font-size: 0.92rem; color: var(--accent-gold); }
+
+    .arena {
+      position: relative; width: 100%; height: 290px; border-radius: 22px; overflow: hidden;
+      background: radial-gradient(circle at 50% 25%, rgba(157, 123, 255, 0.28), #101336 62%, #070817 100%);
+      border: 1px solid rgba(255,255,255,0.14); margin-bottom: 12px;
+      touch-action: none;
+    }
+
+    .controls-row {
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+    }
+    .ctrl-btn {
+      flex: 1; min-width: 110px; padding: 11px 14px; border: none; border-radius: 15px;
+      font-family: inherit; font-weight: 800; font-size: 0.82rem; cursor: pointer;
+      transition: 0.18s;
+    }
+    .ctrl-btn:active { transform: scale(0.96); }
+    .btn-primary {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899); color: #fff;
+    }
+    .btn-move {
+      background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border);
+      max-width: 90px; min-width: 68px; font-size: 1rem;
+    }
+    .btn-bonus {
+      background: rgba(74, 222, 128, 0.16); color: var(--accent-mint);
+      border: 1px solid rgba(74, 222, 128, 0.4);
+    }
+
+    /* Game 1 & 2 Entities */
+    .entity {
+      position: absolute; font-size: 1.65rem; transform: translate(-50%, -50%);
+      pointer-events: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
+    }
+    .player-avatar {
+      position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+      font-size: 2.55rem; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.5));
+      transition: transform 0.08s ease-out;
+    }
+    .ground-line {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 28px;
+      background: linear-gradient(180deg, rgba(157, 123, 255, 0.22), rgba(11, 12, 30, 0.92));
+      border-top: 1px solid rgba(255, 209, 102, 0.25);
+    }
+
+    /* Game 3: Cosmic Beat */
+    .beat-wrap {
+      height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 14px; gap: 14px;
+    }
+    .sequence-strip {
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; min-height: 44px;
+    }
+    .seq-chip {
+      background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+      border-radius: 12px; padding: 6px 10px; font-size: 1.15rem; transition: 0.2s;
+    }
+    .seq-chip.lit {
+      background: rgba(255, 209, 102, 0.28); border-color: var(--accent-gold);
+      transform: scale(1.18); box-shadow: 0 0 14px rgba(255, 209, 102, 0.45);
+    }
+    .beat-pads {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 260px;
+    }
+    .beat-pad {
+      background: rgba(255,255,255,0.07); border: 1.5px solid var(--border);
+      border-radius: 18px; padding: 14px; font-size: 1.55rem; cursor: pointer;
+      color: #fff; transition: 0.14s;
+    }
+    .beat-pad:active { transform: scale(0.92); background: rgba(255, 126, 179, 0.28); border-color: var(--accent-pink); }
+
+    /* Game 4: Sagittarius Archer */
+    .bow-player {
+      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+      font-size: 2.2rem;
+    }
+    .arrow-proj {
+      position: absolute; font-size: 1.35rem; transform: translate(-50%, -50%) rotate(-45deg);
+      pointer-events: none;
+    }
+    .target-star {
+      position: absolute; font-size: 1.85rem; transform: translate(-50%, -50%);
+      pointer-events: none; filter: drop-shadow(0 0 10px rgba(255, 209, 102, 0.65));
+    }
+
+    /* Game 5: Virgo Match */
+    .match-grid {
+      height: 100%; padding: 14px; display: grid;
+      grid-template-columns: repeat(4, 1fr); gap: 8px; align-content: center;
+    }
+    .m-card {
+      height: 56px; border-radius: 14px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.07); color: var(--accent-gold);
+      font-size: 1.35rem; font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    }
+    .m-card.revealed {
+      background: linear-gradient(135deg, rgba(157, 123, 255, 0.35), rgba(255, 126, 179, 0.3));
+      border-color: var(--accent-pink); color: #fff;
+    }
+    .m-card.matched {
+      background: rgba(74, 222, 128, 0.22); border-color: var(--accent-mint); color: #fff;
+    }
+
+    /* Overlay inside Arena */
+    .arena-overlay {
+      position: absolute; inset: 0; background: rgba(9, 11, 28, 0.78);
+      backdrop-filter: blur(4px); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: 20px; z-index: 8;
+    }
+    .arena-overlay.hidden { display: none; }
+    .arena-overlay h4 { font-size: 1.05rem; font-weight: 800; color: var(--accent-gold); margin-bottom: 6px; }
+    .arena-overlay p { font-size: 0.78rem; color: var(--text-main); max-width: 280px; line-height: 1.45; margin-bottom: 14px; }
+
+    .toast {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-80px);
+      background: #1e2144; color: #fff; border: 1px solid var(--accent-pink);
+      padding: 9px 16px; border-radius: 999px; font-size: 0.78rem; font-weight: 700;
+      z-index: 100; transition: transform 0.3s ease; white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="toast" id="toast">Siap bermain!</div>
+
+  <div class="container">
+    <!-- Top Navigation & Plant Buddy -->
+    <div class="top-bar">
+      <a class="back-btn" href="./car_lendar%20versi%20ok.html" onclick="saveBonusToStorage()">← Kebun</a>
+      <div class="buddy-pill">
+        <span class="buddy-avatar" id="buddyEmoji">🌰</span>
+        <span id="buddyLabel">Gen #1 • Tahap 1</span>
+      </div>
+      <div class="buddy-pill" style="border-color: rgba(74,222,128,0.35); color: var(--accent-mint);">
+        <span>⭐ <strong id="totalFunStars">0</strong></span>
+      </div>
+    </div>
+
+    <!-- 5 Mini-Game Tabs -->
+    <div class="game-tabs">
+      <button class="g-tab active" data-game="dew" onclick="selectGame('dew', this)">
+        <span class="g-ico">💧</span>
+        <span>Embun</span>
+      </button>
+      <button class="g-tab" data-game="hop" onclick="selectGame('hop', this)">
+        <span class="g-ico">☄️</span>
+        <span>Lompat</span>
+      </button>
+      <button class="g-tab" data-game="beat" onclick="selectGame('beat', this)">
+        <span class="g-ico">🎶</span>
+        <span>Ritme</span>
+      </button>
+      <button class="g-tab" data-game="archer" onclick="selectGame('archer', this)">
+        <span class="g-ico">🏹</span>
+        <span>Panah</span>
+      </button>
+      <button class="g-tab" data-game="match" onclick="selectGame('match', this)">
+        <span class="g-ico">🃏</span>
+        <span>Rasi</span>
+      </button>
+    </div>
+
+    <!-- Game Stage -->
+    <div class="stage-card">
+      <div class="stage-header">
+        <div>
+          <div class="stage-title" id="gameTitle">Tangkap Embun & Bintang</div>
+          <div class="stage-sub" id="gameDesc">Geser jari atau pakai tombol kiri/kanan untuk menangkap 💧 & ✨, hindari ⛈️.</div>
+        </div>
+      </div>
+
+      <div class="hud-row">
+        <div class="hud-box">
+          <small>Skor Ronde</small>
+          <strong id="hudScore">0</strong>
+        </div>
+        <div class="hud-box">
+          <small>Rekor</small>
+          <strong id="hudBest">0</strong>
+        </div>
+        <div class="hud-box">
+          <small>Waktu</small>
+          <strong id="hudTime">25s</strong>
+        </div>
+      </div>
+
+      <div class="arena" id="arena">
+        <div class="arena-overlay" id="arenaOverlay">
+          <h4 id="overlayTitle">Siap Main Bareng? ✨</h4>
+          <p id="overlayDesc">Bantu benih kosmik mengumpulkan embun & bintang Virgo-Sagittarius!</p>
+          <button class="ctrl-btn btn-primary" style="max-width:190px;" onclick="startCurrentGame()">▶ Mulai Main</button>
+        </div>
+      </div>
+
+      <div class="controls-row" id="controlsRow">
+        <button class="ctrl-btn btn-move" id="btnLeft" onpointerdown="setMoveDir(-1)" onpointerup="setMoveDir(0)" onpointerleave="setMoveDir(0)">◀</button>
+        <button class="ctrl-btn btn-primary" onclick="startCurrentGame()">Mulai / Ulang</button>
+        <button class="ctrl-btn btn-move" id="btnRight" onpointerdown="setMoveDir(1)" onpointerup="setMoveDir(0)" onpointerleave="setMoveDir(0)">▶</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    let cachedCarelendar = null;
+    try {
+      cachedCarelendar = JSON.parse(localStorage.getItem('carelendar_cosmic_cache') || 'null');
+    } catch (e) {}
+
+    const plantEmoji = params.get('emoji')
+      || (cachedCarelendar && cachedCarelendar.garden && cachedCarelendar.garden.rewards && cachedCarelendar.garden.rewards.displayEmoji)
+      || '🌰';
+    const plantStage = params.get('stage')
+      || (cachedCarelendar && cachedCarelendar.garden && cachedCarelendar.garden.stage)
+      || 1;
+    const plantGen = params.get('gen')
+      || (cachedCarelendar && cachedCarelendar.garden && cachedCarelendar.garden.currentGen)
+      || 1;
+
+    document.getElementById('buddyEmoji').textContent = plantEmoji;
+    document.getElementById('buddyLabel').textContent = `Gen #${plantGen} • Tahap ${plantStage}`;
+
+    let totalStars = Number(localStorage.getItem('cosmic_minigame_stars') || 0);
+    document.getElementById('totalFunStars').textContent = totalStars;
+
+    const bestScores = JSON.parse(localStorage.getItem('cosmic_minigame_best') || '{"dew":0,"hop":0,"beat":0,"archer":0,"match":0}');
+
+    const GAME_META = {
+      dew: {
+        title: '💧 Tangkap Embun & Bintang',
+        desc: 'Geser tanaman ke kiri/kanan untuk menangkap 💧 (+10) & ✨ (+20), hindari ⛈️!',
+        duration: 25,
+        startText: 'Tangkap embun & bintang sebanyak mungkin sebelum waktu habis!'
+      },
+      hop: {
+        title: '☄️ Lompat Rasi Bintang',
+        desc: 'Tap area arena atau tekan Lompat untuk melompati meteor ☄️ yang meluncur!',
+        duration: 25,
+        startText: 'Atur waktu lompatmu agar tidak terkena meteor kosmik!'
+      },
+      beat: {
+        title: '🎶 Ketuk Ritme Virgo & Sagittarius',
+        desc: 'Perhatikan urutan simbol kosmik yang menyala, lalu ketuk ulang sesuai urutan!',
+        duration: 30,
+        startText: 'Ingat pola ♍, ♐, 🌸, ⭐ lalu ketuk dengan tepat!'
+      },
+      archer: {
+        title: '🏹 Panah Sagittarius',
+        desc: 'Geser pemanah lalu tap/tembak bintang bergerak 🌟 & 🎯 sebelum waktu habis!',
+        duration: 25,
+        startText: 'Tunjukkan akurasi panah Sagittarius untuk mengenai bintang!'
+      },
+      match: {
+        title: '🃏 Pasangan Rasi Virgo',
+        desc: 'Temukan semua pasangan simbol kosmik secepat mungkin sebelum waktu habis!',
+        duration: 35,
+        startText: 'Cocokkan 6 pasang kartu rasi & bunga kosmik!'
+      }
+    };
+
+    let currentGame = 'dew';
+    let score = 0;
+    let timeLeft = 25;
+    let isPlaying = false;
+    let rafId = null;
+    let timerInterval = null;
+    let moveDir = 0;
+    let lastFrameTime = 0;
+
+    // Web Audio Sound Effects
+    let audioCtx = null;
+    function playSfx(kind) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!audioCtx) audioCtx = new Ctx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      if (kind === 'point') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(660, now);
+        osc.frequency.exponentialRampToValueAtTime(990, now + 0.11);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.14);
+      } else if (kind === 'jump') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(340, now);
+        osc.frequency.exponentialRampToValueAtTime(680, now + 0.14);
+        gain.gain.setValueAtTime(0.16, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.16);
+      } else if (kind === 'hit') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(95, now + 0.18);
+        gain.gain.setValueAtTime(0.14, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.21);
+      } else if (kind === 'win') {
+        [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.frequency.setValueAtTime(f, now + i * 0.08);
+          g.gain.setValueAtTime(0.15, now + i * 0.08);
+          g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.2);
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start(now + i * 0.08); o.stop(now + i * 0.08 + 0.21);
+        });
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2300);
+    }
+
+    function selectGame(gameKey, btnEl) {
+      stopLoops();
+      isPlaying = false;
+      currentGame = gameKey;
+      document.querySelectorAll('.g-tab').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      const meta = GAME_META[gameKey];
+      document.getElementById('gameTitle').textContent = meta.title;
+      document.getElementById('gameDesc').textContent = meta.desc;
+      score = 0;
+      timeLeft = meta.duration;
+      updateHud();
+      renderControls(gameKey);
+      preparePreviewArena(gameKey);
+      showOverlay(meta.title, meta.startText, '▶ Mulai Main');
+    }
+
+    function renderControls(gameKey) {
+      const row = document.getElementById('controlsRow');
+      if (gameKey === 'dew' || gameKey === 'archer') {
+        row.innerHTML = `
+          <button class="ctrl-btn btn-move" onpointerdown="setMoveDir(-1)" onpointerup="setMoveDir(0)" onpointerleave="setMoveDir(0)">◀</button>
+          <button class="ctrl-btn btn-primary" onclick="startCurrentGame()">Mulai / Ulang</button>
+          <button class="ctrl-btn btn-move" onpointerdown="setMoveDir(1)" onpointerup="setMoveDir(0)" onpointerleave="setMoveDir(0)">▶</button>
+        `;
+      } else if (gameKey === 'hop') {
+        row.innerHTML = `
+          <button class="ctrl-btn btn-bonus" onclick="triggerHop()">🦘 Lompat!</button>
+          <button class="ctrl-btn btn-primary" onclick="startCurrentGame()">Mulai / Ulang</button>
+        `;
+      } else {
+        row.innerHTML = `
+          <button class="ctrl-btn btn-primary" onclick="startCurrentGame()">Mulai / Ulang Ronde</button>
+        `;
+      }
+    }
+
+    function setMoveDir(dir) {
+      moveDir = dir;
+    }
+
+    function showOverlay(title, desc, btnLabel) {
+      const ov = document.getElementById('arenaOverlay');
+      document.getElementById('overlayTitle').textContent = title;
+      document.getElementById('overlayDesc').textContent = desc;
+      ov.querySelector('button').textContent = btnLabel;
+      ov.classList.remove('hidden');
+    }
+
+    function hideOverlay() {
+      document.getElementById('arenaOverlay').classList.add('hidden');
+    }
+
+    function updateHud() {
+      document.getElementById('hudScore').textContent = score;
+      document.getElementById('hudBest').textContent = bestScores[currentGame] || 0;
+      document.getElementById('hudTime').textContent = `${timeLeft}s`;
+    }
+
+    function stopLoops() {
+      if (rafId) cancelAnimationFrame(rafId);
+      if (timerInterval) clearInterval(timerInterval);
+      rafId = null;
+      timerInterval = null;
+    }
+
+    function preparePreviewArena(gameKey) {
+      const arena = document.getElementById('arena');
+      const overlay = document.getElementById('arenaOverlay');
+      arena.innerHTML = '';
+      arena.appendChild(overlay);
+
+      if (gameKey === 'dew' || gameKey === 'hop') {
+        arena.innerHTML += `<div class="ground-line"></div><div class="player-avatar" id="playerEl">${plantEmoji}</div>`;
+      } else if (gameKey === 'archer') {
+        arena.innerHTML += `<div class="bow-player" id="bowEl">🏹</div>`;
+      } else if (gameKey === 'beat') {
+        arena.innerHTML += `
+          <div class="beat-wrap">
+            <div class="sequence-strip" id="seqStrip"></div>
+            <div class="beat-pads">
+              <button class="beat-pad" onclick="pressBeat('♍')">♍</button>
+              <button class="beat-pad" onclick="pressBeat('♐')">♐</button>
+              <button class="beat-pad" onclick="pressBeat('🌸')">🌸</button>
+              <button class="beat-pad" onclick="pressBeat('⭐')">⭐</button>
+            </div>
+          </div>`;
+      } else if (gameKey === 'match') {
+        arena.innerHTML += `<div class="match-grid" id="matchGrid"></div>`;
+      }
+      arena.appendChild(overlay);
+    }
+
+    function startCurrentGame() {
+      stopLoops();
+      hideOverlay();
+      const meta = GAME_META[currentGame];
+      score = 0;
+      timeLeft = meta.duration;
+      isPlaying = true;
+      lastFrameTime = performance.now();
+      updateHud();
+      preparePreviewArena(currentGame);
+
+      timerInterval = setInterval(() => {
+        if (!isPlaying) return;
+        timeLeft--;
+        updateHud();
+        if (timeLeft <= 0) {
+          finishGame();
+        }
+      }, 1000);
+
+      if (currentGame === 'dew') initDewGame();
+      else if (currentGame === 'hop') initHopGame();
+      else if (currentGame === 'beat') initBeatGame();
+      else if (currentGame === 'archer') initArcherGame();
+      else if (currentGame === 'match') initMatchGame();
+    }
+
+    function addScore(pts) {
+      score += pts;
+      if (score > (bestScores[currentGame] || 0)) {
+        bestScores[currentGame] = score;
+        localStorage.setItem('cosmic_minigame_best', JSON.stringify(bestScores));
+      }
+      updateHud();
+    }
+
+    function finishGame() {
+      isPlaying = false;
+      stopLoops();
+      playSfx('win');
+      const earnedStars = Math.max(1, Math.floor(score / 25));
+      totalStars += earnedStars;
+      localStorage.setItem('cosmic_minigame_stars', String(totalStars));
+      document.getElementById('totalFunStars').textContent = totalStars;
+      showToast(`+${earnedStars} Bintang Kosmik terkumpul! ✨`);
+      showOverlay(
+        'Ronde Selesai! 🌟',
+        `Skor kamu: ${score} • Dapat +${earnedStars} ⭐ untuk ${plantEmoji}!`,
+        'Main Lagi'
+      );
+    }
+
+    // ==========================================
+    // 1. TANGKAP EMBUN & BINTANG
+    // ==========================================
+    let dewState = {};
+    function initDewGame() {
+      const arena = document.getElementById('arena');
+      const player = document.getElementById('playerEl');
+      dewState = { x: arena.clientWidth / 2, drops: [], spawnTimer: 0 };
+
+      const onPointerMove = (e) => {
+        if (!isPlaying) return;
+        const rect = arena.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        dewState.x = Math.max(26, Math.min(rect.width - 26, clientX - rect.left));
+      };
+      arena.onpointermove = onPointerMove;
+      arena.ontouchmove = onPointerMove;
+
+      function loop(now) {
+        if (!isPlaying) return;
+        const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+        lastFrameTime = now;
+        const w = arena.clientWidth;
+        const h = arena.clientHeight;
+
+        dewState.x += moveDir * 270 * dt;
+        dewState.x = Math.max(26, Math.min(w - 26, dewState.x));
+        player.style.left = `${dewState.x}px`;
+
+        dewState.spawnTimer -= dt;
+        if (dewState.spawnTimer <= 0) {
+          dewState.spawnTimer = 0.55;
+          const r = Math.random();
+          const kind = r < 0.24 ? 'storm' : (r < 0.65 ? 'dew' : 'star');
+          const icon = kind === 'storm' ? '⛈️' : (kind === 'dew' ? '💧' : '✨');
+          const el = document.createElement('div');
+          el.className = 'entity';
+          el.textContent = icon;
+          const item = {
+            el, kind,
+            x: 24 + Math.random() * Math.max(40, w - 48),
+            y: -16,
+            vy: 125 + Math.random() * 85
+          };
+          arena.appendChild(el);
+          dewState.drops.push(item);
+        }
+
+        const py = h - 46;
+        for (let i = dewState.drops.length - 1; i >= 0; i--) {
+          const d = dewState.drops[i];
+          d.y += d.vy * dt;
+          d.el.style.left = `${d.x}px`;
+          d.el.style.top = `${d.y}px`;
+
+          const hit = Math.abs(d.x - dewState.x) < 34 && Math.abs(d.y - py) < 32;
+          if (hit) {
+            if (d.kind === 'storm') {
+              playSfx('hit');
+              addScore(-10);
+              player.style.transform = 'translateX(-50%) scale(0.84)';
+            } else {
+              playSfx('point');
+              addScore(d.kind === 'star' ? 20 : 10);
+              player.style.transform = 'translateX(-50%) scale(1.18)';
+            }
+            setTimeout(() => { if (player) player.style.transform = 'translateX(-50%) scale(1)'; }, 120);
+            d.el.remove();
+            dewState.drops.splice(i, 1);
+            continue;
+          }
+
+          if (d.y > h + 24) {
+            d.el.remove();
+            dewState.drops.splice(i, 1);
+          }
+        }
+        rafId = requestAnimationFrame(loop);
+      }
+      rafId = requestAnimationFrame(loop);
+    }
+
+    // ==========================================
+    // 2. LOMPAT RASI BINTANG
+    // ==========================================
+    let hopState = {};
+    function initHopGame() {
+      const arena = document.getElementById('arena');
+      const player = document.getElementById('playerEl');
+      hopState = { y: 0, vy: 0, rocks: [], spawnTimer: 0.9 };
+
+      arena.onclick = () => { if (isPlaying) triggerHop(); };
+
+      function loop(now) {
+        if (!isPlaying) return;
+        const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+        lastFrameTime = now;
+        const w = arena.clientWidth;
+
+        if (hopState.y > 0 || hopState.vy > 0) {
+          hopState.vy -= 1150 * dt;
+          hopState.y += hopState.vy * dt;
+          if (hopState.y <= 0) {
+            hopState.y = 0;
+            hopState.vy = 0;
+          }
+        }
+        player.style.bottom = `${26 + hopState.y}px`;
+
+        hopState.spawnTimer -= dt;
+        if (hopState.spawnTimer <= 0) {
+          hopState.spawnTimer = 1.05 + Math.random() * 0.65;
+          const el = document.createElement('div');
+          el.className = 'entity';
+          el.textContent = Math.random() < 0.75 ? '☄️' : '🌟';
+          const isBonus = el.textContent === '🌟';
+          const rock = { el, x: w + 24, isBonus, passed: false, airOffset: isBonus ? 52 : 0 };
+          el.style.bottom = `${34 + rock.airOffset}px`;
+          arena.appendChild(el);
+          hopState.rocks.push(rock);
+        }
+
+        const px = 72;
+        for (let i = hopState.rocks.length - 1; i >= 0; i--) {
+          const rk = hopState.rocks[i];
+          rk.x -= 235 * dt;
+          rk.el.style.left = `${rk.x}px`;
+
+          const dx = Math.abs(rk.x - px);
+          if (dx < 26) {
+            if (rk.isBonus && hopState.y > 22) {
+              playSfx('point');
+              addScore(25);
+              rk.el.remove();
+              hopState.rocks.splice(i, 1);
+              continue;
+            } else if (!rk.isBonus && hopState.y < 30) {
+              playSfx('hit');
+              addScore(-10);
+              rk.el.remove();
+              hopState.rocks.splice(i, 1);
+              continue;
+            }
+          }
+
+          if (!rk.passed && rk.x < px - 26) {
+            rk.passed = true;
+            if (!rk.isBonus) {
+              playSfx('point');
+              addScore(10);
+            }
+          }
+
+          if (rk.x < -30) {
+            rk.el.remove();
+            hopState.rocks.splice(i, 1);
+          }
+        }
+        rafId = requestAnimationFrame(loop);
+      }
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function triggerHop() {
+      if (!isPlaying || currentGame !== 'hop' || !hopState) return;
+      if (hopState.y <= 2) {
+        playSfx('jump');
+        hopState.vy = 450;
+      }
+    }
+
+    // ==========================================
+    // 3. KETUK RITME KOSMIK
+    // ==========================================
+    const BEAT_SYMBOLS = ['♍', '♐', '🌸', '⭐'];
+    let beatState = { seq: [], idx: 0, showing: false };
+
+    function initBeatGame() {
+      nextBeatRound();
+    }
+
+    function nextBeatRound() {
+      if (!isPlaying) return;
+      const len = Math.min(6, 3 + Math.floor(score / 30));
+      beatState.seq = Array.from({ length: len }, () => BEAT_SYMBOLS[Math.floor(Math.random() * BEAT_SYMBOLS.length)]);
+      beatState.idx = 0;
+      beatState.showing = true;
+
+      const strip = document.getElementById('seqStrip');
+      strip.innerHTML = beatState.seq.map((s, i) => `<div class="seq-chip" id="bchip-${i}">${s}</div>`).join('');
+
+      beatState.seq.forEach((_, i) => {
+        setTimeout(() => {
+          if (!isPlaying || currentGame !== 'beat') return;
+          const chip = document.getElementById(`bchip-${i}`);
+          if (chip) {
+            chip.classList.add('lit');
+            playSfx('point');
+            setTimeout(() => chip.classList.remove('lit'), 260);
+          }
+          if (i === beatState.seq.length - 1) {
+            setTimeout(() => { beatState.showing = false; }, 320);
+          }
+        }, i * 440);
+      });
+    }
+
+    function pressBeat(sym) {
+      if (!isPlaying || currentGame !== 'beat' || beatState.showing) return;
+      const expected = beatState.seq[beatState.idx];
+      if (sym === expected) {
+        playSfx('point');
+        const chip = document.getElementById(`bchip-${beatState.idx}`);
+        if (chip) chip.style.borderColor = '#4ade80';
+        beatState.idx++;
+        if (beatState.idx >= beatState.seq.length) {
+          addScore(15);
+          setTimeout(nextBeatRound, 260);
+        }
+      } else {
+        playSfx('hit');
+        addScore(-5);
+        beatState.idx = 0;
+        showToast("Ups, ulangi polanya ya!");
+      }
+    }
+
+    // ==========================================
+    // 4. PANAH SAGITTARIUS
+    // ==========================================
+    let archerState = {};
+    function initArcherGame() {
+      const arena = document.getElementById('arena');
+      const bow = document.getElementById('bowEl');
+      const w = arena.clientWidth;
+      const targetEl = document.createElement('div');
+      targetEl.className = 'target-star';
+      targetEl.textContent = '🌟';
+      arena.appendChild(targetEl);
+
+      archerState = {
+        bx: w / 2,
+        tx: w / 2,
+        ty: 62,
+        tDir: 1,
+        arrows: [],
+        cooldown: 0
+      };
+
+      arena.onclick = (e) => {
+        if (!isPlaying) return;
+        const rect = arena.getBoundingClientRect();
+        archerState.bx = Math.max(28, Math.min(rect.width - 28, e.clientX - rect.left));
+        shootArrow();
+      };
+
+      function loop(now) {
+        if (!isPlaying) return;
+        const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+        lastFrameTime = now;
+        const cw = arena.clientWidth;
+
+        archerState.bx += moveDir * 260 * dt;
+        archerState.bx = Math.max(28, Math.min(cw - 28, archerState.bx));
+        bow.style.left = `${archerState.bx}px`;
+
+        archerState.tx += archerState.tDir * 145 * dt;
+        if (archerState.tx > cw - 34) { archerState.tx = cw - 34; archerState.tDir = -1; }
+        if (archerState.tx < 34) { archerState.tx = 34; archerState.tDir = 1; }
+        targetEl.style.left = `${archerState.tx}px`;
+        targetEl.style.top = `${archerState.ty}px`;
+
+        archerState.cooldown = Math.max(0, archerState.cooldown - dt);
+
+        for (let i = archerState.arrows.length - 1; i >= 0; i--) {
+          const ar = archerState.arrows[i];
+          ar.y -= 390 * dt;
+          ar.el.style.left = `${ar.x}px`;
+          ar.el.style.top = `${ar.y}px`;
+
+          const dist = Math.hypot(ar.x - archerState.tx, ar.y - archerState.ty);
+          if (dist < 28) {
+            playSfx('point');
+            addScore(15);
+            targetEl.textContent = targetEl.textContent === '🌟' ? '🎯' : '🌟';
+            ar.el.remove();
+            archerState.arrows.splice(i, 1);
+            continue;
+          }
+
+          if (ar.y < -20) {
+            ar.el.remove();
+            archerState.arrows.splice(i, 1);
+          }
+        }
+        rafId = requestAnimationFrame(loop);
+      }
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function shootArrow() {
+      if (!isPlaying || currentGame !== 'archer' || archerState.cooldown > 0) return;
+      archerState.cooldown = 0.25;
+      playSfx('jump');
+      const arena = document.getElementById('arena');
+      const el = document.createElement('div');
+      el.className = 'arrow-proj';
+      el.textContent = '🏹';
+      const ar = { el, x: archerState.bx, y: arena.clientHeight - 48 };
+      arena.appendChild(el);
+      archerState.arrows.push(ar);
+    }
+
+    // ==========================================
+    // 5. PASANGAN RASI VIRGO
+    // ==========================================
+    let matchState = { opened: [], matchedCount: 0, lock: false };
+    function initMatchGame() {
+      const pairs = ['♍', '♐', '🌙', '🌸', '✨', '🏹'];
+      const deck = [...pairs, ...pairs].sort(() => Math.random() - 0.5);
+      matchState = { opened: [], matchedCount: 0, lock: false };
+
+      const grid = document.getElementById('matchGrid');
+      grid.innerHTML = deck.map((sym, idx) => `
+        <button class="m-card" data-idx="${idx}" data-sym="${sym}" onclick="flipMatchCard(this)">✦</button>
+      `).join('');
+    }
+
+    function flipMatchCard(cardEl) {
+      if (!isPlaying || currentGame !== 'match' || matchState.lock) return;
+      if (cardEl.classList.contains('revealed') || cardEl.classList.contains('matched')) return;
+
+      playSfx('point');
+      cardEl.classList.add('revealed');
+      cardEl.textContent = cardEl.dataset.sym;
+      matchState.opened.push(cardEl);
+
+      if (matchState.opened.length === 2) {
+        const [a, b] = matchState.opened;
+        if (a.dataset.sym === b.dataset.sym) {
+          a.classList.add('matched');
+          b.classList.add('matched');
+          matchState.opened = [];
+          matchState.matchedCount += 2;
+          addScore(20);
+          if (matchState.matchedCount === 12) {
+            addScore(timeLeft * 2);
+            finishGame();
+          }
+        } else {
+          matchState.lock = true;
+          playSfx('hit');
+          setTimeout(() => {
+            a.classList.remove('revealed');
+            b.classList.remove('revealed');
+            a.textContent = '✦';
+            b.textContent = '✦';
+            matchState.opened = [];
+            matchState.lock = false;
+          }, 520);
+        }
+      }
+    }
+
+    function saveBonusToStorage() {
+      localStorage.setItem('cosmic_minigame_stars', String(totalStars));
+    }
+
+    // Init default preview
+    renderControls('dew');
+    preparePreviewArena('dew');
+    updateHud();
+  </script>
+</body>
+</html>
