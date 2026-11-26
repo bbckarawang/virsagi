@@ -41,7 +41,7 @@
     .app-shell {
       max-width: 780px;
       margin: 0 auto;
-      padding: 16px 16px 40px;
+      padding: 14px 14px 40px;
     }
 
     .top-brand {
@@ -50,10 +50,10 @@
       justify-content: space-between;
       gap: 12px;
       padding: 12px 16px;
-      background: rgba(16, 24, 46, 0.88);
+      background: rgba(16, 24, 46, 0.9);
       border: 1px solid var(--gold-border);
       border-radius: var(--radius);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .brand-title {
@@ -65,7 +65,7 @@
 
     .brand-sub {
       margin: 2px 0 0;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
     }
 
@@ -74,12 +74,12 @@
       border: 1px solid var(--gold-border);
       background: var(--bg-card);
       color: var(--text-main);
-      padding: 8px 13px;
+      padding: 8px 12px;
       border-radius: 11px;
-      font-size: 0.85rem;
+      font-size: 0.83rem;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+      transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
     }
 
     .btn:hover {
@@ -89,6 +89,12 @@
 
     .btn:active {
       transform: scale(0.97);
+    }
+
+    .btn.active-pill {
+      background: var(--gold);
+      color: #141006;
+      border-color: var(--gold);
     }
 
     .btn-gold {
@@ -105,7 +111,7 @@
     .arcade-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      gap: 11px;
     }
 
     @media (min-width: 600px) {
@@ -119,7 +125,7 @@
       flex-direction: column;
       justify-content: space-between;
       text-align: left;
-      padding: 14px;
+      padding: 13px;
       background: var(--bg-panel);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius);
@@ -141,12 +147,12 @@
     }
 
     .game-icon {
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       line-height: 1;
     }
 
     .game-num {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
       color: var(--gold);
       background: var(--gold-soft);
@@ -156,14 +162,14 @@
 
     .game-name {
       margin: 0 0 4px;
-      font-size: 0.98rem;
+      font-size: 0.96rem;
       font-weight: 700;
       color: var(--text-main);
     }
 
     .game-desc {
       margin: 0 0 10px;
-      font-size: 0.78rem;
+      font-size: 0.77rem;
       color: var(--text-muted);
       line-height: 1.35;
     }
@@ -180,7 +186,7 @@
       background: var(--bg-panel);
       border: 1px solid var(--gold-border);
       border-radius: var(--radius);
-      padding: 14px;
+      padding: 12px;
     }
 
     .stage-wrap.active {
@@ -193,7 +199,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
       margin-bottom: 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
@@ -206,12 +212,12 @@
 
     .stage-title {
       margin: 0;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       color: var(--gold);
     }
 
     .stage-stats {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: var(--accent-cyan);
       font-weight: 600;
     }
@@ -227,10 +233,10 @@
       margin-bottom: 12px;
       padding: 10px 12px;
       border-radius: 12px;
-      background: rgba(245, 185, 66, 0.14);
+      background: rgba(245, 185, 66, 0.15);
       border: 1px solid var(--gold-border);
       color: var(--text-main);
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
@@ -245,7 +251,8 @@
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      min-height: 280px;
+      min-height: 290px;
+      width: 100%;
     }
 
     .hint-text {
@@ -253,32 +260,69 @@
       font-size: 0.78rem;
       color: var(--text-muted);
       text-align: center;
+      line-height: 1.4;
     }
 
     canvas.game-canvas {
       max-width: 100%;
       border-radius: 12px;
       background: #090e1c;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       touch-action: none;
+      display: block;
     }
 
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    /* Tetris Full-Width Controls */
+    .tetris-controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      width: 100%;
+    }
+
+    .tetris-btn {
+      height: 54px;
+      border-radius: 12px;
+      border: 1px solid var(--gold-border);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .tetris-btn:active {
+      background: var(--gold);
+      color: #111;
+    }
+
+    /* Snake D-Pad */
     .pad-grid {
       display: grid;
-      grid-template-columns: repeat(3, 52px);
-      gap: 6px;
+      grid-template-columns: repeat(3, 62px);
+      gap: 8px;
       justify-content: center;
     }
 
     .pad-btn {
-      height: 44px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      height: 50px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
       background: var(--bg-card);
       color: var(--text-main);
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       font-weight: 700;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     .pad-btn:active {
@@ -291,28 +335,32 @@
       flex-wrap: wrap;
       gap: 8px;
       justify-content: center;
+      width: 100%;
     }
 
-    /* Sliding Puzzle */
+    /* Sliding Puzzle Multi-Level */
     .slide-board {
       display: grid;
-      grid-template-columns: repeat(3, 76px);
-      gap: 8px;
+      gap: 6px;
       padding: 10px;
+      width: min(100%, 340px);
+      aspect-ratio: 1 / 1;
       background: #0a1020;
       border-radius: 14px;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .slide-tile {
-      height: 76px;
       border-radius: 10px;
       border: 1px solid var(--gold-border);
       background: var(--bg-card);
       color: var(--gold);
-      font-size: 1.35rem;
       font-weight: 800;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
     }
 
     .slide-tile.empty {
@@ -321,65 +369,106 @@
       cursor: default;
     }
 
-    /* Solitaire */
-    .sol-top {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
+    /* Solitaire PC-Style Table */
+    .sol-table {
       width: 100%;
+      background: radial-gradient(circle at 50% 20%, #144d38, #0c2e22 85%);
+      border: 1px solid rgba(245, 185, 66, 0.32);
+      border-radius: 14px;
+      padding: 10px 8px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      user-select: none;
     }
 
-    .sol-card {
-      min-width: 52px;
-      padding: 7px 9px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      background: #f8fafc;
-      color: #0f172a;
-      font-size: 0.8rem;
+    .sol-top-row {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 5px;
+      align-items: center;
+    }
+
+    .sol-slot {
+      aspect-ratio: 2.4 / 3.3;
+      border-radius: 7px;
+      border: 1px dashed rgba(255, 255, 255, 0.28);
+      background: rgba(0, 0, 0, 0.22);
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 0.78rem;
       font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      text-align: center;
+      padding: 0;
     }
 
-    .sol-card.red {
+    .sol-card-face {
+      aspect-ratio: 2.4 / 3.3;
+      width: 100%;
+      border-radius: 7px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #0f172a;
+      font-weight: 800;
+      cursor: pointer;
+      padding: 3px 4px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+      position: relative;
+      text-align: left;
+    }
+
+    .sol-card-face.red {
       color: #dc2626;
     }
 
-    .sol-card.back {
-      background: linear-gradient(135deg, #1d3557, #2b4c7e);
+    .sol-card-face.back {
+      background: linear-gradient(135deg, #1e3a8a, #312e81);
+      border-color: rgba(245, 185, 66, 0.5);
       color: var(--gold);
-      border-color: var(--gold-border);
+      align-items: center;
+      justify-content: center;
     }
 
-    .sol-card.selected {
+    .sol-card-face.selected {
       outline: 3px solid var(--gold);
+      transform: translateY(-2px);
+      z-index: 20 !important;
     }
 
-    .sol-tableau {
+    .sol-corner {
+      font-size: 0.74rem;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .sol-center-suit {
+      font-size: 1.05rem;
+      align-self: center;
+      opacity: 0.85;
+    }
+
+    .sol-tableau-grid {
       display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 6px;
-      width: 100%;
+      gap: 5px;
       align-items: start;
+      min-height: 250px;
     }
 
-    .sol-col {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-height: 90px;
-      padding: 4px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.03);
+    .sol-stack-col {
+      position: relative;
+      min-height: 95px;
     }
 
-    .sol-col .sol-card {
-      min-width: 0;
-      width: 100%;
-      padding: 6px 2px;
-      font-size: 0.72rem;
+    .sol-stack-item {
+      position: absolute;
+      left: 0;
+      right: 0;
     }
 
     /* Minesweeper */
@@ -415,38 +504,15 @@
       color: var(--gold);
     }
 
-    /* Tangram */
-    .tangram-board {
-      display: grid;
-      grid-template-columns: repeat(4, 60px);
-      gap: 6px;
-      padding: 10px;
-      background: #0a1020;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .tang-cell {
-      width: 60px;
-      height: 60px;
-      border-radius: 9px;
-      border: 1px dashed rgba(245, 185, 66, 0.35);
-      background: rgba(255, 255, 255, 0.03);
-      color: #0b1020;
-      font-size: 0.75rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
     /* Pattern Memory */
     .simon-grid {
       display: grid;
-      grid-template-columns: repeat(2, 110px);
+      grid-template-columns: repeat(2, 115px);
       gap: 12px;
     }
 
     .simon-pad {
-      height: 110px;
+      height: 115px;
       border-radius: 16px;
       border: 2px solid rgba(255, 255, 255, 0.16);
       opacity: 0.65;
@@ -461,39 +527,6 @@
       opacity: 1;
       transform: scale(1.04);
       box-shadow: 0 0 22px rgba(255, 255, 255, 0.45);
-    }
-
-    /* GG Merge */
-    .merge-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 64px);
-      gap: 8px;
-      padding: 10px;
-      background: #0a1020;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .merge-cell {
-      width: 64px;
-      height: 64px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: var(--bg-card);
-      color: var(--text-main);
-      font-size: 0.85rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-    }
-
-    .merge-cell.selected {
-      outline: 3px solid var(--gold);
-      transform: scale(1.04);
     }
   </style>
 </head>
@@ -539,7 +572,7 @@
      * 1. SHARED CORE (Namespace Tunggal + Isolasi Storage + Web Audio SFX)
      */
     const VirSagiArcade = (() => {
-      const STORAGE_PREFIX = "virsagi_arcade_v1_";
+      const STORAGE_PREFIX = "virsagi_arcade_v2_";
       let soundEnabled = true;
       let audioCtx = null;
       let activeGameId = null;
@@ -576,9 +609,7 @@
       function writeStorage(gameId, subKey, value) {
         try {
           localStorage.setItem(makeKey(gameId, subKey), JSON.stringify(value));
-        } catch (_) {
-          // Abaikan bila storage penuh/diblokir
-        }
+        } catch (_) {}
       }
 
       function playTone(freq = 520, duration = 0.08, type = "sine") {
@@ -594,15 +625,13 @@
           const gain = audioCtx.createGain();
           osc.type = type;
           osc.frequency.value = freq;
-          gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.075, audioCtx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
           osc.connect(gain);
           gain.connect(audioCtx.destination);
           osc.start();
           osc.stop(audioCtx.currentTime + duration);
-        } catch (_) {
-          // Abaikan error audio pada browser ketat
-        }
+        } catch (_) {}
       }
 
       function setStats(text) {
@@ -740,82 +769,113 @@
     })();
 
     /**
-     * 2. MODUL 10 GAME SOLO (Masing-masing terisolasi di VirSagiArcade.Games)
+     * 2. MODUL 10 GAME SOLO
      */
 
-    // #01 SLIDING PUZZLE (3x3)
+    // #01 SLIDING PUZZLE (Easy 3x3, Medium 4x4, Hard 5x5)
     VirSagiArcade.Games.sliding = (() => {
       const ID = "sliding";
+      const LEVELS = [
+        { key: "easy", label: "Easy (3×3)", size: 3, basePts: 1000 },
+        { key: "medium", label: "Medium (4×4)", size: 4, basePts: 2500 },
+        { key: "hard", label: "Hard (5×5)", size: 5, basePts: 5000 }
+      ];
+      let levelIdx = 0;
       let tiles = [];
       let moves = 0;
       let boardEl = null;
+      let levelBtns = [];
 
-      function isSolvable(arr) {
-        const nums = arr.filter((n) => n !== 0);
-        let inv = 0;
-        for (let i = 0; i < nums.length; i++) {
-          for (let j = i + 1; j < nums.length; j++) {
-            if (nums[i] > nums[j]) inv++;
-          }
-        }
-        return inv % 2 === 0;
+      function getSize() {
+        return LEVELS[levelIdx].size;
       }
 
       function isSolved(arr) {
-        for (let i = 0; i < 8; i++) {
+        const total = arr.length;
+        for (let i = 0; i < total - 1; i++) {
           if (arr[i] !== i + 1) return false;
         }
-        return arr[8] === 0;
+        return arr[total - 1] === 0;
       }
 
+      // Acak melalui langkah valid dari kondisi terpecahkan agar 100% solvable di semua ukuran
       function shuffleBoard() {
-        let candidate;
-        do {
-          candidate = [1, 2, 3, 4, 5, 6, 7, 8, 0];
-          for (let i = candidate.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [candidate[i], candidate[j]] = [candidate[j], candidate[i]];
-          }
-        } while (!isSolvable(candidate) || isSolved(candidate));
-        tiles = candidate;
+        const size = getSize();
+        const total = size * size;
+        tiles = Array.from({ length: total }, (_, i) => (i === total - 1 ? 0 : i + 1));
+        let emptyIdx = total - 1;
+        let prevIdx = -1;
+        const scrambleSteps = size === 3 ? 65 : size === 4 ? 150 : 280;
+
+        for (let s = 0; s < scrambleSteps; s++) {
+          const r = Math.floor(emptyIdx / size);
+          const c = emptyIdx % size;
+          const neighbors = [];
+          if (r > 0) neighbors.push(emptyIdx - size);
+          if (r < size - 1) neighbors.push(emptyIdx + size);
+          if (c > 0) neighbors.push(emptyIdx - 1);
+          if (c < size - 1) neighbors.push(emptyIdx + 1);
+          const filtered = neighbors.filter((n) => n !== prevIdx);
+          const pick = filtered[Math.floor(Math.random() * filtered.length)];
+          [tiles[emptyIdx], tiles[pick]] = [tiles[pick], tiles[emptyIdx]];
+          prevIdx = emptyIdx;
+          emptyIdx = pick;
+        }
+
+        if (isSolved(tiles)) {
+          [tiles[total - 2], tiles[total - 1]] = [tiles[total - 1], tiles[total - 2]];
+        }
         moves = 0;
         VirSagiArcade.hideBanner();
         render();
       }
 
       function tryMove(idx) {
+        const size = getSize();
         const emptyIdx = tiles.indexOf(0);
-        const r1 = Math.floor(idx / 3);
-        const c1 = idx % 3;
-        const r2 = Math.floor(emptyIdx / 3);
-        const c2 = emptyIdx % 3;
+        const r1 = Math.floor(idx / size);
+        const c1 = idx % size;
+        const r2 = Math.floor(emptyIdx / size);
+        const c2 = emptyIdx % size;
         if (Math.abs(r1 - r2) + Math.abs(c1 - c2) !== 1) return;
 
         [tiles[idx], tiles[emptyIdx]] = [tiles[emptyIdx], tiles[idx]];
         moves++;
-        VirSagiArcade.playTone(580, 0.05, "sine");
+        VirSagiArcade.playTone(580, 0.045, "sine");
         render();
 
         if (isSolved(tiles)) {
-          const score = Math.max(100, 1000 - moves * 10);
+          const lv = LEVELS[levelIdx];
+          const score = Math.max(150, lv.basePts - moves * 8);
           const best = VirSagiArcade.updateBestIfHigher(ID, score);
-          VirSagiArcade.playTone(840, 0.16, "triangle");
+          VirSagiArcade.playTone(860, 0.16, "triangle");
+          const hasNext = levelIdx < LEVELS.length - 1;
           VirSagiArcade.showBanner(
-            `Selesai dalam ${moves} langkah! Skor: ${score} (Rekor: ${best})`,
-            "Acak Baru",
-            shuffleBoard
+            `${lv.label} selesai dalam ${moves} langkah! Skor: ${score} (Rekor: ${best})`,
+            hasNext ? "Lanjut Level Berikutnya" : "Acak Baru",
+            () => {
+              if (hasNext) levelIdx++;
+              shuffleBoard();
+            }
           );
         }
       }
 
       function render() {
+        const size = getSize();
         const best = VirSagiArcade.readStorage(ID, "best", 0);
-        VirSagiArcade.setStats(`Langkah: ${moves} • Rekor: ${best}`);
+        VirSagiArcade.setStats(`${LEVELS[levelIdx].label} • Langkah: ${moves} • Rekor: ${best}`);
+        levelBtns.forEach((b, i) => b.classList.toggle("active-pill", i === levelIdx));
+
+        boardEl.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
         boardEl.innerHTML = "";
+        const fontSize = size === 3 ? "1.35rem" : size === 4 ? "1.1rem" : "0.92rem";
+
         tiles.forEach((val, idx) => {
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = val === 0 ? "slide-tile empty" : "slide-tile";
+          btn.style.fontSize = fontSize;
           btn.textContent = val === 0 ? "" : String(val);
           if (val !== 0) {
             btn.addEventListener("click", () => tryMove(idx));
@@ -825,11 +885,31 @@
       }
 
       function mount(container) {
+        levelBtns = [];
+        const levelBar = document.createElement("div");
+        levelBar.className = "pill-row";
+        LEVELS.forEach((lv, i) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "btn";
+          btn.textContent = lv.label;
+          btn.addEventListener("click", () => {
+            levelIdx = i;
+            VirSagiArcade.playTone(620, 0.05, "triangle");
+            shuffleBoard();
+          });
+          levelBtns.push(btn);
+          levelBar.appendChild(btn);
+        });
+
         boardEl = document.createElement("div");
         boardEl.className = "slide-board";
+
         const hint = document.createElement("p");
         hint.className = "hint-text";
-        hint.textContent = "Susun angka 1 sampai 8 berurutan dengan menggeser ubin ke kotak kosong.";
+        hint.textContent = "Pilih tingkat kesulitan dari 3×3 (8 kotak) hingga 5×5 (24 kotak) dan susun berurutan.";
+
+        container.appendChild(levelBar);
         container.appendChild(boardEl);
         container.appendChild(hint);
         shuffleBoard();
@@ -837,24 +917,25 @@
 
       function unmount() {
         boardEl = null;
+        levelBtns = [];
       }
 
       return {
         icon: "🧩",
         title: "Sliding Puzzle",
-        desc: "Geser ubin angka 1–8 hingga berurutan rapi.",
+        desc: "Puzzle geser dari Easy (3×3) hingga Hard (5×5).",
         mount,
         unmount,
         restart: shuffleBoard
       };
     })();
 
-    // #02 TETRIS
+    // #02 TETRIS (Full-Width Mobile Controls)
     VirSagiArcade.Games.tetris = (() => {
       const ID = "tetris";
       const COLS = 10;
       const ROWS = 18;
-      const CELL = 22;
+      const CELL = 21;
       const SHAPES = [
         { color: "#4cc9f0", mat: [[1, 1, 1, 1]] },
         { color: "#f5b942", mat: [[1, 1], [1, 1]] },
@@ -977,7 +1058,7 @@
 
       function scheduleDrop() {
         clearInterval(dropTimer);
-        const speedMs = Math.max(160, 620 - lines * 25);
+        const speedMs = Math.max(170, 620 - lines * 22);
         dropTimer = setInterval(stepDown, speedMs);
       }
 
@@ -1050,15 +1131,17 @@
         ctx = canvas.getContext("2d");
 
         const controls = document.createElement("div");
-        controls.className = "row-controls";
+        controls.className = "tetris-controls";
         controls.innerHTML = `
-          <button type="button" class="pad-btn" data-act="left">◀</button>
-          <button type="button" class="pad-btn" data-act="rot">↻</button>
-          <button type="button" class="pad-btn" data-act="down">▼</button>
-          <button type="button" class="pad-btn" data-act="right">▶</button>
+          <button type="button" class="tetris-btn" data-act="left" aria-label="Kiri">◀</button>
+          <button type="button" class="tetris-btn" data-act="rot" aria-label="Putar">↻</button>
+          <button type="button" class="tetris-btn" data-act="down" aria-label="Turun">▼</button>
+          <button type="button" class="tetris-btn" data-act="right" aria-label="Kanan">▶</button>
         `;
         controls.addEventListener("click", (e) => {
-          const act = e.target.dataset.act;
+          const btn = e.target.closest("[data-act]");
+          if (!btn) return;
+          const act = btn.dataset.act;
           if (act === "left") moveHoriz(-1);
           else if (act === "right") moveHoriz(1);
           else if (act === "down") stepDown();
@@ -1067,7 +1150,7 @@
 
         const hint = document.createElement("p");
         hint.className = "hint-text";
-        hint.textContent = "Penuhi baris horizontal untuk membersihkan blok. Pakai tombol atau panah keyboard.";
+        hint.textContent = "Gunakan tombol lebar di bawah layar HP untuk geser, putar, dan percepat balok.";
 
         container.appendChild(canvas);
         container.appendChild(controls);
@@ -1087,18 +1170,25 @@
       return {
         icon: "🧱",
         title: "Tetris",
-        desc: "Susun balok jatuh dan bersihkan baris penuh.",
+        desc: "Susun balok jatuh & bersihkan baris penuh.",
         mount,
         unmount,
         restart
       };
     })();
 
-    // #03 SNAKE / COSMIC TRAIL
+    // #03 SNAKE / COSMIC TRAIL (Pengatur Kecepatan Santai / Normal / Cepat)
     VirSagiArcade.Games.snake = (() => {
       const ID = "snake";
       const SIZE = 18;
-      const CELL = 18;
+      const CELL = 17;
+      const SPEEDS = [
+        { label: "Santai", ms: 230 },
+        { label: "Normal", ms: 165 },
+        { label: "Cepat", ms: 110 }
+      ];
+
+      let speedIdx = 0; // Default Santai agar nyaman di HP
       let canvas = null;
       let ctx = null;
       let snake = [];
@@ -1108,6 +1198,7 @@
       let score = 0;
       let loopTimer = null;
       let isOver = false;
+      let speedBtns = [];
 
       function spawnStar() {
         let pos;
@@ -1123,6 +1214,16 @@
       function setDirection(nx, ny) {
         if (nx === -dir.x && ny === -dir.y) return;
         nextDir = { x: nx, y: ny };
+      }
+
+      function applySpeed(idx) {
+        speedIdx = idx;
+        speedBtns.forEach((b, i) => b.classList.toggle("active-pill", i === speedIdx));
+        if (!isOver) {
+          clearInterval(loopTimer);
+          loopTimer = setInterval(tick, SPEEDS[speedIdx].ms);
+        }
+        updateStats();
       }
 
       function tick() {
@@ -1161,7 +1262,7 @@
 
       function updateStats() {
         const best = VirSagiArcade.readStorage(ID, "best", 0);
-        VirSagiArcade.setStats(`Skor: ${score} • Rekor: ${best}`);
+        VirSagiArcade.setStats(`${SPEEDS[speedIdx].label} • Skor: ${score} • Rekor: ${best}`);
       }
 
       function draw() {
@@ -1169,16 +1270,17 @@
         ctx.fillStyle = "#080d1a";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Bintang target
+        // Bintang target bersinar
         ctx.fillStyle = "#f5b942";
         ctx.beginPath();
-        ctx.arc(star.x * CELL + CELL / 2, star.y * CELL + CELL / 2, CELL * 0.38, 0, Math.PI * 2);
+        ctx.arc(star.x * CELL + CELL / 2, star.y * CELL + CELL / 2, CELL * 0.4, 0, Math.PI * 2);
         ctx.fill();
 
-        // Jejak kosmik
         snake.forEach((seg, i) => {
           ctx.fillStyle = i === 0 ? "#4cc9f0" : "#72efdd";
-          ctx.fillRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2);
+          ctx.beginPath();
+          ctx.roundRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2, 4);
+          ctx.fill();
         });
       }
 
@@ -1197,12 +1299,27 @@
         score = 0;
         isOver = false;
         spawnStar();
-        updateStats();
+        applySpeed(speedIdx);
         draw();
-        loopTimer = setInterval(tick, 135);
       }
 
       function mount(container) {
+        speedBtns = [];
+        const speedBar = document.createElement("div");
+        speedBar.className = "pill-row";
+        SPEEDS.forEach((sp, i) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "btn";
+          btn.textContent = sp.label;
+          btn.addEventListener("click", () => {
+            VirSagiArcade.playTone(600, 0.04, "sine");
+            applySpeed(i);
+          });
+          speedBtns.push(btn);
+          speedBar.appendChild(btn);
+        });
+
         canvas = document.createElement("canvas");
         canvas.className = "game-canvas";
         canvas.width = SIZE * CELL;
@@ -1220,7 +1337,9 @@
           <button type="button" class="pad-btn" data-d="right">▶</button>
         `;
         pad.addEventListener("click", (e) => {
-          const d = e.target.dataset.d;
+          const btn = e.target.closest("[data-d]");
+          if (!btn) return;
+          const d = btn.dataset.d;
           if (d === "up") setDirection(0, -1);
           else if (d === "down") setDirection(0, 1);
           else if (d === "left") setDirection(-1, 0);
@@ -1229,8 +1348,9 @@
 
         const hint = document.createElement("p");
         hint.className = "hint-text";
-        hint.textContent = "Kumpulkan bintang emas tanpa menabrak dinding atau ekor sendiri.";
+        hint.textContent = "Pilih kecepatan (Santai / Normal / Cepat) kapan saja saat bermain.";
 
+        container.appendChild(speedBar);
         container.appendChild(canvas);
         container.appendChild(pad);
         container.appendChild(hint);
@@ -1244,19 +1364,20 @@
         window.removeEventListener("keydown", onKeyDown);
         canvas = null;
         ctx = null;
+        speedBtns = [];
       }
 
       return {
         icon: "🌠",
         title: "Snake / Cosmic Trail",
-        desc: "Arahkan jejak bintang dan kumpulkan cahaya.",
+        desc: "Arahkan jejak bintang dengan kecepatan yang bisa diatur.",
         mount,
         unmount,
         restart
       };
     })();
 
-    // #04 FLAPPY BIRD
+    // #04 FLAPPY BIRD (Karakter Burung Kosmik Bersayap + Pilar Rintangan)
     VirSagiArcade.Games.flappy = (() => {
       const ID = "flappy";
       const W = 320;
@@ -1267,14 +1388,25 @@
       let lastTs = 0;
       let birdY = 190;
       let velY = 0;
+      let flapAnim = 0;
       let pipes = [];
+      let starsBg = [];
       let spawnDist = 0;
       let score = 0;
       let isOver = false;
 
+      function initStars() {
+        starsBg = Array.from({ length: 24 }, () => ({
+          x: Math.random() * W,
+          y: Math.random() * (H - 40),
+          r: 0.8 + Math.random() * 1.4
+        }));
+      }
+
       function flap() {
         if (isOver) return;
-        velY = -275;
+        velY = -270;
+        flapAnim = 1;
         VirSagiArcade.playTone(660, 0.05, "sine");
       }
 
@@ -1289,7 +1421,7 @@
         cancelAnimationFrame(rafId);
         const best = VirSagiArcade.updateBestIfHigher(ID, score);
         VirSagiArcade.playTone(200, 0.2, "sawtooth");
-        VirSagiArcade.showBanner(`Jatuh! Skor: ${score} • Rekor: ${best}`);
+        VirSagiArcade.showBanner(`Menabrak rintangan! Skor: ${score} • Rekor: ${best}`);
       }
 
       function step(ts) {
@@ -1298,67 +1430,142 @@
         const dt = Math.min(0.033, (ts - lastTs) / 1000);
         lastTs = ts;
 
-        velY += 860 * dt;
+        velY += 840 * dt;
         birdY += velY * dt;
+        flapAnim = Math.max(0, flapAnim - dt * 4.5);
 
-        if (birdY < 10 || birdY > H - 10) {
+        if (birdY < 14 || birdY > H - 24) {
           endRun();
           return;
         }
 
-        const speed = 135;
+        const speed = 132;
         spawnDist += speed * dt;
-        if (spawnDist >= 165) {
+        if (spawnDist >= 170) {
           spawnDist = 0;
-          const gap = 108;
-          const topH = 45 + Math.random() * (H - gap - 95);
+          const gap = 114;
+          const topH = 44 + Math.random() * (H - gap - 110);
           pipes.push({ x: W, topH, gap, passed: false });
         }
 
-        const birdX = 68;
-        const birdR = 11;
+        const birdX = 72;
+        const birdR = 12;
 
         for (let i = pipes.length - 1; i >= 0; i--) {
           const p = pipes[i];
           p.x -= speed * dt;
 
-          if (!p.passed && p.x + 36 < birdX) {
+          if (!p.passed && p.x + 40 < birdX) {
             p.passed = true;
             score++;
             VirSagiArcade.playTone(820, 0.06, "triangle");
             updateStats();
           }
 
-          const hitX = birdX + birdR > p.x && birdX - birdR < p.x + 36;
-          const hitTop = birdY - birdR < p.topH;
-          const hitBot = birdY + birdR > p.topH + p.gap;
+          const hitX = birdX + birdR - 2 > p.x && birdX - birdR + 2 < p.x + 40;
+          const hitTop = birdY - birdR + 2 < p.topH;
+          const hitBot = birdY + birdR - 2 > p.topH + p.gap;
           if (hitX && (hitTop || hitBot)) {
             endRun();
             return;
           }
 
-          if (p.x < -45) pipes.splice(i, 1);
+          if (p.x < -50) pipes.splice(i, 1);
         }
 
         draw();
         rafId = requestAnimationFrame(step);
       }
 
-      function draw() {
-        if (!ctx) return;
-        ctx.fillStyle = "#0a1124";
-        ctx.fillRect(0, 0, W, H);
+      function drawBird(x, y) {
+        ctx.save();
+        ctx.translate(x, y);
+        const tilt = Math.max(-0.45, Math.min(0.65, velY / 420));
+        ctx.rotate(tilt);
 
-        ctx.fillStyle = "#4ade80";
-        pipes.forEach((p) => {
-          ctx.fillRect(p.x, 0, 36, p.topH);
-          ctx.fillRect(p.x, p.topH + p.gap, 36, H - (p.topH + p.gap));
-        });
+        // Ekor
+        ctx.fillStyle = "#ff5d8f";
+        ctx.beginPath();
+        ctx.moveTo(-11, 0);
+        ctx.lineTo(-19, -5);
+        ctx.lineTo(-17, 4);
+        ctx.closePath();
+        ctx.fill();
 
+        // Badan burung
         ctx.fillStyle = "#f5b942";
         ctx.beginPath();
-        ctx.arc(68, birdY, 11, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, 14, 11, 0, 0, Math.PI * 2);
         ctx.fill();
+
+        // Perut terang
+        ctx.fillStyle = "#fde68a";
+        ctx.beginPath();
+        ctx.ellipse(2, 3, 9, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Sayap mengepak
+        const wingAngle = flapAnim > 0 ? -0.65 : 0.25;
+        ctx.save();
+        ctx.translate(-2, 0);
+        ctx.rotate(wingAngle);
+        ctx.fillStyle = "#4cc9f0";
+        ctx.beginPath();
+        ctx.ellipse(-2, 2, 8, 4.5, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Mata
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(6, -3, 3.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#0f172a";
+        ctx.beginPath();
+        ctx.arc(7, -3, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Paruh
+        ctx.fillStyle = "#fb7185";
+        ctx.beginPath();
+        ctx.moveTo(12, -1);
+        ctx.lineTo(20, 2);
+        ctx.lineTo(12, 5);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function draw() {
+        if (!ctx) return;
+        ctx.fillStyle = "#091024";
+        ctx.fillRect(0, 0, W, H);
+
+        // Bintang latar
+        ctx.fillStyle = "rgba(255,255,255,0.45)";
+        starsBg.forEach((s) => {
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Pilar kosmik dengan topi bibir pipa
+        pipes.forEach((p) => {
+          ctx.fillStyle = "#1e3a5f";
+          ctx.fillRect(p.x + 3, 0, 34, p.topH);
+          ctx.fillRect(p.x + 3, p.topH + p.gap, 34, H - (p.topH + p.gap));
+
+          ctx.fillStyle = "#4cc9f0";
+          ctx.fillRect(p.x, p.topH - 10, 40, 10);
+          ctx.fillRect(p.x, p.topH + p.gap, 40, 10);
+        });
+
+        // Tanah bawah
+        ctx.fillStyle = "#16213e";
+        ctx.fillRect(0, H - 14, W, 14);
+
+        drawBird(72, birdY);
       }
 
       function onKeyDown(e) {
@@ -1373,10 +1580,12 @@
         lastTs = 0;
         birdY = 190;
         velY = 0;
+        flapAnim = 0;
         pipes = [];
-        spawnDist = 110;
+        spawnDist = 115;
         score = 0;
         isOver = false;
+        initStars();
         updateStats();
         draw();
         rafId = requestAnimationFrame(step);
@@ -1394,7 +1603,7 @@
 
         const hint = document.createElement("p");
         hint.className = "hint-text";
-        hint.textContent = "Tap layar, klik canvas, atau tekan Spasi untuk terbang melewati celah.";
+        hint.textContent = "Tap layar untuk mengepakkan sayap melewati pilar langit.";
 
         container.appendChild(canvas);
         container.appendChild(hint);
@@ -1413,14 +1622,14 @@
       return {
         icon: "🕊️",
         title: "Flappy Bird",
-        desc: "Atur ritme tap agar tetap melayang di celah.",
+        desc: "Terbangkan burung kosmik melewati celah pilar.",
         mount,
         unmount,
         restart
       };
     })();
 
-    // #05 SOLITAIRE (Versi Ringkas 7 Kolom + Stock + 4 Foundation)
+    // #05 SOLITAIRE (Tampilan Meja Kartu Bertumpuk Ala Solitaire PC + Auto-Foundation + Undo)
     VirSagiArcade.Games.solitaire = (() => {
       const ID = "solitaire";
       const SUITS = ["♠", "♥", "♦", "♣"];
@@ -1430,10 +1639,33 @@
       let tableau = [];
       let selected = null;
       let score = 0;
+      let history = [];
       let rootEl = null;
 
       function isRed(suit) {
         return suit === "♥" || suit === "♦";
+      }
+
+      function cloneState() {
+        return JSON.stringify({ stock, waste, foundations, tableau, score });
+      }
+
+      function pushHistory() {
+        history.push(cloneState());
+        if (history.length > 25) history.shift();
+      }
+
+      function undoMove() {
+        if (history.length === 0) return;
+        const prev = JSON.parse(history.pop());
+        stock = prev.stock;
+        waste = prev.waste;
+        foundations = prev.foundations;
+        tableau = prev.tableau;
+        score = prev.score;
+        selected = null;
+        VirSagiArcade.playTone(430, 0.05, "sine");
+        render();
       }
 
       function buildDeck() {
@@ -1471,27 +1703,64 @@
 
       function revealTops() {
         tableau.forEach((col) => {
-          if (col.length > 0) col[col.length - 1].faceUp = true;
+          if (col.length > 0 && !col[col.length - 1].faceUp) {
+            col[col.length - 1].faceUp = true;
+            score += 5;
+          }
         });
       }
 
       function checkWin() {
         const total = foundations.reduce((acc, p) => acc + p.length, 0);
         if (total === 52) {
-          const best = VirSagiArcade.updateBestIfHigher(ID, score + 200);
+          const finalScore = score + 250;
+          const best = VirSagiArcade.updateBestIfHigher(ID, finalScore);
           VirSagiArcade.playTone(880, 0.2, "triangle");
-          VirSagiArcade.showBanner(`Selamat! Semua 52 kartu tersusun! Skor: ${best}`);
+          VirSagiArcade.showBanner(`Menang Solitaire! Skor: ${finalScore} • Rekor: ${best}`);
         }
+      }
+
+      function autoSendCardToFoundation(sourceInfo) {
+        let card = null;
+        if (sourceInfo.source === "waste" && waste.length > 0) {
+          card = waste[waste.length - 1];
+        } else if (sourceInfo.source === "tab") {
+          const col = tableau[sourceInfo.col];
+          if (col.length > 0 && sourceInfo.cardIdx === col.length - 1) {
+            card = col[col.length - 1];
+          }
+        }
+        if (!card) return false;
+
+        const suitIdx = SUITS.indexOf(card.suit);
+        if (suitIdx >= 0 && canStackFoundation(card, foundations[suitIdx])) {
+          pushHistory();
+          if (sourceInfo.source === "waste") {
+            foundations[suitIdx].push(waste.pop());
+          } else {
+            foundations[suitIdx].push(tableau[sourceInfo.col].pop());
+            revealTops();
+          }
+          score += 15;
+          selected = null;
+          VirSagiArcade.playTone(780, 0.07, "triangle");
+          render();
+          checkWin();
+          return true;
+        }
+        return false;
       }
 
       function drawStock() {
         selected = null;
+        if (stock.length === 0 && waste.length === 0) return;
+        pushHistory();
         if (stock.length > 0) {
           const c = stock.pop();
           c.faceUp = true;
           waste.push(c);
           VirSagiArcade.playTone(500, 0.04, "sine");
-        } else if (waste.length > 0) {
+        } else {
           stock = waste.reverse().map((c) => ({ ...c, faceUp: false }));
           waste = [];
           VirSagiArcade.playTone(440, 0.04, "sine");
@@ -1502,27 +1771,28 @@
       function tryMoveToFoundation(fIdx) {
         if (!selected) return;
         const pile = foundations[fIdx];
-        let card = null;
         if (selected.source === "waste" && waste.length > 0) {
-          card = waste[waste.length - 1];
+          const card = waste[waste.length - 1];
           if (canStackFoundation(card, pile)) {
+            pushHistory();
             pile.push(waste.pop());
             score += 15;
             selected = null;
-            VirSagiArcade.playTone(760, 0.07, "triangle");
+            VirSagiArcade.playTone(780, 0.07, "triangle");
             render();
             checkWin();
           }
         } else if (selected.source === "tab") {
           const col = tableau[selected.col];
           if (col.length > 0 && selected.cardIdx === col.length - 1) {
-            card = col[col.length - 1];
+            const card = col[col.length - 1];
             if (canStackFoundation(card, pile)) {
+              pushHistory();
               pile.push(col.pop());
               score += 15;
               selected = null;
               revealTops();
-              VirSagiArcade.playTone(760, 0.07, "triangle");
+              VirSagiArcade.playTone(780, 0.07, "triangle");
               render();
               checkWin();
             }
@@ -1538,6 +1808,7 @@
         if (selected.source === "waste" && waste.length > 0) {
           const card = waste[waste.length - 1];
           if (canStackTableau(card, destTop)) {
+            pushHistory();
             destCol.push(waste.pop());
             score += 5;
             selected = null;
@@ -1553,6 +1824,7 @@
           const srcCol = tableau[selected.col];
           const movingStack = srcCol.slice(selected.cardIdx);
           if (movingStack.length > 0 && canStackTableau(movingStack[0], destTop)) {
+            pushHistory();
             srcCol.splice(selected.cardIdx);
             destCol.push(...movingStack);
             score += 5;
@@ -1564,92 +1836,161 @@
         }
       }
 
+      function makeCardEl(card, isSel = false) {
+        const el = document.createElement("button");
+        el.type = "button";
+        if (!card.faceUp) {
+          el.className = "sol-card-face back";
+          el.textContent = "✦";
+          return el;
+        }
+        el.className = "sol-card-face" + (isRed(card.suit) ? " red" : "") + (isSel ? " selected" : "");
+        const lbl = `${rankLabel(card.rank)}${card.suit}`;
+        el.innerHTML = `<span class="sol-corner">${lbl}</span><span class="sol-center-suit">${card.suit}</span>`;
+        return el;
+      }
+
       function render() {
         const best = VirSagiArcade.readStorage(ID, "best", 0);
         VirSagiArcade.setStats(`Skor: ${score} • Rekor: ${best}`);
         rootEl.innerHTML = "";
 
-        const topBar = document.createElement("div");
-        topBar.className = "sol-top";
+        const actionBar = document.createElement("div");
+        actionBar.className = "pill-row";
 
-        const stockBtn = document.createElement("button");
-        stockBtn.type = "button";
-        stockBtn.className = "sol-card back";
-        stockBtn.textContent = `Stok (${stock.length})`;
-        stockBtn.addEventListener("click", drawStock);
-        topBar.appendChild(stockBtn);
+        const undoBtn = document.createElement("button");
+        undoBtn.type = "button";
+        undoBtn.className = "btn";
+        undoBtn.textContent = `↩ Undo (${history.length})`;
+        undoBtn.disabled = history.length === 0;
+        undoBtn.addEventListener("click", undoMove);
+
+        const autoBtn = document.createElement("button");
+        autoBtn.type = "button";
+        autoBtn.className = "btn";
+        autoBtn.textContent = "⚡ Naikkan Kartu Otomatis";
+        autoBtn.addEventListener("click", () => {
+          let moved = false;
+          if (autoSendCardToFoundation({ source: "waste" })) moved = true;
+          for (let c = 0; c < 7 && !moved; c++) {
+            if (tableau[c].length > 0) {
+              moved = autoSendCardToFoundation({ source: "tab", col: c, cardIdx: tableau[c].length - 1 });
+            }
+          }
+        });
+
+        actionBar.appendChild(undoBtn);
+        actionBar.appendChild(autoBtn);
+
+        const table = document.createElement("div");
+        table.className = "sol-table";
+
+        // Baris atas: Stock, Waste, Spacer, 4 Foundation
+        const topRow = document.createElement("div");
+        topRow.className = "sol-top-row";
+
+        if (stock.length > 0) {
+          const stBtn = document.createElement("button");
+          stBtn.type = "button";
+          stBtn.className = "sol-card-face back";
+          stBtn.textContent = String(stock.length);
+          stBtn.addEventListener("click", drawStock);
+          topRow.appendChild(stBtn);
+        } else {
+          const emptySt = document.createElement("button");
+          emptySt.type = "button";
+          emptySt.className = "sol-slot";
+          emptySt.textContent = "↻";
+          emptySt.addEventListener("click", drawStock);
+          topRow.appendChild(emptySt);
+        }
 
         const wasteTop = waste.length > 0 ? waste[waste.length - 1] : null;
-        const wasteBtn = document.createElement("button");
-        wasteBtn.type = "button";
-        wasteBtn.className =
-          "sol-card" +
-          (wasteTop && isRed(wasteTop.suit) ? " red" : "") +
-          (selected && selected.source === "waste" ? " selected" : "");
-        wasteBtn.textContent = wasteTop ? `${rankLabel(wasteTop.rank)}${wasteTop.suit}` : "Kosong";
         if (wasteTop) {
-          wasteBtn.addEventListener("click", () => {
-            selected = selected && selected.source === "waste" ? null : { source: "waste" };
-            render();
+          const isSel = selected && selected.source === "waste";
+          const wCard = makeCardEl(wasteTop, isSel);
+          wCard.addEventListener("click", () => {
+            if (isSel) {
+              // Tap kedua kali pada kartu yang sama langsung kirim ke pondasi jika cocok
+              if (!autoSendCardToFoundation({ source: "waste" })) {
+                selected = null;
+                render();
+              }
+            } else {
+              selected = { source: "waste" };
+              render();
+            }
           });
+          topRow.appendChild(wCard);
+        } else {
+          const emptyW = document.createElement("div");
+          emptyW.className = "sol-slot";
+          topRow.appendChild(emptyW);
         }
-        topBar.appendChild(wasteBtn);
+
+        const spacer = document.createElement("div");
+        topRow.appendChild(spacer);
 
         foundations.forEach((pile, idx) => {
           const top = pile.length > 0 ? pile[pile.length - 1] : null;
-          const fBtn = document.createElement("button");
-          fBtn.type = "button";
-          fBtn.className = "sol-card" + (top && isRed(top.suit) ? " red" : "");
-          fBtn.textContent = top ? `${rankLabel(top.rank)}${top.suit}` : `${SUITS[idx]}`;
-          fBtn.addEventListener("click", () => {
-            if (selected) tryMoveToFoundation(idx);
-          });
-          topBar.appendChild(fBtn);
+          if (top) {
+            const fCard = makeCardEl(top, false);
+            fCard.addEventListener("click", () => {
+              if (selected) tryMoveToFoundation(idx);
+            });
+            topRow.appendChild(fCard);
+          } else {
+            const fSlot = document.createElement("button");
+            fSlot.type = "button";
+            fSlot.className = "sol-slot";
+            fSlot.textContent = SUITS[idx];
+            fSlot.addEventListener("click", () => {
+              if (selected) tryMoveToFoundation(idx);
+            });
+            topRow.appendChild(fSlot);
+          }
         });
 
-        const tabWrap = document.createElement("div");
-        tabWrap.className = "sol-tableau";
+        // 7 Kolom Tableau Tumpang-Tindih Vertikal Ala PC
+        const tabGrid = document.createElement("div");
+        tabGrid.className = "sol-tableau-grid";
 
         tableau.forEach((col, colIdx) => {
-          const colEl = document.createElement("div");
-          colEl.className = "sol-col";
-          colEl.addEventListener("click", (e) => {
-            if (e.target === colEl && selected) {
-              tryMoveToTableau(colIdx);
-            }
-          });
+          const colWrap = document.createElement("div");
+          colWrap.className = "sol-stack-col";
 
           if (col.length === 0) {
-            const slot = document.createElement("button");
-            slot.type = "button";
-            slot.className = "sol-card back";
-            slot.textContent = "K";
-            slot.addEventListener("click", () => {
+            const kSlot = document.createElement("button");
+            kSlot.type = "button";
+            kSlot.className = "sol-slot";
+            kSlot.style.width = "100%";
+            kSlot.textContent = "K";
+            kSlot.addEventListener("click", () => {
               if (selected) tryMoveToTableau(colIdx);
             });
-            colEl.appendChild(slot);
+            colWrap.appendChild(kSlot);
           } else {
+            let offsetY = 0;
             col.forEach((card, cIdx) => {
-              const cBtn = document.createElement("button");
-              cBtn.type = "button";
               const isSel =
                 selected &&
                 selected.source === "tab" &&
                 selected.col === colIdx &&
                 cIdx >= selected.cardIdx;
-              cBtn.className =
-                "sol-card" +
-                (!card.faceUp ? " back" : "") +
-                (card.faceUp && isRed(card.suit) ? " red" : "") +
-                (isSel ? " selected" : "");
-              cBtn.textContent = card.faceUp ? `${rankLabel(card.rank)}${card.suit}` : "★";
-              cBtn.addEventListener("click", (ev) => {
+              const cEl = makeCardEl(card, isSel);
+              cEl.classList.add("sol-stack-item");
+              cEl.style.top = `${offsetY}px`;
+              cEl.style.zIndex = String(cIdx + 1);
+
+              cEl.addEventListener("click", (ev) => {
                 ev.stopPropagation();
                 if (!card.faceUp) return;
                 if (selected) {
                   if (selected.source === "tab" && selected.col === colIdx && selected.cardIdx === cIdx) {
-                    selected = null;
-                    render();
+                    if (!autoSendCardToFoundation({ source: "tab", col: colIdx, cardIdx: cIdx })) {
+                      selected = null;
+                      render();
+                    }
                   } else {
                     tryMoveToTableau(colIdx);
                   }
@@ -1658,19 +1999,25 @@
                   render();
                 }
               });
-              colEl.appendChild(cBtn);
+
+              colWrap.appendChild(cEl);
+              offsetY += card.faceUp ? 22 : 10;
             });
+            colWrap.style.height = `${offsetY + 62}px`;
           }
 
-          tabWrap.appendChild(colEl);
+          tabGrid.appendChild(colWrap);
         });
+
+        table.appendChild(topRow);
+        table.appendChild(tabGrid);
 
         const hint = document.createElement("p");
         hint.className = "hint-text";
-        hint.textContent = "Pilih kartu lalu klik kolom tujuan atau slot As-K (♠♥♦♣).";
+        hint.textContent = "Susun kartu merah-hitam selang-seling menurun (K→A). Tap 2× kartu terbuka untuk naik otomatis ke pondasi (♠♥♦♣).";
 
-        rootEl.appendChild(topBar);
-        rootEl.appendChild(tabWrap);
+        rootEl.appendChild(actionBar);
+        rootEl.appendChild(table);
         rootEl.appendChild(hint);
       }
 
@@ -1681,6 +2028,7 @@
         waste = [];
         selected = null;
         score = 0;
+        history = [];
 
         for (let c = 0; c < 7; c++) {
           for (let r = 0; r <= c; r++) {
@@ -1698,7 +2046,7 @@
         rootEl.style.width = "100%";
         rootEl.style.display = "flex";
         rootEl.style.flexDirection = "column";
-        rootEl.style.gap = "12px";
+        rootEl.style.gap = "10px";
         container.appendChild(rootEl);
         restart();
       }
@@ -1710,7 +2058,7 @@
       return {
         icon: "🃏",
         title: "Solitaire",
-        desc: "Susun kartu bergantian warna dan naikkan ke pondasi.",
+        desc: "Klondike klasik 7 kolom dengan kartu bertumpuk & Undo.",
         mount,
         unmount,
         restart
@@ -1898,142 +2246,335 @@
       };
     })();
 
-    // #07 TANGRAM (Grid Puzzle Pola Bentuk 4x4 Bertingkat)
+    // #07 TANGRAM (7 Keping Bangun Datar Geometri Klasik: Segitiga, Persegi, Jajar Genjang)
     VirSagiArcade.Games.tangram = (() => {
       const ID = "tangram";
-      const PATTERNS = [
+      const W = 320;
+      const H = 370;
+
+      // 7 keping tangram klasik dalam koordinat lokal terhadap titik pusatnya
+      const BASE_PIECES = [
+        { id: "big1", name: "Segitiga Besar 1", color: "#ff5d8f", pts: [[-48, -24], [48, -24], [0, 24]] },
+        { id: "big2", name: "Segitiga Besar 2", color: "#4cc9f0", pts: [[-48, -24], [48, -24], [0, 24]] },
+        { id: "med",  name: "Segitiga Sedang",  color: "#f5b942", pts: [[-34, -17], [34, -17], [0, 17]] },
+        { id: "sm1",  name: "Segitiga Kecil 1", color: "#4ade80", pts: [[-24, -12], [24, -12], [0, 12]] },
+        { id: "sm2",  name: "Segitiga Kecil 2", color: "#c77dff", pts: [[-24, -12], [24, -12], [0, 12]] },
+        { id: "sq",   name: "Persegi",          color: "#fb923c", pts: [[-17, -17], [17, -17], [17, 17], [-17, 17]] },
+        { id: "para", name: "Jajar Genjang",    color: "#38bdf8", pts: [[-34, -12], [14, -12], [34, 12], [-14, 12]] }
+      ];
+
+      // Siluet bentuk target (masing-masing slot adalah target penempatan 1 keping bangun datar)
+      const PUZZLES = [
         {
-          name: "Bintang Virgo",
-          target: [
-            0, 1, 1, 0,
-            1, 1, 1, 1,
-            0, 1, 1, 0,
-            1, 0, 0, 1
+          name: "Rumah Bintang",
+          slots: [
+            { id: "big1", x: 136, y: 92,  rot: 180 },
+            { id: "big2", x: 184, y: 92,  rot: 180 },
+            { id: "sq",   x: 135, y: 145, rot: 0 },
+            { id: "med",  x: 185, y: 145, rot: 180 },
+            { id: "sm1",  x: 135, y: 174, rot: 0 },
+            { id: "sm2",  x: 185, y: 174, rot: 0 },
+            { id: "para", x: 160, y: 198, rot: 0 }
           ]
         },
         {
-          name: "Busur Sagi",
-          target: [
-            0, 0, 0, 1,
-            0, 0, 1, 1,
-            1, 1, 1, 0,
-            1, 0, 0, 0
+          name: "Perahu Layar",
+          slots: [
+            { id: "big1", x: 145, y: 95,  rot: 90 },
+            { id: "big2", x: 190, y: 105, rot: 270 },
+            { id: "med",  x: 112, y: 118, rot: 90 },
+            { id: "sq",   x: 145, y: 168, rot: 0 },
+            { id: "sm1",  x: 112, y: 168, rot: 0 },
+            { id: "sm2",  x: 178, y: 168, rot: 0 },
+            { id: "para", x: 155, y: 195, rot: 0 }
           ]
         },
         {
-          name: "Mahkota Langit",
-          target: [
-            1, 0, 1, 0,
-            1, 1, 1, 1,
-            1, 1, 1, 1,
-            0, 1, 1, 0
+          name: "Roket Sagi",
+          slots: [
+            { id: "med",  x: 160, y: 65,  rot: 180 },
+            { id: "sq",   x: 160, y: 100, rot: 0 },
+            { id: "big1", x: 136, y: 145, rot: 90 },
+            { id: "big2", x: 184, y: 145, rot: 270 },
+            { id: "sm1",  x: 112, y: 178, rot: 180 },
+            { id: "sm2",  x: 208, y: 178, rot: 180 },
+            { id: "para", x: 160, y: 198, rot: 0 }
           ]
         }
       ];
 
-      let patIdx = 0;
-      let state = [];
-      let moves = 0;
-      let boardEl = null;
-      let labelEl = null;
+      let puzzleIdx = 0;
+      let pieces = [];
+      let activeIdx = 0;
+      let dragging = false;
+      let dragOffset = { x: 0, y: 0 };
+      let canvas = null;
+      let ctx = null;
 
-      function startPattern(idx = patIdx) {
-        patIdx = idx % PATTERNS.length;
-        state = Array(16).fill(0);
-        moves = 0;
+      function rotatePoint(px, py, deg) {
+        const rad = (deg * Math.PI) / 180;
+        const cos = Math.cos(rad);
+        const sin = Math.sin(rad);
+        return [px * cos - py * sin, px * sin + py * cos];
+      }
+
+      function getWorldPolygon(piece) {
+        return piece.pts.map(([px, py]) => {
+          const [rx, ry] = rotatePoint(px, py, piece.rot);
+          return [piece.x + rx, piece.y + ry];
+        });
+      }
+
+      function pointInPoly(x, y, poly) {
+        let inside = false;
+        for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+          const xi = poly[i][0], yi = poly[i][1];
+          const xj = poly[j][0], yj = poly[j][1];
+          const intersect = ((yi > y) !== (yj > y)) && (x < ((xj - xi) * (y - yi)) / (yj - yi + 1e-9) + xi);
+          if (intersect) inside = !inside;
+        }
+        return inside;
+      }
+
+      function setupPuzzle(idx = puzzleIdx) {
+        puzzleIdx = idx % PUZZLES.length;
+        const dockPositions = [
+          { x: 58,  y: 275, rot: 0 },
+          { x: 162, y: 275, rot: 0 },
+          { x: 264, y: 275, rot: 0 },
+          { x: 54,  y: 332, rot: 0 },
+          { x: 124, y: 332, rot: 0 },
+          { x: 194, y: 332, rot: 0 },
+          { x: 268, y: 332, rot: 0 }
+        ];
+
+        pieces = BASE_PIECES.map((bp, i) => ({
+          ...bp,
+          x: dockPositions[i].x,
+          y: dockPositions[i].y,
+          rot: dockPositions[i].rot,
+          locked: false
+        }));
+        activeIdx = 0;
         VirSagiArcade.hideBanner();
-        render();
+        updateStats();
+        draw();
       }
 
-      function nextPattern() {
-        startPattern(patIdx + 1);
-      }
+      function checkSnap(piece) {
+        const puzzle = PUZZLES[puzzleIdx];
+        const matchingSlots = puzzle.slots.filter((s) => {
+          // Segitiga besar/kecil kembar boleh saling bertukar slot seukuran
+          if (piece.id.startsWith("big")) return s.id.startsWith("big");
+          if (piece.id.startsWith("sm")) return s.id.startsWith("sm");
+          return s.id === piece.id;
+        });
 
-      function toggleCell(i) {
-        state[i] = state[i] ? 0 : 1;
-        moves++;
-        VirSagiArcade.playTone(state[i] ? 660 : 480, 0.05, "sine");
-        render();
+        for (const slot of matchingSlots) {
+          const alreadyOccupied = pieces.some(
+            (other) => other !== piece && other.locked && Math.hypot(other.x - slot.x, other.y - slot.y) < 6
+          );
+          if (alreadyOccupied) continue;
 
-        const target = PATTERNS[patIdx].target;
-        const matched = target.every((v, idx) => v === state[idx]);
-        if (matched) {
-          const pts = 120;
+          const dist = Math.hypot(piece.x - slot.x, piece.y - slot.y);
+          const rotDiff = Math.abs(((piece.rot - slot.rot + 540) % 360) - 180);
+          // Persegi simetris tiap 90 derajat, segitiga sama kaki tiap 360 derajat
+          const rotOk = piece.id === "sq" ? (piece.rot % 90 === slot.rot % 90) : rotDiff <= 15;
+
+          if (dist < 24 && rotOk) {
+            piece.x = slot.x;
+            piece.y = slot.y;
+            piece.rot = slot.rot;
+            piece.locked = true;
+            VirSagiArcade.playTone(760, 0.08, "triangle");
+            break;
+          }
+        }
+
+        updateStats();
+        if (pieces.every((p) => p.locked)) {
+          const pts = 150;
           const best = VirSagiArcade.updateBestIfHigher(ID, pts);
-          VirSagiArcade.playTone(860, 0.16, "triangle");
+          VirSagiArcade.playTone(900, 0.18, "triangle");
           VirSagiArcade.showBanner(
-            `Pola "${PATTERNS[patIdx].name}" cocok! Skor +${pts} (Rekor: ${best})`,
-            "Pola Berikutnya",
-            nextPattern
+            `Siluet "${PUZZLES[puzzleIdx].name}" selesai! Skor +${pts} (Rekor: ${best})`,
+            "Bentuk Berikutnya",
+            () => setupPuzzle(puzzleIdx + 1)
           );
         }
       }
 
-      function render() {
-        const pat = PATTERNS[patIdx];
+      function rotateSelected() {
+        const p = pieces[activeIdx];
+        if (!p || p.locked) return;
+        p.rot = (p.rot + 45) % 360;
+        VirSagiArcade.playTone(620, 0.04, "sine");
+        checkSnap(p);
+        draw();
+      }
+
+      function updateStats() {
+        const lockedCount = pieces.filter((p) => p.locked).length;
         const best = VirSagiArcade.readStorage(ID, "best", 0);
-        VirSagiArcade.setStats(`Pola: ${pat.name} • Langkah: ${moves} • Rekor: ${best}`);
-        if (labelEl) {
-          labelEl.textContent = `Target Pola "${pat.name}" (${pat.target.filter(Boolean).length} blok terisi):`;
+        VirSagiArcade.setStats(`${PUZZLES[puzzleIdx].name}: ${lockedCount}/7 keping • Rekor: ${best}`);
+      }
+
+      function drawPoly(poly, fill, stroke, lineWidth = 1.5, dash = []) {
+        ctx.save();
+        ctx.setLineDash(dash);
+        ctx.beginPath();
+        poly.forEach(([x, y], idx) => {
+          if (idx === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        if (fill) {
+          ctx.fillStyle = fill;
+          ctx.fill();
         }
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = lineWidth;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
 
-        boardEl.innerHTML = "";
-        for (let i = 0; i < 16; i++) {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "tang-cell";
-          const isTarget = pat.target[i] === 1;
-          const isFilled = state[i] === 1;
+      function draw() {
+        if (!ctx) return;
+        ctx.fillStyle = "#080d1a";
+        ctx.fillRect(0, 0, W, H);
 
-          if (isFilled) {
-            btn.style.background = "#f5b942";
-            btn.style.borderColor = "#f5b942";
-            btn.textContent = "✦";
-          } else if (isTarget) {
-            btn.style.background = "rgba(76, 201, 240, 0.16)";
-            btn.style.borderStyle = "solid";
-            btn.style.borderColor = "rgba(76, 201, 240, 0.55)";
-            btn.textContent = "·";
-          } else {
-            btn.textContent = "";
+        // Area bayangan siluet target di bagian atas
+        const puzzle = PUZZLES[puzzleIdx];
+        puzzle.slots.forEach((slot) => {
+          const ref = BASE_PIECES.find((b) => b.id === slot.id);
+          const poly = getWorldPolygon({ ...ref, x: slot.x, y: slot.y, rot: slot.rot });
+          drawPoly(poly, "rgba(76, 201, 240, 0.14)", "rgba(76, 201, 240, 0.55)", 1.5, [4, 3]);
+        });
+
+        // Garis pemisah area baki kepingan bawah
+        ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        ctx.beginPath();
+        ctx.moveTo(12, 236);
+        ctx.lineTo(W - 12, 236);
+        ctx.stroke();
+
+        // Gambar kepingan (yang terkunci di bawah, aktif di paling atas)
+        const ordered = pieces
+          .map((p, idx) => ({ p, idx }))
+          .sort((a, b) => (a.idx === activeIdx ? 1 : b.idx === activeIdx ? -1 : 0));
+
+        ordered.forEach(({ p, idx }) => {
+          const poly = getWorldPolygon(p);
+          const isSel = idx === activeIdx && !p.locked;
+          drawPoly(
+            poly,
+            p.color,
+            isSel ? "#ffffff" : p.locked ? "#f5b942" : "rgba(10,15,28,0.7)",
+            isSel ? 2.5 : 1.5
+          );
+        });
+      }
+
+      function getCanvasPt(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: ((e.clientX - rect.left) / rect.width) * W,
+          y: ((e.clientY - rect.top) / rect.height) * H
+        };
+      }
+
+      function onPointerDown(e) {
+        const pt = getCanvasPt(e);
+        for (let i = pieces.length - 1; i >= 0; i--) {
+          if (pieces[i].locked) continue;
+          const poly = getWorldPolygon(pieces[i]);
+          if (pointInPoly(pt.x, pt.y, poly) || Math.hypot(pt.x - pieces[i].x, pt.y - pieces[i].y) < 24) {
+            activeIdx = i;
+            dragging = true;
+            dragOffset = { x: pt.x - pieces[i].x, y: pt.y - pieces[i].y };
+            VirSagiArcade.playTone(520, 0.03, "sine");
+            draw();
+            return;
           }
+        }
+      }
 
-          btn.addEventListener("click", () => toggleCell(i));
-          boardEl.appendChild(btn);
+      function onPointerMove(e) {
+        if (!dragging) return;
+        const pt = getCanvasPt(e);
+        const p = pieces[activeIdx];
+        if (!p || p.locked) return;
+        p.x = Math.max(24, Math.min(W - 24, pt.x - dragOffset.x));
+        p.y = Math.max(24, Math.min(H - 20, pt.y - dragOffset.y));
+        draw();
+      }
+
+      function onPointerUp() {
+        if (!dragging) return;
+        dragging = false;
+        const p = pieces[activeIdx];
+        if (p && !p.locked) {
+          checkSnap(p);
+          draw();
         }
       }
 
       function mount(container) {
-        labelEl = document.createElement("p");
-        labelEl.className = "hint-text";
+        canvas = document.createElement("canvas");
+        canvas.className = "game-canvas";
+        canvas.width = W;
+        canvas.height = H;
+        ctx = canvas.getContext("2d");
 
-        boardEl = document.createElement("div");
-        boardEl.className = "tangram-board";
+        canvas.addEventListener("pointerdown", onPointerDown);
+        window.addEventListener("pointermove", onPointerMove);
+        window.addEventListener("pointerup", onPointerUp);
 
-        const switchBtn = document.createElement("button");
-        switchBtn.type = "button";
-        switchBtn.className = "btn";
-        switchBtn.textContent = "Ganti Pola";
-        switchBtn.addEventListener("click", nextPattern);
+        const bar = document.createElement("div");
+        bar.className = "pill-row";
 
-        container.appendChild(labelEl);
-        container.appendChild(boardEl);
-        container.appendChild(switchBtn);
-        startPattern(0);
+        const rotBtn = document.createElement("button");
+        rotBtn.type = "button";
+        rotBtn.className = "btn btn-gold";
+        rotBtn.textContent = "↻ Putar 45°";
+        rotBtn.addEventListener("click", rotateSelected);
+
+        const nextBtn = document.createElement("button");
+        nextBtn.type = "button";
+        nextBtn.className = "btn";
+        nextBtn.textContent = "Ganti Siluet";
+        nextBtn.addEventListener("click", () => setupPuzzle(puzzleIdx + 1));
+
+        bar.appendChild(rotBtn);
+        bar.appendChild(nextBtn);
+
+        const hint = document.createElement("p");
+        hint.className = "hint-text";
+        hint.textContent = "Geser 7 bangun datar (segitiga, persegi, jajar genjang) dan putar 45° agar pas masuk ke siluet.";
+
+        container.appendChild(canvas);
+        container.appendChild(bar);
+        container.appendChild(hint);
+        setupPuzzle(0);
       }
 
       function unmount() {
-        boardEl = null;
-        labelEl = null;
+        if (canvas) canvas.removeEventListener("pointerdown", onPointerDown);
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerup", onPointerUp);
+        canvas = null;
+        ctx = null;
       }
 
       return {
         icon: "🔷",
         title: "Tangram",
-        desc: "Rakit blok pola kosmik sesuai siluet target.",
+        desc: "Rakit 7 bangun datar geometri ke dalam siluet.",
         mount,
         unmount,
-        restart: () => startPattern(patIdx)
+        restart: () => setupPuzzle(puzzleIdx)
       };
     })();
 
@@ -2168,187 +2709,344 @@
       };
     })();
 
-    // #09 GG MERGE (Grid 4x4 Merge Level Item + Autosave)
+    // #09 GG MERGE (Mode Suika / Physics Drop Merge 10 Tier Kosmik)
     VirSagiArcade.Games.merge = (() => {
       const ID = "merge";
-      const TIERS = ["✦", "🌙", "🌸", "🏹", "👑", "🌌", "☀️"];
-      let cells = Array(16).fill(0);
-      let selectedIdx = null;
+      const W = 320;
+      const H = 410;
+      const DANGER_Y = 74;
+      const TIERS = [
+        { r: 15, color: "#4cc9f0", sym: "✦", pts: 10 },
+        { r: 20, color: "#a78bfa", sym: "🌙", pts: 25 },
+        { r: 25, color: "#f472b6", sym: "🌸", pts: 50 },
+        { r: 31, color: "#34d399", sym: "🍀", pts: 90 },
+        { r: 37, color: "#fbbf24", sym: "🏹", pts: 150 },
+        { r: 44, color: "#fb923c", sym: "🔥", pts: 240 },
+        { r: 51, color: "#f87171", sym: "👑", pts: 360 },
+        { r: 58, color: "#38bdf8", sym: "🪐", pts: 520 },
+        { r: 66, color: "#c084fc", sym: "🌌", pts: 750 },
+        { r: 74, color: "#fde047", sym: "☀️", pts: 1200 }
+      ];
+
+      let canvas = null;
+      let ctx = null;
+      let rafId = null;
+      let balls = [];
+      let dropX = W / 2;
+      let currentTier = 0;
+      let nextTier = 1;
+      let dropCooldown = 0;
       let score = 0;
-      let boardEl = null;
+      let dangerTimer = 0;
+      let isOver = false;
 
-      function saveState() {
-        VirSagiArcade.writeStorage(ID, "save", { cells, score });
+      function pickSpawnTier() {
+        return Math.floor(Math.random() * 4); // Drop awal tier 0..3
       }
 
-      function spawnItem() {
-        const empty = [];
-        cells.forEach((v, i) => { if (v === 0) empty.push(i); });
-        if (empty.length === 0) return false;
-        const pick = empty[Math.floor(Math.random() * empty.length)];
-        cells[pick] = Math.random() < 0.8 ? 1 : 2;
-        return true;
+      function clampDropX(rawX) {
+        const rad = TIERS[currentTier].r;
+        return Math.max(rad + 8, Math.min(W - rad - 8, rawX));
       }
 
-      function hasAnyMove() {
-        if (cells.some((v) => v === 0)) return true;
-        for (let r = 0; r < 4; r++) {
-          for (let c = 0; c < 4; c++) {
-            const idx = r * 4 + c;
-            const val = cells[idx];
-            if (val >= TIERS.length) continue;
-            if (c < 3 && cells[idx + 1] === val) return true;
-            if (r < 3 && cells[idx + 4] === val) return true;
-          }
-        }
-        return false;
+      function dropBall() {
+        if (isOver || dropCooldown > 0) return;
+        const t = TIERS[currentTier];
+        balls.push({
+          x: clampDropX(dropX),
+          y: 44,
+          vx: (Math.random() - 0.5) * 14,
+          vy: 30,
+          tier: currentTier,
+          r: t.r,
+          age: 0
+        });
+        VirSagiArcade.playTone(460 + currentTier * 55, 0.05, "sine");
+        currentTier = nextTier;
+        nextTier = pickSpawnTier();
+        dropX = clampDropX(dropX);
+        dropCooldown = 0.42;
       }
 
-      function onCellClick(idx) {
-        if (selectedIdx === null) {
-          if (cells[idx] > 0) {
-            selectedIdx = idx;
-            VirSagiArcade.playTone(540, 0.04, "sine");
-            render();
+      function updatePhysics(dt) {
+        if (dropCooldown > 0) dropCooldown = Math.max(0, dropCooldown - dt);
+
+        const gravity = 680;
+        for (let i = 0; i < balls.length; i++) {
+          const b = balls[i];
+          b.age += dt;
+          b.vy += gravity * dt;
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+          b.vx *= 0.992;
+
+          if (b.x - b.r < 6) {
+            b.x = 6 + b.r;
+            b.vx = Math.abs(b.vx) * 0.45;
+          } else if (b.x + b.r > W - 6) {
+            b.x = W - 6 - b.r;
+            b.vx = -Math.abs(b.vx) * 0.45;
           }
-          return;
+          if (b.y + b.r > H - 6) {
+            b.y = H - 6 - b.r;
+            b.vy = -Math.abs(b.vy) * 0.25;
+            b.vx *= 0.9;
+          }
         }
 
-        if (selectedIdx === idx) {
-          selectedIdx = null;
-          render();
-          return;
+        // Beberapa iterasi tumbukan + penggabungan tier identik
+        for (let iter = 0; iter < 3; iter++) {
+          let mergedThisPass = false;
+          for (let i = 0; i < balls.length; i++) {
+            for (let j = i + 1; j < balls.length; j++) {
+              const a = balls[i];
+              const b = balls[j];
+              const dx = b.x - a.x;
+              const dy = b.y - a.y;
+              const dist = Math.hypot(dx, dy);
+              const minDist = a.r + b.r;
+
+              if (dist < minDist) {
+                // Gabung jika tier sama dan belum maksimum
+                if (a.tier === b.tier && a.tier < TIERS.length - 1) {
+                  const newTier = a.tier + 1;
+                  const meta = TIERS[newTier];
+                  const nx = (a.x + b.x) / 2;
+                  const ny = (a.y + b.y) / 2;
+                  balls.splice(j, 1);
+                  balls.splice(i, 1);
+                  balls.push({
+                    x: Math.max(meta.r + 6, Math.min(W - meta.r - 6, nx)),
+                    y: Math.min(H - meta.r - 6, ny),
+                    vx: 0,
+                    vy: -60,
+                    tier: newTier,
+                    r: meta.r,
+                    age: 0.5
+                  });
+                  score += meta.pts;
+                  VirSagiArcade.updateBestIfHigher(ID, score);
+                  VirSagiArcade.playTone(580 + newTier * 60, 0.09, "triangle");
+                  updateStats();
+                  mergedThisPass = true;
+                  break;
+                }
+
+                // Dorong pisah elastis lembut
+                const nx = dist > 0.001 ? dx / dist : 0;
+                const ny = dist > 0.001 ? dy / dist : 1;
+                const overlap = (minDist - dist) * 0.52;
+                a.x -= nx * overlap;
+                a.y -= ny * overlap;
+                b.x += nx * overlap;
+                b.y += ny * overlap;
+
+                const rvx = b.vx - a.vx;
+                const rvy = b.vy - a.vy;
+                const sepVel = rvx * nx + rvy * ny;
+                if (sepVel < 0) {
+                  const imp = -sepVel * 0.58;
+                  a.vx -= imp * nx;
+                  a.vy -= imp * ny;
+                  b.vx += imp * nx;
+                  b.vy += imp * ny;
+                }
+              }
+            }
+            if (mergedThisPass) break;
+          }
         }
 
-        const a = cells[selectedIdx];
-        const b = cells[idx];
-
-        if (a > 0 && a === b && a < TIERS.length) {
-          const nextLv = a + 1;
-          cells[idx] = nextLv;
-          cells[selectedIdx] = 0;
-          selectedIdx = null;
-          score += nextLv * 25;
-          VirSagiArcade.updateBestIfHigher(ID, score);
-          VirSagiArcade.playTone(620 + nextLv * 55, 0.08, "triangle");
-
-          if (cells.filter((v) => v > 0).length <= 2) {
-            spawnItem();
-          }
-          saveState();
-          render();
-
-          if (!hasAnyMove()) {
-            VirSagiArcade.showBanner(`Papan penuh! Skor akhir: ${score}`);
+        // Cek apakah ada bola yang menetap melewati garis batas atas
+        const overLine = balls.some((b) => b.age > 1.2 && b.y - b.r < DANGER_Y);
+        if (overLine) {
+          dangerTimer += dt;
+          if (dangerTimer >= 1.5) {
+            isOver = true;
+            const best = VirSagiArcade.updateBestIfHigher(ID, score);
+            VirSagiArcade.playTone(210, 0.22, "sawtooth");
+            VirSagiArcade.showBanner(`Wadah penuh melewati garis batas! Skor: ${score} • Rekor: ${best}`);
           }
         } else {
-          selectedIdx = cells[idx] > 0 ? idx : null;
-          render();
+          dangerTimer = 0;
         }
       }
 
-      function render() {
+      function updateStats() {
         const best = VirSagiArcade.readStorage(ID, "best", 0);
-        VirSagiArcade.setStats(`Skor: ${score} • Rekor: ${best}`);
-        boardEl.innerHTML = "";
+        const nextSym = TIERS[nextTier].sym;
+        VirSagiArcade.setStats(`Skor: ${score} • Next: ${nextSym} • Rekor: ${best}`);
+      }
 
-        cells.forEach((lv, idx) => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "merge-cell" + (selectedIdx === idx ? " selected" : "");
-          if (lv > 0) {
-            const sym = TIERS[Math.min(lv - 1, TIERS.length - 1)];
-            btn.style.background = `rgba(245, 185, 66, ${Math.min(0.45, 0.1 + lv * 0.05)})`;
-            btn.innerHTML = `<span>${sym}</span><small>Lv.${lv}</small>`;
-          }
-          btn.addEventListener("click", () => onCellClick(idx));
-          boardEl.appendChild(btn);
+      function draw() {
+        if (!ctx) return;
+        ctx.fillStyle = "#080d1a";
+        ctx.fillRect(0, 0, W, H);
+
+        // Dinding wadah kiri-kanan-bawah
+        ctx.strokeStyle = "rgba(245, 185, 66, 0.35)";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(4, 4, W - 8, H - 8);
+
+        // Garis batas atas wadah (berkedip merah bila hampir penuh)
+        ctx.save();
+        ctx.setLineDash([6, 5]);
+        ctx.strokeStyle = dangerTimer > 0 ? "#ff5d8f" : "rgba(255, 93, 143, 0.45)";
+        ctx.lineWidth = dangerTimer > 0 ? 2.5 : 1.5;
+        ctx.beginPath();
+        ctx.moveTo(8, DANGER_Y);
+        ctx.lineTo(W - 8, DANGER_Y);
+        ctx.stroke();
+        ctx.restore();
+
+        // Garis panduan jatuh & calon bola di atas
+        if (!isOver && dropCooldown <= 0) {
+          const cur = TIERS[currentTier];
+          const px = clampDropX(dropX);
+          ctx.strokeStyle = "rgba(255,255,255,0.16)";
+          ctx.beginPath();
+          ctx.moveTo(px, 44);
+          ctx.lineTo(px, H - 10);
+          ctx.stroke();
+
+          ctx.fillStyle = cur.color;
+          ctx.beginPath();
+          ctx.arc(px, 44, cur.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "#0b1020";
+          ctx.font = `bold ${Math.max(12, Math.floor(cur.r * 0.9))}px sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(cur.sym, px, 45);
+        }
+
+        // Semua bola di dalam wadah
+        balls.forEach((b) => {
+          const meta = TIERS[b.tier];
+          ctx.fillStyle = meta.color;
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255,255,255,0.28)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          ctx.fillStyle = "#0b1020";
+          ctx.font = `bold ${Math.max(12, Math.floor(b.r * 0.85))}px sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(meta.sym, b.x, b.y + 1);
         });
       }
 
-      function freshGame() {
-        cells = Array(16).fill(0);
-        selectedIdx = null;
+      let lastTs = 0;
+      function loop(ts) {
+        if (!ctx) return;
+        if (!lastTs) lastTs = ts;
+        const dt = Math.min(0.033, (ts - lastTs) / 1000);
+        lastTs = ts;
+
+        if (!isOver) updatePhysics(dt);
+        draw();
+        rafId = requestAnimationFrame(loop);
+      }
+
+      function setPointerX(e) {
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        const px = ((e.clientX - rect.left) / rect.width) * W;
+        dropX = clampDropX(px);
+      }
+
+      function onPointerDown(e) {
+        setPointerX(e);
+      }
+
+      function onPointerMove(e) {
+        setPointerX(e);
+      }
+
+      function onPointerUp(e) {
+        setPointerX(e);
+        dropBall();
+      }
+
+      function restart() {
+        balls = [];
         score = 0;
-        spawnItem();
-        spawnItem();
-        spawnItem();
-        saveState();
-        render();
+        dangerTimer = 0;
+        dropCooldown = 0;
+        isOver = false;
+        currentTier = 0;
+        nextTier = 1;
+        dropX = W / 2;
+        lastTs = 0;
+        updateStats();
       }
 
       function mount(container) {
-        boardEl = document.createElement("div");
-        boardEl.className = "merge-grid";
+        canvas = document.createElement("canvas");
+        canvas.className = "game-canvas";
+        canvas.width = W;
+        canvas.height = H;
+        ctx = canvas.getContext("2d");
 
-        const dropBtn = document.createElement("button");
-        dropBtn.type = "button";
-        dropBtn.className = "btn";
-        dropBtn.textContent = "+ Tambah Item";
-        dropBtn.addEventListener("click", () => {
-          if (!spawnItem()) {
-            if (!hasAnyMove()) VirSagiArcade.showBanner(`Papan penuh! Skor: ${score}`);
-            return;
-          }
-          VirSagiArcade.playTone(500, 0.05, "sine");
-          saveState();
-          render();
-          if (!hasAnyMove()) {
-            VirSagiArcade.showBanner(`Papan penuh! Skor: ${score}`);
-          }
-        });
+        canvas.addEventListener("pointerdown", onPointerDown);
+        canvas.addEventListener("pointermove", onPointerMove);
+        canvas.addEventListener("pointerup", onPointerUp);
 
         const hint = document.createElement("p");
         hint.className = "hint-text";
-        hint.textContent = "Klik 2 item dengan level yang sama untuk menggabungkannya. Progres tersimpan otomatis.";
+        hint.textContent = "Geser posisi lalu lepas untuk menjatuhkan orb kosmik. Dua orb sama akan bergabung hingga ☀️!";
 
-        container.appendChild(boardEl);
-        container.appendChild(dropBtn);
+        container.appendChild(canvas);
         container.appendChild(hint);
-
-        const saved = VirSagiArcade.readStorage(ID, "save", null);
-        if (saved && Array.isArray(saved.cells) && saved.cells.length === 16) {
-          cells = saved.cells;
-          score = Number(saved.score) || 0;
-          selectedIdx = null;
-          render();
-        } else {
-          freshGame();
-        }
+        restart();
+        rafId = requestAnimationFrame(loop);
       }
 
       function unmount() {
-        saveState();
-        boardEl = null;
+        cancelAnimationFrame(rafId);
+        rafId = null;
+        if (canvas) {
+          canvas.removeEventListener("pointerdown", onPointerDown);
+          canvas.removeEventListener("pointermove", onPointerMove);
+          canvas.removeEventListener("pointerup", onPointerUp);
+        }
+        canvas = null;
+        ctx = null;
       }
 
       return {
         icon: "✨",
-        title: "GG Merge",
-        desc: "Gabungkan item identik jadi level lebih tinggi.",
+        title: "GG Merge (Suika)",
+        desc: "Jatuhkan & gabungkan orb kosmik hingga matahari ☀️.",
         mount,
         unmount,
-        restart: freshGame
+        restart
       };
     })();
 
-    // #10 BUBBLE SHOOTER
+    // #10 BUBBLE SHOOTER (Pantulan Dinding, Next Bubble + Swap, Floating Drop & Garis Batas Jelas)
     VirSagiArcade.Games.bubble = (() => {
       const ID = "bubble";
       const W = 320;
-      const H = 390;
+      const H = 410;
       const R = 15;
       const COLS = 9;
       const ROWS = 10;
+      const DANGER_ROW = 8; // Garis batas kalah terlihat jelas di atas shooter
       const COLORS = ["#ff5d8f", "#4cc9f0", "#f5b942", "#4ade80", "#c77dff"];
 
       let canvas = null;
       let ctx = null;
       let rafId = null;
       let board = [];
-      let shooterColor = 0;
+      let shooterColor = 1;
+      let nextColor = 2;
       let aimAngle = -Math.PI / 2;
       let proj = null;
+      let popEffects = [];
       let score = 0;
       let shots = 0;
       let isOver = false;
@@ -2358,6 +3056,15 @@
         const x = 22 + c * (R * 2 + 2) + offset;
         const y = 24 + r * (R * 1.75);
         return { x, y };
+      }
+
+      function randomColorVal() {
+        const present = new Set(board.flat().filter((v) => v > 0));
+        if (present.size > 0 && present.size < COLORS.length && Math.random() < 0.75) {
+          const arr = Array.from(present);
+          return arr[Math.floor(Math.random() * arr.length)];
+        }
+        return 1 + Math.floor(Math.random() * COLORS.length);
       }
 
       function seedRows(count = 4) {
@@ -2403,6 +3110,41 @@
         return found;
       }
 
+      // Rontokkan gelembung yang tidak lagi terhubung ke atap (baris 0)
+      function dropFloatingBubbles() {
+        const anchored = new Set();
+        const stack = [];
+        for (let c = 0; c < COLS; c++) {
+          if (board[0][c] !== 0) {
+            anchored.add(`0,${c}`);
+            stack.push([0, c]);
+          }
+        }
+        while (stack.length > 0) {
+          const [r, c] = stack.pop();
+          getNeighbors(r, c).forEach(([nr, nc]) => {
+            const key = `${nr},${nc}`;
+            if (!anchored.has(key) && board[nr][nc] !== 0) {
+              anchored.add(key);
+              stack.push([nr, nc]);
+            }
+          });
+        }
+
+        let dropped = 0;
+        for (let r = 0; r < ROWS; r++) {
+          for (let c = 0; c < COLS; c++) {
+            if (board[r][c] !== 0 && !anchored.has(`${r},${c}`)) {
+              const pt = cellCenter(r, c);
+              popEffects.push({ x: pt.x, y: pt.y, color: COLORS[board[r][c] - 1], life: 1, fall: true });
+              board[r][c] = 0;
+              dropped++;
+            }
+          }
+        }
+        return dropped;
+      }
+
       function snapProjectile() {
         if (!proj) return;
         let bestR = 0;
@@ -2424,8 +3166,13 @@
         board[bestR][bestC] = proj.color;
         const cluster = collectCluster(bestR, bestC, proj.color);
         if (cluster.length >= 3) {
-          cluster.forEach(([r, c]) => { board[r][c] = 0; });
-          score += cluster.length * 15;
+          cluster.forEach(([r, c]) => {
+            const pt = cellCenter(r, c);
+            popEffects.push({ x: pt.x, y: pt.y, color: COLORS[board[r][c] - 1], life: 1, fall: false });
+            board[r][c] = 0;
+          });
+          const dropped = dropFloatingBubbles();
+          score += cluster.length * 15 + dropped * 25;
           VirSagiArcade.updateBestIfHigher(ID, score);
           VirSagiArcade.playTone(790, 0.08, "triangle");
         } else {
@@ -2434,38 +3181,53 @@
 
         proj = null;
         shots++;
-        if (shots % 4 === 0) addTopRow();
+        if (shots % 5 === 0) addTopRow();
 
-        // Refill otomatis bila papan bersih agar terus jalan
         if (board.flat().every((v) => v === 0)) {
-          score += 100;
+          score += 120;
           VirSagiArcade.updateBestIfHigher(ID, score);
           seedRows(4);
         }
 
-        // Cek batas bawah
-        if (board[ROWS - 1].some((v) => v !== 0)) {
+        // Cek apakah ada gelembung melewati garis merah batas bawah
+        let crossedLimit = false;
+        for (let r = DANGER_ROW; r < ROWS; r++) {
+          if (board[r].some((v) => v !== 0)) {
+            crossedLimit = true;
+            break;
+          }
+        }
+
+        if (crossedLimit) {
           isOver = true;
           const best = VirSagiArcade.updateBestIfHigher(ID, score);
           VirSagiArcade.playTone(210, 0.2, "sawtooth");
-          VirSagiArcade.showBanner(`Gelembung mencapai batas! Skor: ${score} • Rekor: ${best}`);
+          VirSagiArcade.showBanner(`Gelembung melewati garis batas! Skor: ${score} • Rekor: ${best}`);
         }
 
-        shooterColor = 1 + Math.floor(Math.random() * COLORS.length);
+        shooterColor = nextColor;
+        nextColor = randomColorVal();
         updateStats();
+      }
+
+      function swapBubbles() {
+        if (isOver || proj) return;
+        [shooterColor, nextColor] = [nextColor, shooterColor];
+        VirSagiArcade.playTone(580, 0.04, "sine");
       }
 
       function updateStats() {
         const best = VirSagiArcade.readStorage(ID, "best", 0);
-        VirSagiArcade.setStats(`Skor: ${score} • Rekor: ${best}`);
+        const untilDrop = 5 - (shots % 5);
+        VirSagiArcade.setStats(`Skor: ${score} • Turun: ${untilDrop} tembakan • Rekor: ${best}`);
       }
 
       function shoot() {
         if (isOver || proj) return;
-        const speed = 460;
+        const speed = 560;
         proj = {
           x: W / 2,
-          y: H - 34,
+          y: H - 36,
           vx: Math.cos(aimAngle) * speed,
           vy: Math.sin(aimAngle) * speed,
           color: shooterColor
@@ -2477,31 +3239,79 @@
         const rect = canvas.getBoundingClientRect();
         const px = ((clientX - rect.left) / rect.width) * W;
         const py = ((clientY - rect.top) / rect.height) * H;
-        const raw = Math.atan2(py - (H - 34), px - W / 2);
-        const clamped = Math.max(-Math.PI + 0.22, Math.min(-0.22, raw));
+        const raw = Math.atan2(py - (H - 36), px - W / 2);
+        const clamped = Math.max(-Math.PI + 0.2, Math.min(-0.2, raw));
         if (clamped < 0) aimAngle = clamped;
+      }
+
+      // Gambar garis bidik lengkap dengan 1x pantulan dinding kiri/kanan
+      function drawAimTrajectory() {
+        let x = W / 2;
+        let y = H - 36;
+        let vx = Math.cos(aimAngle);
+        let vy = Math.sin(aimAngle);
+
+        ctx.save();
+        ctx.strokeStyle = "rgba(245, 185, 66, 0.65)";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        let bounced = false;
+        for (let step = 0; step < 52; step++) {
+          x += vx * 8;
+          y += vy * 8;
+          if (!bounced && (x - R <= 6 || x + R >= W - 6)) {
+            x = Math.max(6 + R, Math.min(W - 6 - R, x));
+            vx *= -1;
+            bounced = true;
+            ctx.lineTo(x, y);
+          }
+          if (y <= 20) break;
+        }
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawBubbleCircle(x, y, rad, color) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, rad, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Kilau gelembung agar lebih hidup
+        ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+        ctx.beginPath();
+        ctx.arc(x - rad * 0.32, y - rad * 0.32, rad * 0.28, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       function loop() {
         if (!ctx) return;
         if (proj && !isOver) {
-          proj.x += proj.vx * 0.016;
-          proj.y += proj.vy * 0.016;
+          const subSteps = 2;
+          const dt = 0.016 / subSteps;
+          for (let s = 0; s < subSteps && proj; s++) {
+            proj.x += proj.vx * dt;
+            proj.y += proj.vy * dt;
 
-          if (proj.x - R < 6 || proj.x + R > W - 6) {
-            proj.vx *= -1;
-            proj.x = Math.max(6 + R, Math.min(W - 6 - R, proj.x));
-          }
-          if (proj.y - R <= 12) {
-            snapProjectile();
-          } else {
-            outer: for (let r = 0; r < ROWS; r++) {
-              for (let c = 0; c < COLS; c++) {
-                if (board[r][c] === 0) continue;
-                const pt = cellCenter(r, c);
-                if (Math.hypot(proj.x - pt.x, proj.y - pt.y) < R * 1.85) {
-                  snapProjectile();
-                  break outer;
+            if (proj.x - R < 6 || proj.x + R > W - 6) {
+              proj.vx *= -1;
+              proj.x = Math.max(6 + R, Math.min(W - 6 - R, proj.x));
+            }
+            if (proj.y - R <= 12) {
+              snapProjectile();
+            } else {
+              outer: for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                  if (board[r][c] === 0) continue;
+                  const pt = cellCenter(r, c);
+                  if (Math.hypot(proj.x - pt.x, proj.y - pt.y) < R * 1.82) {
+                    snapProjectile();
+                    break outer;
+                  }
                 }
               }
             }
@@ -2511,39 +3321,61 @@
         ctx.fillStyle = "#080d1a";
         ctx.fillRect(0, 0, W, H);
 
+        // Garis batas merah jelas di atas shooter
+        const limitY = cellCenter(DANGER_ROW, 0).y - R * 0.4;
+        const nearDanger = board[DANGER_ROW - 1].some((v) => v !== 0);
+        ctx.save();
+        ctx.setLineDash([7, 5]);
+        ctx.strokeStyle = nearDanger ? "#ff5d8f" : "rgba(255, 93, 143, 0.52)";
+        ctx.lineWidth = nearDanger ? 2.5 : 1.6;
+        ctx.beginPath();
+        ctx.moveTo(8, limitY);
+        ctx.lineTo(W - 8, limitY);
+        ctx.stroke();
+        ctx.restore();
+
+        // Gelembung di papan
         for (let r = 0; r < ROWS; r++) {
           for (let c = 0; c < COLS; c++) {
             const v = board[r][c];
             if (!v) continue;
             const pt = cellCenter(r, c);
-            ctx.fillStyle = COLORS[v - 1];
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, R - 1, 0, Math.PI * 2);
-            ctx.fill();
+            drawBubbleCircle(pt.x, pt.y, R - 1, COLORS[v - 1]);
           }
         }
 
-        // Garis bidik
-        ctx.strokeStyle = "rgba(245, 185, 66, 0.45)";
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(W / 2, H - 34);
-        ctx.lineTo(W / 2 + Math.cos(aimAngle) * 75, H - 34 + Math.sin(aimAngle) * 75);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        if (proj) {
-          ctx.fillStyle = COLORS[proj.color - 1];
+        // Efek pecah / jatuh
+        for (let i = popEffects.length - 1; i >= 0; i--) {
+          const ef = popEffects[i];
+          ef.life -= 0.06;
+          if (ef.fall) ef.y += 4;
+          if (ef.life <= 0) {
+            popEffects.splice(i, 1);
+            continue;
+          }
+          ctx.save();
+          ctx.globalAlpha = ef.life;
+          ctx.strokeStyle = ef.color;
+          ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.arc(proj.x, proj.y, R - 1, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.arc(ef.x, ef.y, R * (1.4 - ef.life * 0.4), 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
         }
 
-        // Shooter aktif
-        ctx.fillStyle = COLORS[shooterColor - 1];
-        ctx.beginPath();
-        ctx.arc(W / 2, H - 34, R, 0, Math.PI * 2);
-        ctx.fill();
+        if (!isOver) drawAimTrajectory();
+
+        if (proj) {
+          drawBubbleCircle(proj.x, proj.y, R - 1, COLORS[proj.color - 1]);
+        }
+
+        // Bola utama di tengah & pratinjau bola berikutnya di kanan bawah
+        drawBubbleCircle(W / 2, H - 36, R, COLORS[shooterColor - 1]);
+        drawBubbleCircle(W / 2 + 46, H - 30, R * 0.72, COLORS[nextColor - 1]);
+        ctx.fillStyle = "rgba(255,255,255,0.65)";
+        ctx.font = "10px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("NEXT", W / 2 + 46, H - 10);
 
         rafId = requestAnimationFrame(loop);
       }
@@ -2552,7 +3384,7 @@
         setAimFromPoint(e.clientX, e.clientY);
       }
 
-      function onPointerDown(e) {
+      function onPointerUp(e) {
         setAimFromPoint(e.clientX, e.clientY);
         shoot();
       }
@@ -2561,10 +3393,12 @@
         score = 0;
         shots = 0;
         proj = null;
+        popEffects = [];
         isOver = false;
         aimAngle = -Math.PI / 2;
-        shooterColor = 1 + Math.floor(Math.random() * COLORS.length);
         seedRows(4);
+        shooterColor = randomColorVal();
+        nextColor = randomColorVal();
         updateStats();
       }
 
@@ -2576,13 +3410,20 @@
         ctx = canvas.getContext("2d");
 
         canvas.addEventListener("pointermove", onPointerMove);
-        canvas.addEventListener("pointerdown", onPointerDown);
+        canvas.addEventListener("pointerup", onPointerUp);
+
+        const swapBtn = document.createElement("button");
+        swapBtn.type = "button";
+        swapBtn.className = "btn";
+        swapBtn.textContent = "⇄ Tukar Bola";
+        swapBtn.addEventListener("click", swapBubbles);
 
         const hint = document.createElement("p");
         hint.className = "hint-text";
-        hint.textContent = "Arahkan bidikan lalu tap/klik untuk menembak kelompok warna yang sama (min. 3).";
+        hint.textContent = "Geser jari untuk memantulkan bidikan ke dinding, lepas untuk menembak. Jangan lewat garis batas merah!";
 
         container.appendChild(canvas);
+        container.appendChild(swapBtn);
         container.appendChild(hint);
         restart();
         rafId = requestAnimationFrame(loop);
@@ -2593,7 +3434,7 @@
         rafId = null;
         if (canvas) {
           canvas.removeEventListener("pointermove", onPointerMove);
-          canvas.removeEventListener("pointerdown", onPointerDown);
+          canvas.removeEventListener("pointerup", onPointerUp);
         }
         canvas = null;
         ctx = null;
@@ -2602,7 +3443,7 @@
       return {
         icon: "🫧",
         title: "Bubble Shooter",
-        desc: "Bidik & pecahkan kelompok gelembung warna sama.",
+        desc: "Bidik dengan pantulan dinding & jaga jangan melewati garis batas.",
         mount,
         unmount,
         restart
