@@ -380,8 +380,17 @@
       border-radius: 999px; transition: width 0.6s ease;
     }
 
+    .minigame-link-btn {
+      margin-top: 12px; width: 100%; padding: 12px 14px; border: 1px solid rgba(255, 209, 102, 0.45);
+      border-radius: 16px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.34), rgba(255, 126, 179, 0.34));
+      color: #fff; font-family: inherit; font-weight: 800; font-size: 0.84rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      box-shadow: 0 6px 18px rgba(157, 123, 255, 0.22); transition: transform 0.18s ease;
+    }
+    .minigame-link-btn:active { transform: scale(0.97); }
+
     .harvest-btn {
-      margin-top: 14px; width: 100%; padding: 13px; border: none; border-radius: 16px;
+      margin-top: 12px; width: 100%; padding: 13px; border: none; border-radius: 16px;
       background: linear-gradient(135deg, #f59e0b, #ec4899); color: white;
       font-family: inherit; font-weight: 800; font-size: 0.9rem; cursor: pointer;
     }
@@ -669,6 +678,10 @@
           </div>
         </div>
 
+        <button type="button" class="minigame-link-btn" id="openMiniGameBtn" onclick="openMiniGameHub()">
+          🎮 Ajak Tumbuh Main Mini-Game (♍ + ♐)
+        </button>
+
         <button class="harvest-btn" id="harvestBtn" style="display:none;" onclick="harvestPlant()">
           ✨ Panen & Simpan ke Greenhouse! ✨
         </button>
@@ -754,6 +767,7 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzoCtaFdkPY_X6DZHFEL38dD2bvTIfMf0hILEAnrXzQcqh8J-s2JrB1-2Dk42ypIivq/exec";
+    const MINIGAME_URL = "https://bbckarawang.github.io/virsagi/minigame";
     let appData = null;
     let isFetching = false;
     let isManualSkyOverride = false;
@@ -762,6 +776,23 @@
     let bubbleTimer = null;
     let currentPlayingBtn = null;
     const requestingTasks = new Set();
+
+    function openMiniGameHub() {
+      playCuteSound('jump');
+      const g = (appData && appData.garden) ? appData.garden : {};
+      const emoji = encodeURIComponent((g.rewards && g.rewards.displayEmoji) || document.getElementById('plantEmoji').textContent || '🌰');
+      const stage = encodeURIComponent(g.stage || 1);
+      const gen = encodeURIComponent(g.currentGen || 1);
+      const pot = encodeURIComponent(g.potStyle || 'terracotta');
+
+      try {
+        if (appData) {
+          localStorage.setItem('carelendar_cosmic_cache', JSON.stringify(appData));
+        }
+      } catch (e) {}
+
+      window.location.href = `${MINIGAME_URL}?emoji=${emoji}&stage=${stage}&gen=${gen}&pot=${pot}`;
+    }
 
     // ==========================================
     // CUTE SYNTHESIZED SOUND EFFECTS (Web Audio)
@@ -1023,7 +1054,6 @@
         "💧😋"
       ];
 
-      // 40% peluang muncul bubble khusus emoji agar terlihat bervariasi & ekspresif
       const showEmojiOnly = Math.random() < 0.4;
       let chosenBubble = "";
 
@@ -1039,7 +1069,6 @@
 
       bubble.textContent = chosenBubble;
 
-      // Posisi pinggir kiri & kanan atas/bawah yang steril dari jalur lompatan badan tanaman
       const safeSidePositions = [
         { top: '38px', left: '10px', right: 'auto', bottom: 'auto' },
         { top: '44px', right: '10px', left: 'auto', bottom: 'auto' },
@@ -1130,7 +1159,6 @@
       document.getElementById('progressFill').style.width = `${Math.min(100, Math.max(4, (g.currentCoins / 1000) * 100))}%`;
       document.getElementById('harvestBtn').style.display = g.canHarvest ? 'block' : 'none';
 
-      // Clues & Foto Kenangan Tahap 5 (Menggunakan Thumbnail Google Drive Res-Tinggi + Fallback)
       let htmlClues = '';
       htmlClues += g.rewards.clue2
         ? `<div class="clue-item">🌱 <b>Petunjuk 1:</b> "${g.rewards.clue2}"</div>`
@@ -1139,14 +1167,13 @@
         ? `<div class="clue-item">🌿 <b>Petunjuk 2:</b> "${g.rewards.clue4}"</div>`
         : `<div class="clue-locked">🔒 Petunjuk 2 terbuka di 300 Koin</div>`;
       htmlClues += g.rewards.foto5
-        ? `<div class="clue-item">📸 <b>Kenangan Terbuka:</b><img class="clue-photo" src="${convertDriveUrl(g.rewards.foto5, 'image')}" alt="Kenangan" onerror="handleImageFallback(this, '${String(g.rewards.foto5).replace(/'/g, "\'")}')" /></div>`
+        ? `<div class="clue-item">📸 <b>Kenangan Terbuka:</b><img class="clue-photo" src="${convertDriveUrl(g.rewards.foto5, 'image')}" alt="Kenangan" onerror="handleImageFallback(this, '${String(g.rewards.foto5).replace(/'/g, "\\'")}')" /></div>`
         : `<div class="clue-locked">🔒 Foto Rahasia terbuka di 500 Koin</div>`;
       htmlClues += g.rewards.surat7
         ? `<div class="clue-item" style="margin-top:8px;">💌 <b>Surat Akhir:</b> "${g.rewards.surat7}"</div>`
         : `<div class="clue-locked">🔒 Identitas Bunga & Surat Spesial terbuka di 1.000 Koin</div>`;
       document.getElementById('cluesContent').innerHTML = htmlClues;
 
-      // Jadwal & Sholat
       const jadwalEl = document.getElementById('jadwalList');
       jadwalEl.innerHTML = (data.jadwal || []).map(item => {
         let btnClass = 'water-btn';
@@ -1163,9 +1190,9 @@
           disabledAttr = 'disabled';
         }
 
-        const safeTitle = String(item.judul).replace(/'/g, "\'");
-        const safeId = String(item.id).replace(/'/g, "\'");
-        const safeVnUrl = String(item.voiceNote || '').trim().replace(/'/g, "\'");
+        const safeTitle = String(item.judul).replace(/'/g, "\\'");
+        const safeId = String(item.id).replace(/'/g, "\\'");
+        const safeVnUrl = String(item.voiceNote || '').trim().replace(/'/g, "\\'");
         return `
           <div class="task-card ${item.isPrayer ? 'prayer' : ''} ${item.status === 'approved' ? 'approved' : ''}">
             <div class="task-time">${item.jam}</div>
@@ -1181,7 +1208,6 @@
         `;
       }).join('');
 
-      // Free Time Matcher
       const ftEl = document.getElementById('freeTimeList');
       if (data.freeTime && data.freeTime.length) {
         ftEl.innerHTML = data.freeTime.map(f => `
@@ -1194,7 +1220,6 @@
         ftEl.innerHTML = `<p style="font-size:0.78rem; color:var(--text-muted);">Isi tab Free_Time di Sheets untuk melihat jam kosong bersama.</p>`;
       }
 
-      // Greenhouse
       const ghEl = document.getElementById('greenhouseGrid');
       if (!data.greenhouse || data.greenhouse.length === 0) {
         ghEl.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:24px; color:var(--text-muted); font-size:0.8rem;">Belum ada tanaman yang dipanen. Siram terus tanaman pertamamu sampai 1.000 koin! 🌱</div>`;
@@ -1394,7 +1419,6 @@
       }
     }
 
-    // Pemutar Voice Note: 1 Hari = 1 Audio Tetap, Besoknya Berubah (Tanpa Mengulang Kemarin)
     function resetVoiceNoteButton() {
       if (currentPlayingBtn) {
         currentPlayingBtn.classList.remove('playing');
@@ -1424,12 +1448,10 @@
         saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
       } catch (e) {}
 
-      // Jika sudah dipilih untuk hari ini dan linknya masih ada di daftar, tetap gunakan link yang sama
       if (saved && saved.date === todayKey && urlList.includes(saved.url)) {
         return saved.url;
       }
 
-      // Saat hari berganti, pilih acak dari daftar sambil menghindari link yang diputar kemarin
       const candidates = (saved && saved.url)
         ? urlList.filter(u => u !== saved.url)
         : urlList;
@@ -1470,7 +1492,6 @@
         });
     }
 
-    // Ekstrak ID Google Drive secara fleksibel (/d/ID atau ?id=ID)
     function extractDriveId(url) {
       if (!url) return null;
       const str = String(url).trim();
