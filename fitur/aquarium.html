@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>VirSagi Cosmic Aquarium</title>
+  <title>VirSagi Cosmic Aquarium v9</title>
   <style>
     :root {
-      --bg-dark: #070b19;
-      --panel: rgba(14, 22, 46, 0.84);
-      --panel-border: rgba(147, 197, 253, 0.22);
+      --bg-dark: #060a17;
+      --panel: rgba(13, 21, 44, 0.88);
+      --panel-border: rgba(147, 197, 253, 0.24);
       --accent: #38bdf8;
       --accent-2: #c084fc;
       --gold: #fbbf24;
@@ -27,7 +27,7 @@
     body {
       margin: 0;
       padding: 0;
-      background: radial-gradient(circle at top, #111c3d, var(--bg-dark) 75%);
+      background: radial-gradient(circle at top, #152552, var(--bg-dark) 75%);
       color: var(--text);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       overflow-x: hidden;
@@ -59,7 +59,7 @@
     .pet-title-group {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
@@ -93,7 +93,7 @@
     }
 
     button {
-      background: rgba(30, 41, 75, 0.9);
+      background: rgba(30, 41, 75, 0.92);
       color: var(--text);
       border: 1px solid rgba(148, 163, 184, 0.28);
       border-radius: 10px;
@@ -105,7 +105,7 @@
     }
 
     button:hover {
-      background: rgba(51, 65, 110, 0.95);
+      background: rgba(51, 65, 110, 0.96);
       border-color: var(--accent);
     }
 
@@ -119,8 +119,8 @@
     }
 
     button.warn {
-      background: rgba(251, 113, 133, 0.2);
-      border-color: rgba(251, 113, 133, 0.55);
+      background: rgba(251, 113, 133, 0.22);
+      border-color: rgba(251, 113, 133, 0.6);
       color: #fecdd3;
     }
 
@@ -179,21 +179,21 @@
       position: relative;
       border-radius: 20px;
       overflow: hidden;
-      border: 1px solid rgba(125, 211, 252, 0.28);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(125, 211, 252, 0.32);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.6);
       background: #081226;
     }
 
     canvas#tankCanvas {
       display: block;
       width: 100%;
-      height: 430px;
+      height: 445px;
       touch-action: none;
     }
 
     @media (max-width: 640px) {
       canvas#tankCanvas {
-        height: 360px;
+        height: 370px;
       }
     }
 
@@ -204,37 +204,39 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 12px;
+      padding: 10px 12px;
+    }
+
+    .hud-top-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
     .hud-top {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .hud-right-chips {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .chip {
       pointer-events: auto;
-      background: rgba(8, 15, 34, 0.72);
+      background: rgba(8, 15, 34, 0.76);
       border: 1px solid rgba(148, 163, 184, 0.25);
       backdrop-filter: blur(6px);
-      padding: 5px 10px;
+      padding: 4px 10px;
       border-radius: 999px;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       color: #e2e8f0;
-    }
-
-    .note-banner {
-      align-self: flex-start;
-      max-width: 82%;
-      background: rgba(15, 23, 42, 0.8);
-      border-left: 3px solid var(--accent-2);
-      padding: 6px 11px;
-      border-radius: 0 10px 10px 0;
-      font-size: 0.78rem;
-      color: #f1f5f9;
-      backdrop-filter: blur(6px);
     }
 
     .minigame-bar {
@@ -244,14 +246,27 @@
       justify-content: space-between;
       gap: 8px;
       background: rgba(15, 23, 42, 0.88);
-      border: 1px solid var(--gold);
+      border: 1px solid rgba(251, 191, 36, 0.75);
       border-radius: 12px;
-      padding: 8px 12px;
-      font-size: 0.82rem;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      backdrop-filter: blur(6px);
     }
 
     .minigame-bar.active {
       display: flex;
+    }
+
+    .note-banner {
+      align-self: flex-start;
+      max-width: 88%;
+      background: rgba(15, 23, 42, 0.8);
+      border-left: 3px solid var(--accent-2);
+      padding: 5px 10px;
+      border-radius: 0 10px 10px 0;
+      font-size: 0.76rem;
+      color: #f1f5f9;
+      backdrop-filter: blur(6px);
     }
 
     .tabs {
@@ -283,7 +298,7 @@
     }
 
     .item-card {
-      background: rgba(15, 23, 45, 0.85);
+      background: rgba(15, 23, 45, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.2);
       border-radius: 12px;
       padding: 10px;
@@ -314,23 +329,23 @@
 
     .toast-stack {
       position: fixed;
-      right: 14px;
-      bottom: 14px;
+      right: 12px;
+      bottom: 12px;
       z-index: 99;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      max-width: 320px;
+      max-width: 300px;
       pointer-events: none;
     }
 
     .toast {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       border: 1px solid var(--accent);
       color: #f8fafc;
-      padding: 9px 12px;
+      padding: 8px 11px;
       border-radius: 12px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
       animation: popIn 0.2s ease;
     }
@@ -397,7 +412,7 @@
     }
 
     .codex-box {
-      background: rgba(15, 23, 45, 0.8);
+      background: rgba(15, 23, 45, 0.82);
       border: 1px solid rgba(148, 163, 184, 0.18);
       border-radius: 10px;
       padding: 8px 10px;
@@ -415,7 +430,8 @@
       </div>
       <div class="top-actions">
         <button id="btnRename">Ganti Nama</button>
-        <button id="btnSound">🔊 Suara: ON</button>
+        <button id="btnBgm">🎵 Lagu: ON</button>
+        <button id="btnSound">🔊 Efek: ON</button>
         <button id="btnSync">☁️ Sinkron</button>
       </div>
     </header>
@@ -434,22 +450,27 @@
         <div class="bar-bg"><div class="bar-fill" id="barMood" style="width:85%"></div></div>
       </div>
       <div class="stat-card">
-        <div class="stat-head"><span>🌙 Kebiasaan</span><span class="stat-val" id="valHabit">Penasaran</span></div>
+        <div class="stat-head"><span>🌙 Kebiasaan</span><span class="stat-val" id="valHabit">Petualang</span></div>
         <div class="bar-bg"><div class="bar-fill" id="barGrowth" style="width:3%"></div></div>
       </div>
     </section>
 
     <div class="stage-wrap">
-      <canvas id="tankCanvas" width="896" height="430"></canvas>
+      <canvas id="tankCanvas" width="896" height="445"></canvas>
       <div class="hud-overlay">
-        <div class="hud-top">
-          <div class="chip" id="weatherChip">✨ Cuaca: Malam Starlight</div>
-          <div class="chip" id="statusChip">Status: Sehat</div>
-        </div>
+        <div class="hud-top-group">
+          <div class="hud-top">
+            <div class="chip" id="weatherChip">✨ Cuaca: Malam Starlight</div>
+            <div class="hud-right-chips">
+              <div class="chip" id="onlineTimerChip">⏳ 10m: 10:00</div>
+              <div class="chip" id="statusChip">Status: Sehat</div>
+            </div>
+          </div>
 
-        <div class="minigame-bar" id="minigameBar">
-          <span id="minigameInfo">Mini-Game aktif!</span>
-          <button id="btnStopMinigame" class="warn">Selesai</button>
+          <div class="minigame-bar" id="minigameBar">
+            <span id="minigameInfo">Mini-Game aktif!</span>
+            <button id="btnStopMinigame" class="warn">Selesai</button>
+          </div>
         </div>
 
         <div class="note-banner" id="noteBanner">💬 Selamat datang di rumah barumu!</div>
@@ -482,18 +503,38 @@
 
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw_jaTY7_ITivXfI5qxY8dv_okQCSji4Qol-HB3ooeF8KmiJM3rjEAejrmdznk9RqfM/exec";
-    const LOCAL_KEY = "virsagi_aquarium_state_v1";
+    const LOCAL_KEY = "virsagi_aquarium_state_v6";
+    const TEN_MINUTES_SEC = 600;
+
+    const NOTE_SCALES = {
+      four: [
+        { label: "Do", freq: 261.63 },
+        { label: "Re", freq: 293.66 },
+        { label: "Mi", freq: 329.63 },
+        { label: "Fa", freq: 349.23 }
+      ],
+      seven: [
+        { label: "Do", freq: 261.63 },
+        { label: "Re", freq: 293.66 },
+        { label: "Mi", freq: 329.63 },
+        { label: "Fa", freq: 349.23 },
+        { label: "So", freq: 392.00 },
+        { label: "La", freq: 440.00 },
+        { label: "Si", freq: 493.88 }
+      ]
+    };
 
     const FOODS = [
-      { id: "pellet", name: "Pelet Dasar", cost: 15, hunger: 22, mood: 4, desc: "Makanan harian ekonomis untuk menaikkan kenyang." },
-      { id: "krill", name: "Cacing Beku / Krill", cost: 35, hunger: 36, mood: 14, desc: "Favorit! Kenyang naik lebih cepat + mood bertambah." },
-      { id: "nectar", name: "Nektar Nebula", cost: 60, hunger: 25, mood: 20, buff: "glow", desc: "Efek 45 detik: sirip berpendar kosmik & renang lebih cepat!" },
-      { id: "tonic", name: "Ramuan Pemulih", cost: 40, hunger: 55, mood: 25, clean: 20, desc: "Menyelamatkan ikan dari kondisi Kritis / Terdampar di Karang." }
+      { id: "pellet", name: "Pelet Dasar", cost: 15, hunger: 26, mood: 8, color: "#fbbf24", desc: "Pelet harian untuk menaikkan kenyang." },
+      { id: "krill", name: "Cacing Beku / Krill", cost: 35, hunger: 40, mood: 16, color: "#fb7185", desc: "Favorit! Kenyang naik lebih cepat + mood bertambah." },
+      { id: "nectar", name: "Nektar Nebula", cost: 60, hunger: 30, mood: 24, color: "#e879f9", buff: "glow", desc: "Efek 45 detik: sirip berpendar kosmik & renang lebih cepat!" },
+      { id: "tonic", name: "Ramuan Pemulih", cost: 40, hunger: 65, mood: 28, clean: 20, color: "#34d399", desc: "Memulihkan ikan dari mode Kritis / Terdampar di Karang." },
+      { id: "water_change", name: "Ganti Air & Lap Kaca", cost: 20, hunger: 0, mood: 12, clean: 38, color: "#38bdf8", desc: "Menyegarkan air akuarium & membersihkan kaca agar ikan lebih lincah." }
     ];
 
     const DECORS = {
       backdrop: [
-        { id: "reef", name: "Terumbu Karang", cost: 0, desc: "Terumbu karang klasik bernuansa lembut." },
+        { id: "reef", name: "Terumbu Karang & Anemon", cost: 0, desc: "Terumbu karang alami dengan anemon yang melambai lembut." },
         { id: "ruins", name: "Reruntuhan Kuil Kosmik", cost: 140, desc: "Pilar kuno berukir rasi bintang di dasar laut." },
         { id: "kelp", name: "Hutan Rumput Laut", cost: 160, desc: "Rumpun alga tinggi yang bergoyang mengikuti arus." },
         { id: "nebula_bg", name: "Langit Nebula", cost: 220, desc: "Awan kosmik ungu-biru penuh debu bintang." }
@@ -512,7 +553,7 @@
       ],
       ornament: [
         { id: "none", name: "Polos", cost: 0, desc: "Tidak ada pernak-pernik tambahan." },
-        { id: "star_bubble", name: "Gelembung Bintang", cost: 95, desc: "Sumber gelembung oksigen berbentuk bintang." },
+        { id: "star_bubble", name: "Gelembung Bintang", cost: 95, desc: "Sumber gelembung oksigen ekstra di akuarium." },
         { id: "glow_plant", name: "Tanaman Air Bercahaya", cost: 150, desc: "Tumbuhan neon yang memancarkan pendar lembut." },
         { id: "coin_chest", name: "Peti Harta Koin", cost: 250, desc: "Menghasilkan bonus koin ekstra tiap beberapa menit!" }
       ],
@@ -539,17 +580,36 @@
 
     const MYSTERY_POOL = [
       { type: "coins", amount: 90, label: "90 Koin Bintang" },
-      { type: "food", id: "nectar", label: "1x Nektar Nebula" },
-      { type: "food", id: "krill", label: "1x Cacing Beku / Krill" },
       { type: "skin", id: "aurora_angel", label: "Skin Bidadari Aurora" },
-      { type: "decor", slot: "ornament", id: "star_bubble", label: "Dekor Gelembung Bintang" }
+      { type: "decor", id: "star_bubble", label: "Dekor Gelembung Bintang" },
+      { type: "decor", id: "glow_plant", label: "Tanaman Air Bercahaya" }
     ];
 
     const SECRET_NOTES = [
       "Pesan botol: 'Yang paling jauh sering kali menyimpan bintang paling terang.'",
-      "Gelembung rahasia: '+35 koin kejutan untuk jiwa petualang yang rajin mampir!'",
+      "Gelembung rahasia: '+15 koin kejutan untuk jiwa petualang yang rajin mampir!'",
       "Catatan kecil: 'Sagitarius selalu punya cara sendiri menemukan hal seru.'",
       "Pesan botol: 'Walaupun pelan, setiap langkah kecil tetap menggerakkan cerita.'"
+    ];
+
+    const TEN_MIN_GIFTS = [
+      "Kejutan 10 Menit: Hujan bintang & +35 koin untuk menemani harimu!",
+      "Kejutan 10 Menit: Nova menemukan mutiara hangat (+35 koin & mood naik)!",
+      "Kejutan 10 Menit: Arus kosmik membawa +35 koin bonus untukmu!"
+    ];
+
+    const sandGrains = Array.from({ length: 135 }, (_, i) => ({
+      nx: ((i * 73) % 1000) / 1000,
+      ny: ((i * 137) % 1000) / 1000,
+      r: 1 + (i % 3) * 0.75,
+      tone: i % 3
+    }));
+
+    const pebbleStones = [
+      { x: 0.14, rx: 11, ry: 5, tilt: -0.12 },
+      { x: 0.31, rx: 8, ry: 4, tilt: 0.15 },
+      { x: 0.56, rx: 13, ry: 6, tilt: -0.06 },
+      { x: 0.85, rx: 9, ry: 4.5, tilt: 0.18 }
     ];
 
     function todayStr() {
@@ -557,7 +617,7 @@
     }
 
     function createRandomTrait() {
-      const tails = ["selendang", "mahkota", "kipas"];
+      const tails = ["selendang", "kipas", "mahkota"];
       const patterns = ["dots", "lines", "starburst"];
       const accessories = ["none", "crown", "halo"];
       return {
@@ -610,56 +670,175 @@
     let state = defaultState();
     let activeTab = "care";
     let decorSlot = "backdrop";
+    let simonScaleMode = "four";
     let soundOn = true;
+    let bgmOn = true;
     let audioCtx = null;
+    let bgmTimer = null;
+    let bgmStep = 0;
 
-    // Visual & mini-game runtime state
     const canvas = document.getElementById("tankCanvas");
     const ctx = canvas.getContext("2d");
+
     const fish = {
-      x: 420,
-      y: 210,
-      vx: 1.4,
-      vy: 0.4,
-      angle: 0,
+      x: 440,
+      y: 215,
+      vx: 1.5,
+      vy: 0.25,
       tailPhase: 0,
       buffUntil: 0,
       pointerTarget: null,
-      inShelter: false
+      wanderTimer: 0,
+      targetVx: 1.5,
+      targetVy: 0.2,
+      lookAtScreenUntil: 0,
+      tapCount: 0,
+      lastTapTime: 0,
+      currentCurrentX: 0,
+      currentCurrentY: 0,
+      lastPointer: null,
+      digTarget: null,
+      digWiggleUntil: 0,
+      nextBlinkAt: Date.now() + 2600,
+      blinkUntil: 0,
+      nextBreathAt: Date.now() + 3400
+    };
+
+    const snail = {
+      x: 230,
+      dir: 1,
+      lastCleanAt: Date.now()
     };
 
     const ripples = [];
-    const ambientBubbles = [];
-    const floatingCoins = [];
+    const bubbles = [];
+    const pellets = [];
+    const sparkles = [];
     const meteors = [];
+    const sandParticles = [];
     let weather = "Malam Starlight";
-    let activeMinigame = null; // 'bubbles' | 'rings' | 'dig' | 'clean' | 'simon'
+    let activeMinigame = null;
     let mgTimer = 0;
     let mgScore = 0;
     let mgTargets = [];
     let simonSeq = [];
     let simonStep = 0;
     let simonFlash = -1;
-    let dirtySpots = [];
+    let simonShowing = false;
+    let mossClusters = [];
     let sandSpots = [];
     let lastChestCoinTime = Date.now();
     let lastPassiveCoinTime = Date.now();
+    let lastCrystalMoodTime = Date.now();
+    let onlineElapsedSec = 0;
+    let tenMinMilestoneCount = 0;
 
-    function playTone(freq = 520, duration = 0.12, type = "sine") {
+    function seedBubbles() {
+      bubbles.length = 0;
+      for (let i = 0; i < 22; i++) {
+        bubbles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: 2 + Math.random() * 3.4,
+          vy: 0.55 + Math.random() * 1.1,
+          wobble: Math.random() * Math.PI * 2
+        });
+      }
+    }
+    seedBubbles();
+
+    function spawnSparkle(x, y, color = "#fde047", text = "") {
+      sparkles.push({ x, y, color, text, life: 48, maxLife: 48 });
+    }
+
+    function spawnSandBurst(x, y, color = "#e2c792", count = 7) {
+      for (let i = 0; i < count; i++) {
+        const ang = -Math.PI * (0.15 + Math.random() * 0.7);
+        const spd = 1.4 + Math.random() * 2.4;
+        sandParticles.push({
+          x: x + (Math.random() - 0.5) * 18,
+          y: y - 2,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          r: 2 + Math.random() * 2.5,
+          color,
+          life: 28 + Math.random() * 12
+        });
+      }
+    }
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume().catch(() => {});
+      }
+    }
+
+    function playTone(freq = 520, duration = 0.12, type = "sine", vol = 0.08) {
       if (!soundOn) return;
       try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        ensureAudio();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = type;
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
         osc.stop(audioCtx.currentTime + duration);
       } catch (_) {}
+    }
+
+    function playCuteChirp() {
+      if (!soundOn) return;
+      playTone(587.33, 0.08, "sine", 0.075);
+      setTimeout(() => playTone(880, 0.11, "triangle", 0.075), 75);
+    }
+
+    function playGentleBgmNote() {
+      if (!bgmOn) return;
+      try {
+        ensureAudio();
+        const melody = [
+          261.63, 329.63, 392.00, 493.88,
+          523.25, 493.88, 392.00, 329.63,
+          293.66, 349.23, 440.00, 523.25,
+          493.88, 440.00, 392.00, 329.63
+        ];
+        const freq = melody[bgmStep % melody.length];
+        bgmStep += 1;
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const filter = audioCtx.createBiquadFilter();
+        const gain = audioCtx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now);
+
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(1150, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.022, now + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.85);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.88);
+      } catch (_) {}
+    }
+
+    function startBgmLoop() {
+      if (bgmTimer) return;
+      bgmTimer = setInterval(playGentleBgmNote, 680);
     }
 
     function toast(msg) {
@@ -674,12 +853,43 @@
       document.getElementById("noteBanner").textContent = "💬 " + msg;
     }
 
+    function updateOnlineTimerDisplay() {
+      const mod = onlineElapsedSec % TEN_MINUTES_SEC;
+      const rem = TEN_MINUTES_SEC - mod;
+      const mins = String(Math.floor(rem / 60)).padStart(2, "0");
+      const secs = String(rem % 60).padStart(2, "0");
+      document.getElementById("onlineTimerChip").textContent = `⏳ 10m: ${mins}:${secs}`;
+    }
+
+    function triggerTenMinuteSurprise() {
+      tenMinMilestoneCount += 1;
+      const giftText = TEN_MIN_GIFTS[(tenMinMilestoneCount - 1) % TEN_MIN_GIFTS.length];
+      addCoins(35, "Kejutan 10 Menit");
+      if (state.status !== "gone") {
+        state.mood = Math.min(100, +(state.mood + 10).toFixed(1));
+      }
+      for (let i = 0; i < 8; i++) {
+        meteors.push({
+          x: 120 + Math.random() * (canvas.width - 140),
+          y: 20 + Math.random() * 110,
+          vx: -4.2 - Math.random() * 2.5,
+          vy: 2.4 + Math.random() * 1.8,
+          life: 65
+        });
+      }
+      setNote(giftText);
+      toast("✨ Sudah 10 menit di akuarium! Ada kejutan buatmu!");
+      playTone(840, 0.22, "triangle");
+      renderTopStats();
+      syncToSheet(true);
+    }
+
     function getGrowthPhase() {
       const d = Number(state.active_days) || 1;
-      if (d <= 5) return { phase: 1, label: "Fase 1: Baby Fry", scale: 0.68, skinUnlocked: false };
-      if (d <= 14) return { phase: 2, label: "Fase 2: Juvenile", scale: 0.85, skinUnlocked: false };
-      if (d <= 25) return { phase: 3, label: "Fase 3: Young Adult", scale: 1.03, skinUnlocked: false };
-      return { phase: 4, label: "Fase 4: Majestic Adult", scale: 1.22, skinUnlocked: true };
+      if (d <= 5) return { phase: 1, label: "Fase 1: Baby Fry", scale: 0.78, skinUnlocked: false };
+      if (d <= 14) return { phase: 2, label: "Fase 2: Juvenile", scale: 0.94, skinUnlocked: false };
+      if (d <= 25) return { phase: 3, label: "Fase 3: Young Adult", scale: 1.1, skinUnlocked: false };
+      return { phase: 4, label: "Fase 4: Majestic Adult", scale: 1.26, skinUnlocked: true };
     }
 
     function getPetTitle() {
@@ -693,8 +903,11 @@
     function getMoodHabit() {
       if (state.status === "critical") return "Lesu / Kritis";
       if (state.status === "gone") return "Ke Bintang";
+      if (Date.now() < fish.digWiggleUntil) return "Menggali Pasir ⛏️";
+      if (Date.now() < fish.lookAtScreenUntil) return "Menatapmu 👀";
       if (fish.pointerTarget) return "Penasaran";
       if (state.mood >= 80) return "Ceria & Manja";
+      if (state.mood < 45 && state.equipped_decor?.shelter !== "none") return "Istirahat di Rumah";
       return "Petualang";
     }
 
@@ -703,12 +916,21 @@
       const prev = Number(state.last_updated) || now;
       const elapsedHours = Math.max(0, (now - prev) / 3600000);
 
-      if (elapsedHours > 0.01 && state.status !== "gone") {
-        // Decay yang ramah agar tidak langsung stres saat sibuk
-        state.hunger = Math.max(0, +(state.hunger - elapsedHours * 1.4).toFixed(1));
-        state.cleanliness = Math.max(0, +(state.cleanliness - elapsedHours * 1.1).toFixed(1));
+      if (elapsedHours > 72 || state.hunger < 20) {
+        state.hunger = Math.max(65, Number(state.hunger) || 85);
+        state.cleanliness = Math.max(65, Number(state.cleanliness) || 90);
+        state.mood = Math.max(65, Number(state.mood) || 85);
+        state.status = "healthy";
+        state.critical_since = null;
+        state.last_updated = now;
+        return;
+      }
+
+      if (elapsedHours > 0.05 && state.status !== "gone") {
+        state.hunger = Math.max(0, +(state.hunger - elapsedHours * 0.85).toFixed(1));
+        state.cleanliness = Math.max(0, +(state.cleanliness - elapsedHours * 0.7).toFixed(1));
         if (state.hunger < 25 || state.cleanliness < 25) {
-          state.mood = Math.max(0, +(state.mood - elapsedHours * 1.2).toFixed(1));
+          state.mood = Math.max(0, +(state.mood - elapsedHours * 0.8).toFixed(1));
         }
       }
 
@@ -717,15 +939,15 @@
           if (state.status !== "critical") {
             state.status = "critical";
             state.critical_since = now;
-            toast(`${state.pet_name} masuk mode Kritis / Terdampar di Karang! Beri Ramuan Pemulih atau rawat segera.`);
+            toast(`${state.pet_name} masuk mode Kritis / Terdampar di Karang!`);
           } else if (state.critical_since && (now - state.critical_since) > 72 * 3600000) {
             state.status = "gone";
             toast(`${state.pet_name} telah pergi ke bintang... Kamu bisa menetas/adopsi ikan baru.`);
           }
-        } else if (state.status === "critical" && state.hunger > 20) {
+        } else if (state.status === "critical") {
           state.status = "healthy";
           state.critical_since = null;
-        } else if (state.status !== "critical") {
+        } else {
           state.status = state.hunger < 30 ? "hungry" : "healthy";
         }
       }
@@ -733,7 +955,7 @@
       state.last_updated = now;
     }
 
-    function registerCareAction(moodGain = 3) {
+    function registerCareAction(moodGain = 4) {
       const today = todayStr();
       if (state.last_care_date !== today && state.status !== "gone") {
         state.last_care_date = today;
@@ -780,25 +1002,25 @@
       const hr = new Date().getHours();
       const base = hr < 11 ? "Pagi Cerah" : hr < 17 ? "Senja Hangat" : "Malam Starlight";
       const roll = Math.random();
-      if (roll < 0.22) {
+      if (roll < 0.28) {
         weather = `${base} • Hujan Meteor Kecil`;
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 8; i++) {
           meteors.push({
             x: Math.random() * canvas.width,
             y: Math.random() * 140,
             vx: -4 - Math.random() * 3,
             vy: 2.5 + Math.random() * 2,
-            life: 60
+            life: 65
           });
         }
         state.codex.meteors = (state.codex.meteors || 0) + 1;
-      } else if (roll < 0.42) {
+      } else if (roll < 0.48) {
         weather = `${base} • Arus Aurora`;
       } else {
         weather = base;
       }
 
-      if (Math.random() < 0.28 && state.status !== "gone") {
+      if (Math.random() < 0.25 && state.status !== "gone") {
         const msg = SECRET_NOTES[Math.floor(Math.random() * SECRET_NOTES.length)];
         state.codex.secret_bottles = (state.codex.secret_bottles || 0) + 1;
         state.coins += 15;
@@ -815,7 +1037,7 @@
 
     function normalizeState(raw) {
       const def = defaultState();
-      const merged = {
+      return {
         ...def,
         ...raw,
         coins: Number(raw.coins ?? def.coins),
@@ -831,7 +1053,6 @@
         trait: { ...def.trait, ...parseJsonField(raw.trait, {}) },
         stats_count: { ...def.stats_count, ...parseJsonField(raw.stats_count, {}) }
       };
-      return merged;
     }
 
     function saveLocal() {
@@ -871,6 +1092,7 @@
       applyElapsedDecay();
       claimVirgoGiftIfAny();
       rollRandomWeatherAndEvent();
+      updateOnlineTimerDisplay();
       saveLocal();
       renderAll();
       await syncToSheet(true);
@@ -878,14 +1100,17 @@
 
     function addCoins(amount, reason = "") {
       state.coins = Math.max(0, Math.round(state.coins + amount));
-      if (reason && amount > 0) toast(`+${amount} koin (${reason})`);
+      if (reason && amount > 0) {
+        toast(`+${amount} koin (${reason})`);
+        spawnSparkle(fish.x, fish.y - 28, "#fde047", `+${amount} 🪙`);
+      }
       renderTopStats();
       saveLocal();
     }
 
     function feedPet(food) {
       if (state.status === "gone") {
-        toast("Ikan sudah pergi ke bintang. Adopsi/tetaskan ikan baru dulu ya.");
+        toast("Ikan sudah pergi ke bintang. Tetaskan/adopsi ikan baru dulu ya.");
         return;
       }
       if (state.coins < food.cost) {
@@ -893,9 +1118,13 @@
         return;
       }
       state.coins -= food.cost;
-      state.hunger = Math.min(100, +(state.hunger + food.hunger).toFixed(1));
+      if (food.hunger) {
+        state.hunger = Math.min(100, +(state.hunger + food.hunger).toFixed(1));
+      }
       state.mood = Math.min(100, +(state.mood + (food.mood || 0)).toFixed(1));
-      if (food.clean) state.cleanliness = Math.min(100, +(state.cleanliness + food.clean).toFixed(1));
+      if (food.clean) {
+        state.cleanliness = Math.min(100, +(state.cleanliness + food.clean).toFixed(1));
+      }
       if (food.buff === "glow") {
         fish.buffUntil = Date.now() + 45000;
         toast("✨ Sirip berpendar & renang ngebut selama 45 detik!");
@@ -903,15 +1132,41 @@
       if (food.id === "krill") {
         state.stats_count.krill = (state.stats_count.krill || 0) + 1;
       }
-      if (state.status === "critical" && state.hunger >= 25) {
+      if (state.status === "critical") {
+        state.hunger = Math.max(45, state.hunger);
+        state.cleanliness = Math.max(45, state.cleanliness);
         state.status = "healthy";
         state.critical_since = null;
-        toast(`💖 ${state.pet_name} pulih dari kondisi kritis!`);
       }
-      state.codex.favorite_food = food.name;
+
+      if (food.hunger > 0) {
+        for (let i = 0; i < 10; i++) {
+          pellets.push({
+            x: Math.max(90, Math.min(canvas.width - 90, fish.x + (Math.random() - 0.5) * 180)),
+            y: 26 + Math.random() * 28,
+            vy: 0.75 + Math.random() * 0.5,
+            color: food.color || "#fbbf24"
+          });
+        }
+        state.codex.favorite_food = food.name;
+      } else {
+        for (let i = 0; i < 14; i++) {
+          bubbles.push({
+            x: 70 + Math.random() * (canvas.width - 140),
+            y: canvas.height - 48,
+            r: 2.5 + Math.random() * 3,
+            vy: 1.1 + Math.random() * 0.9,
+            wobble: Math.random() * Math.PI * 2
+          });
+        }
+      }
+
+      fish.lookAtScreenUntil = Date.now() + 1800;
+      const badgeText = food.hunger > 0 ? `+${food.hunger}% Kenyang` : `+${food.clean || 0}% Bersih`;
+      spawnSparkle(fish.x, fish.y - 24, food.color || "#34d399", badgeText);
       registerCareAction(4);
-      playTone(620, 0.14, "sine");
-      setNote(`Menikmati ${food.name}!`);
+      playCuteChirp();
+      setNote(food.hunger > 0 ? `Menikmati ${food.name}!` : `Air & kaca akuarium segar kembali!`);
       renderAll();
       syncToSheet(true);
     }
@@ -936,94 +1191,144 @@
       syncToSheet(true);
     }
 
-    // Mini-games
+    function buildOrganicMossClusters() {
+      mossClusters = [];
+      for (let i = 0; i < 7; i++) {
+        const cx = 115 + Math.random() * (canvas.width - 230);
+        const cy = 95 + Math.random() * (canvas.height - 180);
+        const lobes = [];
+        const count = 14;
+        const baseSeed = Math.random() * 10;
+        for (let k = 0; k < count; k++) {
+          const ang = (k / count) * Math.PI * 2;
+          const wave = 18 + Math.sin(k * 2.4 + baseSeed) * 8 + Math.cos(k * 3.7) * 5;
+          lobes.push({
+            x: Math.cos(ang) * wave * (0.9 + Math.random() * 0.35),
+            y: Math.sin(ang) * wave * 0.72
+          });
+        }
+        const specks = Array.from({ length: 8 }, () => ({
+          dx: (Math.random() - 0.5) * 24,
+          dy: (Math.random() - 0.5) * 16,
+          r: 1.5 + Math.random() * 2.5
+        }));
+        mossClusters.push({
+          x: cx,
+          y: cy,
+          rot: (Math.random() - 0.5) * 0.7,
+          lobes,
+          specks,
+          wiped: 0
+        });
+      }
+    }
+
     function startMinigame(mode) {
       if (state.status === "gone") {
-        toast("Adopsi/tetaskan ikan baru dulu sebelum main.");
+        toast("Tetaskan/adopsi ikan baru dulu sebelum main.");
         return;
       }
+      startBgmLoop();
       activeMinigame = mode;
       mgScore = 0;
       mgTimer = 25;
       mgTargets = [];
-      dirtySpots = [];
+      mossClusters = [];
       sandSpots = [];
       simonSeq = [];
       simonStep = 0;
+      fish.digTarget = null;
+      fish.digWiggleUntil = 0;
 
       document.getElementById("minigameBar").classList.add("active");
 
       if (mode === "bubbles") {
-        setNote("Klik gelembung emas (+12 koin)! Hindari gelembung hitam.");
-        for (let i = 0; i < 9; i++) {
+        setNote("Klik gelembung emas/bintang (+12 koin)! Hindari gelembung gelap.");
+        for (let i = 0; i < 8; i++) {
           mgTargets.push({
-            x: 80 + Math.random() * (canvas.width - 160),
-            y: 70 + Math.random() * (canvas.height - 150),
-            r: 20 + Math.random() * 10,
-            vy: -0.9 - Math.random() * 1.2,
-            bad: Math.random() < 0.22
+            x: 90 + Math.random() * (canvas.width - 180),
+            y: 120 + Math.random() * (canvas.height - 180),
+            baseX: 90 + Math.random() * (canvas.width - 180),
+            r: 20 + Math.random() * 9,
+            vy: -0.75 - Math.random() * 0.95,
+            phase: Math.random() * Math.PI * 2,
+            bad: Math.random() < 0.22,
+            star: Math.random() < 0.28
           });
         }
       } else if (mode === "rings") {
         setNote("Arahkan kursor/jari agar ikan melewati ring cahaya rasi bintang!");
         spawnRing();
       } else if (mode === "dig") {
-        setNote("Gosok/klik kilauan di pasir dasar untuk menggali mutiara & koin!");
+        setNote("Gosok/klik gundukan pasir di dasar agar ikan menukik menggali mutiara!");
         for (let i = 0; i < 6; i++) {
           sandSpots.push({
-            x: 90 + Math.random() * (canvas.width - 180),
-            y: canvas.height - 52 + (Math.random() * 22 - 11),
+            x: 110 + Math.random() * (canvas.width - 220),
+            y: canvas.height - 32,
             progress: 0,
             found: false
           });
         }
       } else if (mode === "clean") {
-        setNote("Usap atau klik bercak lumut di kaca sampai bersih mengilap!");
-        for (let i = 0; i < 12; i++) {
-          dirtySpots.push({
-            x: 70 + Math.random() * (canvas.width - 140),
-            y: 60 + Math.random() * (canvas.height - 130),
-            r: 28,
-            clean: 0
-          });
-        }
+        setNote("Swipe kiri-kanan / atas-bawah menyapu lumut organik di kaca!");
+        buildOrganicMossClusters();
       } else if (mode === "simon") {
-        setNote("Perhatikan urutan cahaya rasi bintang lalu klik ulang!");
-        for (let i = 0; i < 4; i++) {
-          mgTargets.push({
-            x: canvas.width * (0.22 + i * 0.18),
-            y: canvas.height * 0.36,
-            r: 26,
-            idx: i
-          });
-        }
+        const scale = NOTE_SCALES[simonScaleMode] || NOTE_SCALES.four;
+        setNote(`Ikuti nada (${scale.map(n => n.label).join(" - ")})! Tunggu urutan selesai lalu ketuk ulang.`);
+        const total = scale.length;
+        mgTargets = scale.map((nObj, i) => {
+          const ratio = total === 1 ? 0.5 : i / (total - 1);
+          const x = canvas.width * (0.14 + ratio * 0.72);
+          const arcY = total === 7
+            ? canvas.height * (0.44 - Math.sin(ratio * Math.PI) * 0.08)
+            : canvas.height * 0.42;
+          return {
+            x,
+            y: arcY,
+            r: total === 7 ? 24 : 28,
+            idx: i,
+            note: nObj.label,
+            freq: nObj.freq
+          };
+        });
         nextSimonRound();
       }
       updateMinigameHud();
     }
 
     function spawnRing() {
+      const prev = mgTargets[0];
+      let nx = 160 + Math.random() * (canvas.width - 320);
+      if (prev && Math.abs(nx - prev.x) < 150) {
+        nx = prev.x > canvas.width * 0.5 ? 180 : canvas.width - 180;
+      }
       mgTargets = [{
-        x: 140 + Math.random() * (canvas.width - 280),
-        y: 100 + Math.random() * (canvas.height - 200),
+        x: nx,
+        y: 135 + Math.random() * (canvas.height - 225),
         r: 34
       }];
     }
 
     function nextSimonRound() {
-      simonSeq.push(Math.floor(Math.random() * 4));
+      const count = mgTargets.length || 4;
+      simonSeq.push(Math.floor(Math.random() * count));
       simonStep = 0;
       playSimonSequence();
     }
 
     function playSimonSequence() {
+      simonShowing = true;
       let i = 0;
       const iv = setInterval(() => {
         simonFlash = simonSeq[i];
-        playTone(360 + simonFlash * 110, 0.14, "sine");
-        setTimeout(() => { simonFlash = -1; }, 260);
+        const target = mgTargets[simonFlash];
+        playTone(target ? target.freq : 392 + simonFlash * 60, 0.17, "sine", 0.09);
+        setTimeout(() => { simonFlash = -1; }, 270);
         i++;
-        if (i >= simonSeq.length) clearInterval(iv);
+        if (i >= simonSeq.length) {
+          clearInterval(iv);
+          setTimeout(() => { simonShowing = false; }, 320);
+        }
       }, 480);
     }
 
@@ -1031,6 +1336,8 @@
       if (!activeMinigame) return;
       const earned = Math.max(finished ? 10 : 0, mgScore);
       activeMinigame = null;
+      fish.digTarget = null;
+      fish.digWiggleUntil = 0;
       document.getElementById("minigameBar").classList.remove("active");
       if (earned > 0) {
         addCoins(earned, "Mini-Game");
@@ -1042,11 +1349,13 @@
 
     function updateMinigameHud() {
       if (!activeMinigame) return;
+      const extra = activeMinigame === "simon"
+        ? (simonShowing ? " • 👀 Perhatikan nada..." : " • 👉 Giliranmu!")
+        : "";
       document.getElementById("minigameInfo").textContent =
-        `🎮 ${activeMinigame.toUpperCase()} • Waktu: ${Math.ceil(mgTimer)}d • Koin Ronde: +${mgScore}`;
+        `🎮 ${activeMinigame.toUpperCase()} • Sisa: ${Math.ceil(mgTimer)}d • Koin Ronde: +${mgScore}${extra}`;
     }
 
-    // Tabs & UI rendering
     function renderTopStats() {
       const phase = getGrowthPhase();
       document.getElementById("petNameDisplay").textContent = state.pet_name;
@@ -1109,13 +1418,30 @@
         if (hatchBtn) hatchBtn.onclick = hatchNewPet;
       } else if (activeTab === "games") {
         const games = [
-          { id: "bubbles", name: "🫧 Tangkap Gelembung", desc: "Klik gelembung emas sebelum menghilang (25 detik)." },
+          { id: "bubbles", name: "🫧 Tangkap Gelembung", desc: "Klik gelembung emas/bintang sebelum menghilang (25 detik)." },
           { id: "rings", name: "✨ Tuntun Lewat Ring Rasi", desc: "Arahkan ikan menembus cincin cahaya rasi bintang." },
-          { id: "dig", name: "⛏️ Gali Harta Pasir", desc: "Gosok/klik pasir dasar untuk menemukan mutiara & koin." },
-          { id: "clean", name: "🧽 Bersihkan Lumut Kaca", desc: "Usap noda lumut di kaca sampai jernih & dapat koin." },
-          { id: "simon", name: "🌟 Ikuti Irama Cahaya", desc: "Tirukan urutan nyala titik bintang untuk panen koin." }
+          { id: "dig", name: "⛏️ Gali Harta Pasir", desc: "Gosok gundukan pasir agar ikan menukik menggali mutiara!" },
+          { id: "clean", name: "🧽 Bersihkan Lumut Kaca", desc: "Swipe kiri-kanan & atas-bawah menyapu lumut di kaca." },
+          { id: "simon", name: "🌟 Ikuti Irama Bintang", desc: "Tirukan urutan nada rasi bintang untuk panen koin." }
         ];
-        box.innerHTML = `<div style="font-weight:700;">Mini-Game Solo Pencari Koin (20–25 Detik)</div><div class="shop-grid" id="gameGrid"></div>`;
+        box.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div style="font-weight:700;">Mini-Game Solo Pencari Koin (25 Detik)</div>
+            <div class="sub-row" style="margin:0;">
+              <button class="pill-btn ${simonScaleMode === "four" ? "active" : ""}" id="btnScaleFour">Nada: Do-Re-Mi-Fa</button>
+              <button class="pill-btn ${simonScaleMode === "seven" ? "active" : ""}" id="btnScaleSeven">Penuh: Do-Re-Mi-Fa-So-La-Si</button>
+            </div>
+          </div>
+          <div class="shop-grid" id="gameGrid"></div>
+        `;
+        document.getElementById("btnScaleFour").onclick = () => {
+          simonScaleMode = "four";
+          renderTabContent();
+        };
+        document.getElementById("btnScaleSeven").onclick = () => {
+          simonScaleMode = "seven";
+          renderTabContent();
+        };
         const grid = document.getElementById("gameGrid");
         games.forEach(g => {
           const card = document.createElement("div");
@@ -1229,19 +1555,34 @@
           grid.appendChild(card);
         });
       } else if (activeTab === "codex") {
+        const pearls = Number(state.codex.pearls || 0);
+        const trait = state.trait || createRandomTrait();
         box.innerHTML = `
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-            <div style="font-weight:700;">Jurnal Penemuan (Codex) & Kerang Misteri</div>
-            <button class="primary" id="btnMystery">🔮 Buka Kerang Misteri (🪙 80)</button>
+            <div style="font-weight:700;">Jurnal Penemuan (Codex) & Penukaran Mutiara</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button id="btnTradePearls" ${pearls < 3 ? "disabled" : ""}>🫧 Tukar 3 Mutiara → +60 🪙</button>
+              <button class="primary" id="btnMystery">🔮 Kerang Misteri (🪙 80)</button>
+            </div>
           </div>
           <div class="codex-list">
-            <div class="codex-box"><b>Mutiara Digali:</b> ${state.codex.pearls || 0}</div>
+            <div class="codex-box"><b>Mutiara Koleksi:</b> ${pearls} 🫧</div>
             <div class="codex-box"><b>Hujan Meteor:</b> ${state.codex.meteors || 0}</div>
             <div class="codex-box"><b>Botol Rahasia:</b> ${state.codex.secret_bottles || 0}</div>
             <div class="codex-box"><b>Makanan Favorit:</b> ${state.codex.favorite_food || "-"}</div>
+            <div class="codex-box"><b>Ekor & Pola:</b> ${trait.tail} • ${trait.pattern}</div>
+            <div class="codex-box"><b>Aksesori:</b> ${trait.accessory}</div>
             <div class="codex-box" style="grid-column:1/-1;"><b>Riwayat Ikan:</b> ${(state.codex.history || []).join(" • ")}</div>
           </div>
         `;
+        document.getElementById("btnTradePearls").onclick = () => {
+          if ((state.codex.pearls || 0) < 3) return toast("Kumpulkan minimal 3 mutiara dari Gali Pasir dulu ya!");
+          state.codex.pearls -= 3;
+          addCoins(60, "Tukar 3 Mutiara");
+          playTone(760, 0.18, "triangle");
+          renderTabContent();
+          syncToSheet(true);
+        };
         document.getElementById("btnMystery").onclick = () => {
           if (state.coins < 80) return toast("Butuh 80 koin untuk membuka Kerang Misteri!");
           state.coins -= 80;
@@ -1262,109 +1603,460 @@
       renderTabContent();
     }
 
-    // Canvas drawing
+    function drawNaturalCoralBackdrop(w, h, t) {
+      const baseY = h - 38;
+
+      ctx.fillStyle = "rgba(18, 28, 62, 0.55)";
+      ctx.beginPath();
+      ctx.moveTo(0, baseY);
+      ctx.quadraticCurveTo(w * 0.16, baseY - 68, w * 0.34, baseY - 22);
+      ctx.quadraticCurveTo(w * 0.52, baseY - 82, w * 0.72, baseY - 28);
+      ctx.quadraticCurveTo(w * 0.88, baseY - 64, w, baseY - 18);
+      ctx.lineTo(w, baseY);
+      ctx.closePath();
+      ctx.fill();
+
+      const drawStaghorn = (ox, oy, scale, color) => {
+        ctx.save();
+        ctx.translate(ox, oy);
+        ctx.scale(scale, scale);
+        ctx.strokeStyle = color;
+        ctx.lineCap = "round";
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(-4, -26, -16, -46);
+        ctx.moveTo(-7, -22);
+        ctx.quadraticCurveTo(-22, -30, -30, -42);
+        ctx.moveTo(0, -14);
+        ctx.quadraticCurveTo(10, -32, 14, -52);
+        ctx.moveTo(7, -28);
+        ctx.quadraticCurveTo(22, -34, 28, -44);
+        ctx.stroke();
+        ctx.restore();
+      };
+
+      drawStaghorn(135, baseY, 1.05, "rgba(244, 114, 182, 0.26)");
+      drawStaghorn(615, baseY, 0.95, "rgba(167, 139, 250, 0.24)");
+
+      const drawAnemone = (ax, ay, tentacleColor, baseColor) => {
+        ctx.save();
+        ctx.translate(ax, ay);
+        for (let i = -4; i <= 4; i++) {
+          const sway = Math.sin(t * 2.2 + i * 0.7 + ax * 0.02) * 5;
+          ctx.strokeStyle = tentacleColor;
+          ctx.lineWidth = 3.5;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(i * 3.5, -4);
+          ctx.quadraticCurveTo(i * 5 + sway * 0.5, -18, i * 6.5 + sway, -30 + Math.abs(i) * 1.4);
+          ctx.stroke();
+
+          ctx.fillStyle = "rgba(253, 224, 71, 0.55)";
+          ctx.beginPath();
+          ctx.arc(i * 6.5 + sway, -30 + Math.abs(i) * 1.4, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = baseColor;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 18, 8, 0, Math.PI, 0);
+        ctx.fill();
+        ctx.restore();
+      };
+
+      drawAnemone(265, baseY + 2, "rgba(45, 212, 191, 0.42)", "rgba(15, 118, 110, 0.48)");
+      drawAnemone(495, baseY + 2, "rgba(251, 113, 133, 0.38)", "rgba(159, 18, 57, 0.45)");
+
+      ctx.strokeStyle = "rgba(52, 211, 153, 0.28)";
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      [82, 345, 765].forEach((gx, idx) => {
+        for (let b = -1; b <= 1; b++) {
+          const sway = Math.sin(t * 1.9 + idx + b) * 7;
+          ctx.beginPath();
+          ctx.moveTo(gx + b * 6, baseY);
+          ctx.quadraticCurveTo(gx + b * 8 + sway, baseY - 24, gx + b * 5 - sway * 0.5, baseY - 46);
+          ctx.stroke();
+        }
+      });
+    }
+
+    function drawNaturalSubstrate(w, h) {
+      const sub = state.equipped_decor.substrate;
+      const topY = h - 42;
+
+      const palette = sub === "moon_gravel"
+        ? { hi: "#64748b", mid: "#475569", lo: "#1e293b", grainHi: "#cbd5e1", grainLo: "#0f172a" }
+        : sub === "violet_sand"
+        ? { hi: "#7c3aed", mid: "#5b21b6", lo: "#2e1065", grainHi: "#e9d5ff", grainLo: "#1e1b4b" }
+        : { hi: "#e6cfa0", mid: "#cfa972", lo: "#9e7745", grainHi: "#fef3c7", grainLo: "#78552b" };
+
+      const sandGrad = ctx.createLinearGradient(0, topY - 8, 0, h);
+      sandGrad.addColorStop(0, palette.hi);
+      sandGrad.addColorStop(0.55, palette.mid);
+      sandGrad.addColorStop(1, palette.lo);
+
+      ctx.fillStyle = sandGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, h);
+      const step = 16;
+      for (let x = 0; x <= w + step; x += step) {
+        const duneY = topY
+          + Math.sin(x * 0.011 + 0.6) * 5.5
+          + Math.cos(x * 0.025) * 2.5;
+        ctx.lineTo(x, duneY);
+      }
+      ctx.lineTo(w, h);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = palette.grainHi;
+      ctx.globalAlpha = 0.35;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let x = 0; x <= w + step; x += step) {
+        const duneY = topY
+          + Math.sin(x * 0.011 + 0.6) * 5.5
+          + Math.cos(x * 0.025) * 2.5;
+        if (x === 0) ctx.moveTo(x, duneY);
+        else ctx.lineTo(x, duneY);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      sandGrains.forEach(g => {
+        const gx = g.nx * w;
+        const baseY = topY + Math.sin(gx * 0.011 + 0.6) * 5.5 + 4;
+        const gy = baseY + g.ny * (h - baseY - 2);
+        ctx.fillStyle = g.tone === 0 ? palette.grainHi : g.tone === 1 ? palette.grainLo : palette.hi;
+        ctx.globalAlpha = g.tone === 0 ? 0.45 : 0.35;
+        ctx.beginPath();
+        ctx.arc(gx, gy, g.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+
+      pebbleStones.forEach(st => {
+        const px = st.x * w;
+        const py = topY + Math.sin(px * 0.011 + 0.6) * 5.5 + 8;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(st.tilt);
+        ctx.fillStyle = palette.grainLo;
+        ctx.globalAlpha = 0.52;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, st.rx, st.ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    function drawShelter(w, h, t) {
+      const sh = state.equipped_decor.shelter;
+      if (!sh || sh === "none") return;
+
+      ctx.save();
+      ctx.translate(w * 0.78, h - 40);
+
+      if (sh === "clam") {
+        const openAngle = 0.25 + Math.sin(t * 2.2) * 0.06;
+        ctx.fillStyle = "#f472b6";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 44, 14, 0, Math.PI, 0);
+        ctx.fill();
+
+        ctx.save();
+        ctx.rotate(-openAngle);
+        ctx.fillStyle = "#e879f9";
+        ctx.beginPath();
+        ctx.ellipse(0, -4, 44, 15, 0, Math.PI, 0);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.fillStyle = "#fef9c3";
+        ctx.beginPath();
+        ctx.arc(0, -6, 7, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (sh === "crystal_cave") {
+        ctx.shadowColor = "#c084fc";
+        ctx.shadowBlur = 16;
+        const crystals = [
+          { x: -24, h: 48, w: 15, col: "#a855f7" },
+          { x: 0, h: 64, w: 18, col: "#c084fc" },
+          { x: 24, h: 44, w: 14, col: "#818cf8" }
+        ];
+        crystals.forEach(c => {
+          ctx.fillStyle = c.col;
+          ctx.beginPath();
+          ctx.moveTo(c.x - c.w * 0.5, 0);
+          ctx.lineTo(c.x - c.w * 0.35, -c.h * 0.7);
+          ctx.lineTo(c.x, -c.h);
+          ctx.lineTo(c.x + c.w * 0.35, -c.h * 0.7);
+          ctx.lineTo(c.x + c.w * 0.5, 0);
+          ctx.closePath();
+          ctx.fill();
+        });
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "rgba(15, 23, 42, 0.78)";
+        ctx.beginPath();
+        ctx.arc(0, 0, 20, Math.PI, 0);
+        ctx.fill();
+      } else if (sh === "castle") {
+        ctx.fillStyle = "rgba(148, 163, 184, 0.45)";
+        ctx.fillRect(-34, -44, 68, 44);
+        ctx.fillRect(-40, -58, 16, 58);
+        ctx.fillRect(24, -58, 16, 58);
+        ctx.fillStyle = "#c084fc";
+        [[-32, -58], [32, -58]].forEach(([tx, ty]) => {
+          ctx.beginPath();
+          ctx.moveTo(tx - 11, ty);
+          ctx.lineTo(tx, ty - 16);
+          ctx.lineTo(tx + 11, ty);
+          ctx.closePath();
+          ctx.fill();
+        });
+        ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+        ctx.beginPath();
+        ctx.arc(0, 0, 14, Math.PI, 0);
+        ctx.fill();
+      } else if (sh === "shipwreck") {
+        ctx.save();
+        ctx.rotate(-0.14);
+        ctx.fillStyle = "#92400e";
+        ctx.beginPath();
+        ctx.moveTo(-42, -16);
+        ctx.lineTo(42, -12);
+        ctx.lineTo(30, 4);
+        ctx.lineTo(-34, 4);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#b45309";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-4, -14);
+        ctx.lineTo(-8, -46);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    function drawGlassSnail(w, h, t) {
+      if (state.equipped_decor.companion !== "glass_snail") return;
+      const baseY = h - 41;
+      ctx.save();
+      ctx.translate(snail.x, baseY);
+      ctx.scale(snail.dir, 1);
+
+      ctx.fillStyle = "#f59e0b";
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 14, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#a855f7";
+      ctx.beginPath();
+      ctx.arc(-2, -6, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      const antWiggle = Math.sin(t * 5) * 2;
+      ctx.strokeStyle = "#fde68a";
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(10, -3);
+      ctx.lineTo(15, -9 + antWiggle);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawFishTraits(skin, trait, wag, facingScreen, now) {
+      if (!trait) return;
+
+      if (trait.pattern === "dots") {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+        const dots = facingScreen ? [[-8, 2], [8, 2], [0, -6]] : [[-8, -4], [0, 3], [6, -2]];
+        dots.forEach(([dx, dy]) => {
+          ctx.beginPath();
+          ctx.arc(dx, dy, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      } else if (trait.pattern === "lines") {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.28)";
+        ctx.lineWidth = 1.6;
+        [-8, 0, 8].forEach(lx => {
+          ctx.beginPath();
+          ctx.moveTo(lx, -10);
+          ctx.quadraticCurveTo(lx - 2, 0, lx, 10);
+          ctx.stroke();
+        });
+      } else if (trait.pattern === "starburst") {
+        ctx.fillStyle = "#fef08a";
+        ctx.beginPath();
+        ctx.arc(facingScreen ? 0 : -4, -3, 2.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (!facingScreen && trait.tail === "selendang") {
+        ctx.strokeStyle = skin.fin;
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(-24, 0);
+        ctx.quadraticCurveTo(-48, -12 + wag * 24, -62, 4 + wag * 18);
+        ctx.stroke();
+      } else if (!facingScreen && trait.tail === "kipas") {
+        ctx.fillStyle = skin.secondary;
+        ctx.beginPath();
+        ctx.moveTo(-24, 0);
+        ctx.lineTo(-52, -16 + wag * 20);
+        ctx.lineTo(-48, 0);
+        ctx.lineTo(-52, 16 + wag * 20);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      const topY = facingScreen ? -19 : -16;
+      if (trait.accessory === "crown") {
+        ctx.fillStyle = "#fde047";
+        ctx.beginPath();
+        ctx.moveTo(-5, topY);
+        ctx.lineTo(-3, topY - 8);
+        ctx.lineTo(0, topY - 4);
+        ctx.lineTo(3, topY - 9);
+        ctx.lineTo(5, topY);
+        ctx.closePath();
+        ctx.fill();
+      } else if (trait.accessory === "halo") {
+        ctx.strokeStyle = `rgba(253, 224, 71, ${0.65 + 0.25 * Math.sin(now * 0.005)})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(0, topY - 5, 10, 3.2, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+
     function drawTank() {
       const w = canvas.width;
       const h = canvas.height;
+      const t = Date.now() * 0.001;
       ctx.clearRect(0, 0, w, h);
 
-      // Lighting & Backdrop
       const lm = state.light_mode;
       const grad = ctx.createLinearGradient(0, 0, 0, h);
       if (lm === "day") {
-        grad.addColorStop(0, "#1d4ed8");
-        grad.addColorStop(1, "#0f172a");
+        grad.addColorStop(0, "#0284c7");
+        grad.addColorStop(0.65, "#0c4a6e");
+        grad.addColorStop(1, "#082f49");
       } else if (lm === "aurora") {
-        grad.addColorStop(0, "#064e3b");
-        grad.addColorStop(0.55, "#1e1b4b");
+        grad.addColorStop(0, "#059669");
+        grad.addColorStop(0.5, "#1e1b4b");
         grad.addColorStop(1, "#090d16");
       } else {
-        grad.addColorStop(0, "#090d1f");
-        grad.addColorStop(0.6, "#161036");
-        grad.addColorStop(1, "#060913");
+        grad.addColorStop(0, "#10214d");
+        grad.addColorStop(0.55, "#1a1440");
+        grad.addColorStop(1, "#070b18");
       }
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
 
-      // Stars
-      for (let i = 0; i < 28; i++) {
-        const sx = ((i * 97) % w);
-        const sy = ((i * 53) % (h * 0.65));
-        ctx.fillStyle = i % 3 === 0 ? "rgba(253,224,71,0.55)" : "rgba(255,255,255,0.35)";
+      ctx.save();
+      for (let r = 0; r < 4; r++) {
+        const rx = 140 + r * 200 + Math.sin(t * 0.6 + r) * 24;
+        const rayGrad = ctx.createLinearGradient(rx, 0, rx + 50, h * 0.78);
+        rayGrad.addColorStop(0, "rgba(186, 230, 253, 0.09)");
+        rayGrad.addColorStop(1, "rgba(186, 230, 253, 0)");
+        ctx.fillStyle = rayGrad;
         ctx.beginPath();
-        ctx.arc(sx, sy, (i % 2) + 1, 0, Math.PI * 2);
+        ctx.moveTo(rx - 22, 0);
+        ctx.lineTo(rx + 28, 0);
+        ctx.lineTo(rx + 95, h * 0.78);
+        ctx.lineTo(rx + 15, h * 0.78);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+
+      for (let i = 0; i < 32; i++) {
+        const sx = ((i * 97) % w);
+        const sy = ((i * 53) % (h * 0.62));
+        const alpha = 0.25 + 0.35 * Math.sin(t * 2.2 + i);
+        ctx.fillStyle = i % 3 === 0 ? `rgba(253,224,71,${alpha})` : `rgba(255,255,255,${alpha})`;
+        ctx.beginPath();
+        ctx.arc(sx, sy, (i % 2) + 1.1, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Backdrop detail
+      ctx.strokeStyle = "rgba(186, 230, 253, 0.28)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 24) {
+        const wy = 10 + Math.sin(t * 2.5 + x * 0.03) * 3;
+        if (x === 0) ctx.moveTo(x, wy);
+        else ctx.lineTo(x, wy);
+      }
+      ctx.stroke();
+
       const bd = state.equipped_decor.backdrop;
       if (bd === "ruins") {
-        ctx.fillStyle = "rgba(148, 163, 184, 0.16)";
-        ctx.fillRect(120, h - 180, 34, 140);
-        ctx.fillRect(680, h - 205, 40, 165);
+        ctx.fillStyle = "rgba(148, 163, 184, 0.22)";
+        ctx.fillRect(120, h - 185, 36, 145);
+        ctx.fillRect(680, h - 210, 42, 170);
       } else if (bd === "kelp") {
-        ctx.strokeStyle = "rgba(52, 211, 153, 0.25)";
+        ctx.strokeStyle = "rgba(52, 211, 153, 0.34)";
         ctx.lineWidth = 8;
+        ctx.lineCap = "round";
         for (let k = 0; k < 5; k++) {
           const kx = 100 + k * 165;
           ctx.beginPath();
           ctx.moveTo(kx, h - 38);
-          ctx.quadraticCurveTo(kx + Math.sin(Date.now() / 600 + k) * 18, h - 110, kx, h - 170);
+          ctx.quadraticCurveTo(kx + Math.sin(t * 1.8 + k) * 20, h - 115, kx + Math.cos(t * 1.5 + k) * 12, h - 175);
           ctx.stroke();
         }
+      } else if (bd === "nebula_bg") {
+        const neb = ctx.createRadialGradient(w * 0.5, h * 0.35, 20, w * 0.5, h * 0.4, w * 0.55);
+        neb.addColorStop(0, "rgba(192, 132, 252, 0.22)");
+        neb.addColorStop(0.5, "rgba(56, 189, 248, 0.12)");
+        neb.addColorStop(1, "rgba(15, 23, 42, 0)");
+        ctx.fillStyle = neb;
+        ctx.fillRect(0, 0, w, h);
       } else {
-        ctx.fillStyle = "rgba(244, 114, 182, 0.14)";
-        for (let c = 0; c < 4; c++) {
-          ctx.beginPath();
-          ctx.arc(140 + c * 190, h - 46, 26 + (c % 2) * 10, Math.PI, 0);
-          ctx.fill();
-        }
+        drawNaturalCoralBackdrop(w, h, t);
       }
 
-      // Substrate
-      const sub = state.equipped_decor.substrate;
-      ctx.fillStyle = sub === "moon_gravel" ? "#334155" : sub === "violet_sand" ? "#3b1d6e" : "#b89f78";
-      ctx.fillRect(0, h - 38, w, 38);
+      drawNaturalSubstrate(w, h);
+      drawShelter(w, h, t);
+      drawGlassSnail(w, h, t);
 
-      // Shelter
-      const sh = state.equipped_decor.shelter;
-      if (sh && sh !== "none") {
-        ctx.save();
-        ctx.translate(w * 0.78, h - 42);
-        ctx.fillStyle = sh === "crystal_cave" ? "rgba(168, 85, 247, 0.35)" : "rgba(245, 158, 11, 0.3)";
-        ctx.beginPath();
-        ctx.arc(0, 0, 48, Math.PI, 0);
-        ctx.fill();
-        ctx.fillStyle = "#e2e8f0";
-        ctx.font = "11px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(sh.replace("_", " "), 0, -54);
-        ctx.restore();
-      }
-
-      // Ornament
       const orn = state.equipped_decor.ornament;
       if (orn === "coin_chest") {
         ctx.fillStyle = "#d97706";
-        ctx.fillRect(68, h - 66, 44, 28);
+        ctx.fillRect(68, h - 68, 44, 28);
         ctx.fillStyle = "#fde047";
-        ctx.fillRect(85, h - 56, 10, 10);
+        ctx.fillRect(85, h - 58, 10, 10);
       } else if (orn === "glow_plant") {
         ctx.strokeStyle = "#22d3ee";
         ctx.lineWidth = 4;
         ctx.beginPath();
-        ctx.moveTo(95, h - 38);
-        ctx.lineTo(82, h - 95);
-        ctx.moveTo(95, h - 38);
-        ctx.lineTo(112, h - 88);
+        ctx.moveTo(95, h - 40);
+        ctx.lineTo(82 + Math.sin(t * 2) * 5, h - 100);
+        ctx.moveTo(95, h - 40);
+        ctx.lineTo(112 + Math.cos(t * 2) * 5, h - 92);
         ctx.stroke();
+      } else if (orn === "star_bubble") {
+        for (let sb = 0; sb < 3; sb++) {
+          const bx = 540 + sb * 22;
+          const by = h - 56 - ((t * 28 + sb * 25) % 90);
+          ctx.strokeStyle = "rgba(253, 224, 71, 0.55)";
+          ctx.beginPath();
+          ctx.arc(bx, by, 4.5, 0, Math.PI * 2);
+          ctx.stroke();
+        }
       }
 
-      // Companion
       if (state.equipped_decor.companion === "neon_shoal") {
         for (let i = 0; i < 3; i++) {
-          const nx = ((fish.x - 60 - i * 24 + w) % w);
-          const ny = Math.max(50, Math.min(h - 70, fish.y + (i - 1) * 20 + Math.sin(Date.now() / 400 + i) * 8));
+          const nx = ((fish.x - 65 - i * 24 + w) % w);
+          const ny = Math.max(55, Math.min(h - 75, fish.y + (i - 1) * 20 + Math.sin(t * 3 + i) * 8));
           ctx.fillStyle = "#38bdf8";
           ctx.beginPath();
           ctx.ellipse(nx, ny, 9, 4, 0, 0, Math.PI * 2);
@@ -1372,124 +2064,359 @@
         }
       }
 
-      // Sand dig spots
-      sandSpots.forEach(sp => {
-        if (sp.found) return;
-        ctx.fillStyle = "rgba(253, 224, 71, 0.85)";
+      bubbles.forEach(b => {
+        ctx.strokeStyle = "rgba(186, 230, 253, 0.42)";
+        ctx.lineWidth = 1.3;
         ctx.beginPath();
-        ctx.arc(sp.x, sp.y, 10 + Math.sin(Date.now() / 150) * 3, 0, Math.PI * 2);
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      pellets.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Minigame targets
+      sandSpots.forEach(sp => {
+        ctx.save();
+        ctx.translate(sp.x, sp.y);
+        if (sp.found) {
+          ctx.shadowColor = "#fef08a";
+          ctx.shadowBlur = 12;
+          ctx.fillStyle = "#fef9c3";
+          ctx.beginPath();
+          ctx.arc(0, -7, 8.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(-2.5, -9.5, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          const moundScale = Math.max(0.35, 1 - sp.progress / 140);
+          ctx.fillStyle = "rgba(217, 174, 112, 0.92)";
+          ctx.beginPath();
+          ctx.ellipse(0, 2, 22 * moundScale, 11 * moundScale, 0, Math.PI, 0);
+          ctx.fill();
+
+          if (sp.progress > 15) {
+            ctx.fillStyle = "rgba(55, 38, 18, 0.55)";
+            ctx.beginPath();
+            ctx.ellipse(0, 2, 12 * (sp.progress / 100), 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          const glintAlpha = 0.45 + 0.45 * Math.sin(t * 6 + sp.x);
+          ctx.fillStyle = `rgba(253, 224, 71, ${glintAlpha})`;
+          ctx.beginPath();
+          ctx.arc(0, -6 * moundScale, 4.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      });
+
+      sandParticles.forEach(prt => {
+        ctx.fillStyle = prt.color;
+        ctx.globalAlpha = Math.max(0, prt.life / 36);
+        ctx.beginPath();
+        ctx.arc(prt.x, prt.y, prt.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+
       if (activeMinigame === "bubbles") {
-        mgTargets.forEach(t => {
-          ctx.fillStyle = t.bad ? "rgba(30, 41, 59, 0.9)" : "rgba(251, 191, 36, 0.45)";
-          ctx.strokeStyle = t.bad ? "#fb7185" : "#fde047";
+        mgTargets.forEach(tObj => {
+          const pulse = 1 + Math.sin(t * 5 + tObj.phase) * 0.08;
+          const rad = tObj.r * pulse;
+          ctx.save();
+          ctx.translate(tObj.x, tObj.y);
+          ctx.fillStyle = tObj.bad
+            ? "rgba(30, 41, 59, 0.9)"
+            : tObj.star
+            ? "rgba(192, 132, 252, 0.36)"
+            : "rgba(251, 191, 36, 0.36)";
+          ctx.strokeStyle = tObj.bad ? "#fb7185" : tObj.star ? "#e879f9" : "#fde047";
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+          ctx.arc(0, 0, rad, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
+
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.72)";
+          ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          ctx.arc(-rad * 0.25, -rad * 0.25, rad * 0.42, Math.PI * 1.1, Math.PI * 1.65);
+          ctx.stroke();
+
+          if (tObj.star && !tObj.bad) {
+            ctx.fillStyle = "#fef08a";
+            ctx.font = "bold 12px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("✦", 0, 1);
+          }
+          ctx.restore();
         });
       } else if (activeMinigame === "rings") {
-        mgTargets.forEach(t => {
+        mgTargets.forEach(tObj => {
+          ctx.save();
+          ctx.translate(tObj.x, tObj.y);
           ctx.strokeStyle = "#f472b6";
           ctx.lineWidth = 4;
           ctx.beginPath();
-          ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+          ctx.arc(0, 0, tObj.r, 0, Math.PI * 2);
           ctx.stroke();
+          ctx.strokeStyle = "rgba(253, 224, 71, 0.65)";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(0, 0, tObj.r + 6 + Math.sin(t * 6) * 2, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
         });
       } else if (activeMinigame === "simon") {
-        mgTargets.forEach(t => {
-          const lit = simonFlash === t.idx;
-          ctx.fillStyle = lit ? "#fde047" : "rgba(56, 189, 248, 0.25)";
-          ctx.strokeStyle = "#7dd3fc";
-          ctx.lineWidth = 2.5;
+        if (mgTargets.length > 1) {
+          ctx.save();
+          ctx.strokeStyle = "rgba(125, 211, 252, 0.28)";
+          ctx.setLineDash([5, 5]);
+          ctx.lineWidth = 1.5;
           ctx.beginPath();
-          ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+          mgTargets.forEach((pt, i) => {
+            if (i === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          });
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        mgTargets.forEach(tObj => {
+          const lit = simonFlash === tObj.idx;
+          ctx.save();
+          ctx.translate(tObj.x, tObj.y);
+          if (lit) {
+            ctx.shadowColor = "#fde047";
+            ctx.shadowBlur = 24;
+          }
+          ctx.fillStyle = lit ? "#fde047" : "rgba(30, 41, 75, 0.72)";
+          ctx.strokeStyle = lit ? "#fef08a" : "#7dd3fc";
+          ctx.lineWidth = lit ? 3.5 : 2;
+          ctx.beginPath();
+          ctx.arc(0, 0, tObj.r, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
+
+          ctx.fillStyle = lit ? "#0f172a" : "#e2e8f0";
+          ctx.font = "bold 12px sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(tObj.note, 0, 1);
+          ctx.restore();
         });
       }
 
       // Main Pet Fish
       if (state.status !== "gone") {
+        const now = Date.now();
         const skin = SKINS.find(s => s.id === state.equipped_skin) || SKINS[0];
         const phase = getGrowthPhase();
-        const glowing = Date.now() < fish.buffUntil || state.equipped_skin === "aurora_angel";
+        const glowing = now < fish.buffUntil || state.equipped_skin === "aurora_angel";
         const critical = state.status === "critical";
+        const facingScreen = !critical && now < fish.lookAtScreenUntil;
+        const isDigWiggling = !critical && now < fish.digWiggleUntil;
+        const isBlinking = now < fish.blinkUntil;
 
         ctx.save();
         ctx.translate(fish.x, fish.y);
-        if (!critical) {
-          ctx.rotate(Math.atan2(fish.vy, fish.vx) * 0.35);
-          if (fish.vx < 0) ctx.scale(1, -1);
-        } else {
-          ctx.rotate(0.45);
+        if (!critical && !facingScreen) {
+          const baseTilt = isDigWiggling
+            ? 0.34 + Math.sin(now * 0.04) * 0.18
+            : Math.max(-0.22, Math.min(0.22, Math.atan2(fish.vy, Math.abs(fish.vx) + 0.5) * 0.45));
+          ctx.rotate(baseTilt);
+          if (fish.vx < 0) ctx.scale(-1, 1);
+        } else if (critical) {
+          ctx.rotate(0.22);
         }
         ctx.scale(phase.scale, phase.scale);
 
-        if (glowing) {
-          ctx.shadowColor = skin.fin;
-          ctx.shadowBlur = 18;
+        if (glowing || facingScreen) {
+          ctx.shadowColor = facingScreen ? "#fde047" : skin.fin;
+          ctx.shadowBlur = facingScreen ? 24 : 18;
         }
 
-        // Tail
-        const wag = critical ? 0.1 : Math.sin(fish.tailPhase) * 0.35;
-        ctx.fillStyle = skin.fin;
-        ctx.beginPath();
-        ctx.moveTo(-24, 0);
-        ctx.quadraticCurveTo(-42, -18 + wag * 30, -48, -6 + wag * 20);
-        ctx.quadraticCurveTo(-40, 0, -48, 6 + wag * 20);
-        ctx.quadraticCurveTo(-42, 18 + wag * 30, -24, 0);
-        ctx.fill();
+        const wag = critical ? 0.08 : Math.sin(fish.tailPhase) * (isDigWiggling ? 0.65 : facingScreen ? 0.62 : 0.45);
 
-        // Body
-        ctx.fillStyle = skin.primary;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 28, 16, 0, 0, Math.PI * 2);
-        ctx.fill();
+        if (facingScreen) {
+          const flapLeft = wag * 0.62;
+          const flapRight = -wag * 0.62;
 
-        // Secondary stripe/pattern
-        ctx.fillStyle = skin.secondary;
-        ctx.beginPath();
-        ctx.ellipse(-4, 2, 14, 8, 0.2, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Accessory
-        if (state.trait?.accessory === "crown") {
-          ctx.fillStyle = "#fde047";
+          ctx.save();
+          ctx.translate(-21, 3);
+          ctx.rotate(-0.35 + flapLeft);
+          ctx.fillStyle = skin.secondary;
           ctx.beginPath();
-          ctx.moveTo(4, -15);
-          ctx.lineTo(10, -24);
-          ctx.lineTo(15, -15);
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(-20, -9, -26, 5);
+          ctx.quadraticCurveTo(-14, 13, 0, 5);
           ctx.closePath();
           ctx.fill();
-        }
+          ctx.restore();
 
-        // Eye
-        ctx.fillStyle = "#ffffff";
-        ctx.beginPath();
-        ctx.arc(14, -4, 4.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#0f172a";
-        ctx.beginPath();
-        ctx.arc(15.5, -4, 2.2, 0, Math.PI * 2);
-        ctx.fill();
+          ctx.save();
+          ctx.translate(21, 3);
+          ctx.rotate(0.35 + flapRight);
+          ctx.fillStyle = skin.secondary;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(20, -9, 26, 5);
+          ctx.quadraticCurveTo(14, 13, 0, 5);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+
+          ctx.fillStyle = skin.fin;
+          ctx.beginPath();
+          ctx.moveTo(-5, -18);
+          ctx.quadraticCurveTo(0, -28 + wag * 6, 5, -18);
+          ctx.fill();
+
+          ctx.fillStyle = skin.primary;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 23, 19, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          drawFishTraits(skin, state.trait, wag, true, now);
+
+          [-8, 8].forEach(ex => {
+            if (isBlinking) {
+              ctx.strokeStyle = "#0f172a";
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.moveTo(ex - 4, -3);
+              ctx.lineTo(ex + 4, -3);
+              ctx.stroke();
+            } else {
+              ctx.fillStyle = "#ffffff";
+              ctx.beginPath();
+              ctx.arc(ex, -3, 5.2, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.fillStyle = "#0f172a";
+              ctx.beginPath();
+              ctx.arc(ex, -2.5, 2.6, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          });
+
+          ctx.strokeStyle = "rgba(15, 23, 42, 0.55)";
+          ctx.lineWidth = 1.6;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.arc(0, 4, 4, 0.15 * Math.PI, 0.85 * Math.PI);
+          ctx.stroke();
+        } else {
+          ctx.save();
+          ctx.translate(6, 7);
+          ctx.rotate(-0.22 - wag * 0.68);
+          ctx.fillStyle = skin.secondary;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(-11, 16, 5, 17);
+          ctx.quadraticCurveTo(11, 9, 0, 0);
+          ctx.fill();
+          ctx.restore();
+
+          ctx.fillStyle = skin.fin;
+          ctx.beginPath();
+          ctx.moveTo(-6, -13);
+          ctx.quadraticCurveTo(4, -26 + wag * 12, 12, -12);
+          ctx.fill();
+
+          ctx.fillStyle = skin.fin;
+          ctx.beginPath();
+          ctx.moveTo(-24, 0);
+          ctx.quadraticCurveTo(-44, -20 + wag * 28, -50, -7 + wag * 18);
+          ctx.quadraticCurveTo(-41, 0, -50, 7 + wag * 18);
+          ctx.quadraticCurveTo(-44, 20 + wag * 28, -24, 0);
+          ctx.fill();
+
+          ctx.fillStyle = skin.primary;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 28, 16, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.save();
+          ctx.translate(2, 4);
+          ctx.rotate(0.16 + wag * 0.68);
+          ctx.fillStyle = skin.secondary;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(-13, 15, 4, 16);
+          ctx.quadraticCurveTo(10, 8, 0, 0);
+          ctx.fill();
+          ctx.restore();
+
+          drawFishTraits(skin, state.trait, wag, false, now);
+
+          if (isBlinking) {
+            ctx.strokeStyle = "#0f172a";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(11, -4);
+            ctx.lineTo(19, -4);
+            ctx.stroke();
+          } else {
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(15, -4, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#0f172a";
+            ctx.beginPath();
+            ctx.arc(16.5, -4, 2.2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
 
         ctx.restore();
       }
 
-      // Dirty spots overlay
-      dirtySpots.forEach(d => {
-        ctx.fillStyle = `rgba(74, 222, 128, ${0.42 * (1 - d.clean / 100)})`;
+      mossClusters.forEach(mc => {
+        if (mc.wiped >= 100) return;
+        const remain = 1 - mc.wiped / 100;
+        const alpha = Math.max(0.1, 0.72 * remain);
+        ctx.save();
+        ctx.translate(mc.x, mc.y);
+        ctx.rotate(mc.rot);
+        ctx.scale(0.65 + 0.35 * remain, 0.65 + 0.35 * remain);
+
+        const mossGrad = ctx.createRadialGradient(0, 0, 3, 0, 0, 26);
+        mossGrad.addColorStop(0, `rgba(22, 101, 52, ${alpha})`);
+        mossGrad.addColorStop(0.65, `rgba(34, 197, 94, ${alpha * 0.92})`);
+        mossGrad.addColorStop(1, `rgba(132, 204, 22, ${alpha * 0.75})`);
+
+        ctx.fillStyle = mossGrad;
         ctx.beginPath();
-        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        const pts = mc.lobes;
+        for (let i = 0; i < pts.length; i++) {
+          const cur = pts[i];
+          const nxt = pts[(i + 1) % pts.length];
+          const mx = (cur.x + nxt.x) * 0.5;
+          const my = (cur.y + nxt.y) * 0.5;
+          if (i === 0) ctx.moveTo(mx, my);
+          ctx.quadraticCurveTo(cur.x, cur.y, mx, my);
+        }
+        ctx.closePath();
         ctx.fill();
+
+        mc.specks.forEach(sp => {
+          ctx.fillStyle = `rgba(20, 83, 45, ${alpha * 0.65})`;
+          ctx.beginPath();
+          ctx.arc(sp.dx, sp.dy, sp.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.restore();
       });
 
-      // Ripples & meteors
       ripples.forEach(r => {
         ctx.strokeStyle = `rgba(125, 211, 252, ${r.alpha})`;
         ctx.lineWidth = 2;
@@ -1506,39 +2433,195 @@
         ctx.lineTo(m.x - m.vx * 3, m.y - m.vy * 3);
         ctx.stroke();
       });
+
+      sparkles.forEach(sp => {
+        const a = sp.life / sp.maxLife;
+        ctx.fillStyle = sp.color;
+        ctx.globalAlpha = Math.max(0, a);
+        ctx.font = "bold 13px sans-serif";
+        ctx.textAlign = "center";
+        if (sp.text) ctx.fillText(sp.text, sp.x, sp.y - (1 - a) * 24);
+        else {
+          ctx.beginPath();
+          ctx.arc(sp.x, sp.y, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      });
     }
 
     function updateLoop(dt) {
       const now = Date.now();
-      const speedMult = (now < fish.buffUntil ? 1.85 : 1) * (state.status === "critical" ? 0.15 : 1);
+      const moodBoost = state.mood >= 80 ? 1.18 : 1;
+      const speedMult = (now < fish.buffUntil ? 1.85 : moodBoost) * (state.status === "critical" ? 0.12 : 1);
 
-      if (state.status !== "gone") {
-        fish.tailPhase += dt * 11 * speedMult;
-        if (fish.pointerTarget && state.status !== "critical") {
-          const dx = fish.pointerTarget.x - fish.x;
-          const dy = fish.pointerTarget.y - fish.y;
-          fish.vx = dx * 0.03 * speedMult;
-          fish.vy = dy * 0.03 * speedMult;
-        } else if (state.status !== "critical") {
-          fish.vx += (Math.random() - 0.5) * 0.14 * speedMult;
-          fish.vy += (Math.random() - 0.5) * 0.1 * speedMult;
-          fish.vx = Math.max(-2.2 * speedMult, Math.min(2.2 * speedMult, fish.vx));
-          fish.vy = Math.max(-1.3 * speedMult, Math.min(1.3 * speedMult, fish.vy));
-        } else {
-          fish.vx *= 0.9;
-          fish.vy = 0.25;
-        }
-
-        fish.x += fish.vx * dt * 55;
-        fish.y += fish.vy * dt * 55;
-
-        if (fish.x < 42) { fish.x = 42; fish.vx = Math.abs(fish.vx); }
-        if (fish.x > canvas.width - 42) { fish.x = canvas.width - 42; fish.vx = -Math.abs(fish.vx); }
-        if (fish.y < 46) { fish.y = 46; fish.vy = Math.abs(fish.vy); }
-        if (fish.y > canvas.height - 62) { fish.y = canvas.height - 62; fish.vy = -Math.abs(fish.vy); }
+      if (now >= fish.nextBlinkAt) {
+        fish.blinkUntil = now + 135;
+        fish.nextBlinkAt = now + 2400 + Math.random() * 2800;
+      }
+      if (state.status !== "gone" && now >= fish.nextBreathAt) {
+        fish.nextBreathAt = now + 3200 + Math.random() * 2600;
+        const mouthX = fish.x + (fish.vx >= 0 ? 22 : -22);
+        bubbles.push({
+          x: mouthX,
+          y: fish.y - 2,
+          r: 2.2,
+          vy: 1.05,
+          wobble: Math.random() * Math.PI * 2
+        });
+        if (bubbles.length > 30) bubbles.shift();
       }
 
-      // Passive coin from well-cared pet & coin chest
+      if (state.equipped_decor.companion === "glass_snail") {
+        snail.x += snail.dir * dt * 14;
+        if (snail.x > canvas.width * 0.7) snail.dir = -1;
+        if (snail.x < 120) snail.dir = 1;
+        if (now - snail.lastCleanAt > 45000 && state.status !== "gone") {
+          snail.lastCleanAt = now;
+          state.cleanliness = Math.min(100, +(state.cleanliness + 2).toFixed(1));
+          renderTopStats();
+        }
+      }
+
+      if (state.equipped_decor.shelter === "crystal_cave" && state.status !== "gone" && (now - lastCrystalMoodTime) > 35000) {
+        lastCrystalMoodTime = now;
+        if (state.mood < 100) {
+          state.mood = Math.min(100, +(state.mood + 3).toFixed(1));
+          renderTopStats();
+        }
+      }
+
+      if (activeMinigame === "clean") {
+        fish.currentCurrentX = 0;
+        fish.currentCurrentY = 0;
+      } else {
+        fish.currentCurrentX *= 0.94;
+        fish.currentCurrentY *= 0.94;
+      }
+
+      bubbles.forEach(b => {
+        b.y -= b.vy * dt * 45;
+        b.x += (Math.sin(now * 0.003 + b.wobble) * 0.35) + fish.currentCurrentX * 0.4;
+        if (b.y < 14) {
+          b.y = canvas.height - 44;
+          b.x = Math.random() * canvas.width;
+        }
+      });
+
+      for (let i = pellets.length - 1; i >= 0; i--) {
+        const p = pellets[i];
+        p.y += p.vy * dt * 45;
+        p.x += fish.currentCurrentX * 0.3;
+        if (state.status !== "gone" && Math.hypot(fish.x - p.x, fish.y - p.y) < 36) {
+          spawnSparkle(p.x, p.y, p.color, "");
+          playTone(690, 0.06, "sine", 0.05);
+          pellets.splice(i, 1);
+          continue;
+        }
+        if (p.y > canvas.height - 42) pellets.splice(i, 1);
+      }
+
+      if (state.status !== "gone") {
+        fish.tailPhase += dt * (now < fish.digWiggleUntil ? 19 : 11.5) * speedMult;
+        fish.wanderTimer -= dt;
+
+        const nearestPellet = pellets[0];
+
+        if (state.status === "critical") {
+          fish.vx *= 0.92;
+          fish.vy = Math.sin(now * 0.002) * 0.15;
+        } else if (now < fish.lookAtScreenUntil) {
+          fish.vx = Math.sin(now * 0.005) * 0.35;
+          fish.vy = Math.cos(now * 0.004) * 0.25;
+        } else if (activeMinigame === "dig" && fish.digTarget && !fish.digTarget.found) {
+          const tgtX = fish.digTarget.x;
+          const tgtY = fish.digTarget.y - 18;
+          const dx = tgtX - fish.x;
+          const dy = tgtY - fish.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist > 22) {
+            fish.vx += (Math.max(-3.4, Math.min(3.4, dx * 0.06)) - fish.vx) * 0.14;
+            fish.vy += (Math.max(-2.6, Math.min(3.2, dy * 0.06)) - fish.vy) * 0.14;
+          } else {
+            fish.digWiggleUntil = now + 260;
+            const rubOffset = Math.sin(now * 0.032) * 14;
+            fish.x += ((tgtX + rubOffset) - fish.x) * 0.25;
+            fish.y += ((tgtY + Math.abs(Math.cos(now * 0.032)) * 4) - fish.y) * 0.25;
+            if (Math.abs(rubOffset) > 1) fish.vx = rubOffset * 0.08;
+            fish.vy = 0.25;
+            if (Math.random() < 0.38) {
+              spawnSandBurst(fish.digTarget.x, fish.digTarget.y - 2, "#e2c792", 2);
+            }
+          }
+        } else if (activeMinigame === "rings" && mgTargets[0]) {
+          const ring = mgTargets[0];
+          const dx = ring.x - fish.x;
+          const dy = ring.y - fish.y;
+          const dist = Math.max(1, Math.hypot(dx, dy));
+          const horizSign = Math.abs(dx) > 12 ? Math.sign(dx) : (fish.vx >= 0 ? 1 : -1);
+          const desiredVx = horizSign * Math.max(1.45, Math.min(2.7, Math.abs(dx) * 0.025)) * speedMult;
+          const desiredVy = (dy / dist) * Math.min(1.5, Math.abs(dy) * 0.022) * speedMult;
+          fish.vx += (desiredVx - fish.vx) * 0.075;
+          fish.vy += (desiredVy - fish.vy) * 0.075;
+        } else if (fish.pointerTarget && activeMinigame !== "clean") {
+          const dx = fish.pointerTarget.x - fish.x;
+          const dy = fish.pointerTarget.y - fish.y;
+          fish.vx = Math.max(-3.1, Math.min(3.1, dx * 0.032 * speedMult)) + fish.currentCurrentX * 0.22;
+          fish.vy = Math.max(-2.1, Math.min(2.1, dy * 0.032 * speedMult)) + fish.currentCurrentY * 0.22;
+        } else if (nearestPellet) {
+          const dx = nearestPellet.x - fish.x;
+          const dy = nearestPellet.y - fish.y;
+          fish.vx = Math.max(-2.7, Math.min(2.7, dx * 0.028 * speedMult));
+          fish.vy = Math.max(-1.9, Math.min(1.9, dy * 0.028 * speedMult));
+        } else if (!activeMinigame && state.mood < 45 && state.equipped_decor.shelter && state.equipped_decor.shelter !== "none") {
+          const homeX = canvas.width * 0.78;
+          const homeY = canvas.height - 76;
+          const dx = homeX - fish.x;
+          const dy = homeY - fish.y;
+          fish.vx += (Math.max(-1.2, Math.min(1.2, dx * 0.02)) - fish.vx) * 0.04;
+          fish.vy += (Math.max(-1.0, Math.min(1.0, dy * 0.02)) - fish.vy) * 0.04;
+        } else {
+          if (fish.wanderTimer <= 0) {
+            fish.wanderTimer = 1.6 + Math.random() * 2.1;
+            const keepDir = Math.random() < 0.45 && Math.abs(fish.vx) > 0.5 ? Math.sign(fish.vx) : (Math.random() < 0.5 ? -1 : 1);
+            fish.targetVx = keepDir * (0.95 + Math.random() * 0.95) * speedMult;
+            fish.targetVy = (Math.random() - 0.5) * 0.95 * speedMult;
+          }
+          const gentleWaveY = Math.sin(now * 0.0022 + fish.x * 0.01) * 0.22;
+          fish.vx += (fish.targetVx - fish.vx) * 0.035 + fish.currentCurrentX * 0.18;
+          fish.vy += ((fish.targetVy + gentleWaveY) - fish.vy) * 0.035 + fish.currentCurrentY * 0.18;
+        }
+
+        fish.x += fish.vx * dt * 52;
+        fish.y += fish.vy * dt * 52;
+
+        const maxFloorY = (activeMinigame === "dig" && fish.digTarget && !fish.digTarget.found)
+          ? canvas.height - 46
+          : canvas.height - 72;
+
+        if (fish.x < 56) {
+          fish.x = 56;
+          fish.vx = Math.abs(fish.vx) || 1.2;
+          fish.targetVx = Math.abs(fish.targetVx) || 1.35;
+        }
+        if (fish.x > canvas.width - 56) {
+          fish.x = canvas.width - 56;
+          fish.vx = -(Math.abs(fish.vx) || 1.2);
+          fish.targetVx = -(Math.abs(fish.targetVx) || 1.35);
+        }
+        if (fish.y < 60) {
+          fish.y = 60;
+          fish.vy = Math.abs(fish.vy) || 0.5;
+          fish.targetVy = Math.abs(fish.targetVy) || 0.5;
+        }
+        if (fish.y > maxFloorY) {
+          fish.y = maxFloorY;
+          fish.vy = -(Math.abs(fish.vy) || 0.3);
+          fish.targetVy = -(Math.abs(fish.targetVy) || 0.3);
+        }
+      }
+
       if (state.hunger > 70 && state.cleanliness > 70 && state.status !== "gone" && (now - lastPassiveCoinTime) > 45000) {
         lastPassiveCoinTime = now;
         addCoins(5, "Gelembung Ceria");
@@ -1548,24 +2631,37 @@
         addCoins(15, "Peti Harta");
       }
 
-      // Minigame timer & motion
       if (activeMinigame) {
         mgTimer -= dt;
         updateMinigameHud();
         if (activeMinigame === "bubbles") {
-          mgTargets.forEach(t => {
-            t.y += t.vy * dt * 45;
-            if (t.y < 30) t.y = canvas.height - 50;
+          mgTargets.forEach(tObj => {
+            tObj.y += tObj.vy * dt * 42;
+            tObj.x = tObj.baseX + Math.sin(now * 0.0028 + tObj.phase) * 16;
+            if (tObj.y < 80) {
+              tObj.y = canvas.height - 56;
+              tObj.baseX = 95 + Math.random() * (canvas.width - 190);
+            }
           });
         } else if (activeMinigame === "rings") {
           const ring = mgTargets[0];
-          if (ring && Math.hypot(fish.x - ring.x, fish.y - ring.y) < ring.r + 16) {
+          if (ring && Math.hypot(fish.x - ring.x, fish.y - ring.y) < ring.r + 18) {
             mgScore += 14;
+            spawnSparkle(ring.x, ring.y, "#f472b6", "+14");
             playTone(680, 0.12, "triangle");
             spawnRing();
           }
         }
         if (mgTimer <= 0) stopMinigame(true);
+      }
+
+      for (let i = sandParticles.length - 1; i >= 0; i--) {
+        const prt = sandParticles[i];
+        prt.x += prt.vx * dt * 45;
+        prt.y += prt.vy * dt * 45;
+        prt.vy += 0.14 * dt * 45;
+        prt.life -= 1;
+        if (prt.life <= 0) sandParticles.splice(i, 1);
       }
 
       for (let i = ripples.length - 1; i >= 0; i--) {
@@ -1580,6 +2676,11 @@
         meteors[i].life -= 1;
         if (meteors[i].life <= 0) meteors.splice(i, 1);
       }
+
+      for (let i = sparkles.length - 1; i >= 0; i--) {
+        sparkles[i].life -= 1;
+        if (sparkles[i].life <= 0) sparkles.splice(i, 1);
+      }
     }
 
     function getCanvasPos(e) {
@@ -1593,74 +2694,132 @@
     }
 
     function handleCanvasInteract(e, isMove = false) {
+      startBgmLoop();
       const pos = getCanvasPos(e);
+      const now = Date.now();
+
+      if (activeMinigame !== "clean" && isMove && fish.lastPointer) {
+        const dx = pos.x - fish.lastPointer.x;
+        const dy = pos.y - fish.lastPointer.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > 3) {
+          fish.currentCurrentX = Math.max(-3.5, Math.min(3.5, dx * 0.2));
+          fish.currentCurrentY = Math.max(-2.5, Math.min(2.5, dy * 0.2));
+          if (Math.random() < 0.14) {
+            playTone(520 + Math.min(240, dist * 8), 0.05, "sine", 0.035);
+          }
+        }
+      }
+      fish.lastPointer = pos;
+
       if (!isMove) {
         ripples.push({ x: pos.x, y: pos.y, radius: 4, alpha: 0.85 });
-        playTone(440, 0.06, "sine");
+        playTone(440, 0.06, "sine", 0.065);
+
+        if (state.status !== "gone" && Math.hypot(pos.x - fish.x, pos.y - fish.y) < 62) {
+          if (now - fish.lastTapTime < 900) {
+            fish.tapCount += 1;
+          } else {
+            fish.tapCount = 1;
+          }
+          fish.lastTapTime = now;
+
+          if (fish.tapCount >= 2) {
+            fish.lookAtScreenUntil = now + 2600;
+            fish.tapCount = 0;
+            spawnSparkle(fish.x, fish.y - 26, "#fde047", "👀");
+            playCuteChirp();
+            renderTopStats();
+          } else {
+            playTone(620, 0.07, "triangle", 0.06);
+          }
+        }
       }
-      fish.pointerTarget = pos;
+
+      if (activeMinigame !== "clean") {
+        fish.pointerTarget = pos;
+      }
 
       if (activeMinigame === "bubbles" && !isMove) {
         for (let i = mgTargets.length - 1; i >= 0; i--) {
-          const t = mgTargets[i];
-          if (Math.hypot(pos.x - t.x, pos.y - t.y) <= t.r + 12) {
-            if (t.bad) {
+          const tObj = mgTargets[i];
+          if (Math.hypot(pos.x - tObj.x, pos.y - tObj.y) <= tObj.r + 12) {
+            if (tObj.bad) {
               mgScore = Math.max(0, mgScore - 6);
+              spawnSparkle(tObj.x, tObj.y, "#fb7185", "-6");
               playTone(210, 0.14, "sawtooth");
             } else {
-              mgScore += 12;
+              const pts = tObj.star ? 16 : 12;
+              mgScore += pts;
+              spawnSparkle(tObj.x, tObj.y, "#fde047", `+${pts}`);
               state.stats_count.bubbles = (state.stats_count.bubbles || 0) + 1;
-              playTone(740, 0.1, "sine");
+              playTone(tObj.star ? 840 : 740, 0.1, "sine");
             }
+            const nx = 95 + Math.random() * (canvas.width - 190);
             mgTargets.splice(i, 1);
             mgTargets.push({
-              x: 80 + Math.random() * (canvas.width - 160),
-              y: canvas.height - 55,
-              r: 20 + Math.random() * 10,
-              vy: -0.9 - Math.random() * 1.2,
-              bad: Math.random() < 0.22
+              x: nx,
+              baseX: nx,
+              y: canvas.height - 56,
+              r: 20 + Math.random() * 9,
+              vy: -0.75 - Math.random() * 0.95,
+              phase: Math.random() * Math.PI * 2,
+              bad: Math.random() < 0.22,
+              star: Math.random() < 0.28
             });
           }
         }
       } else if (activeMinigame === "dig") {
         sandSpots.forEach(sp => {
-          if (!sp.found && Math.hypot(pos.x - sp.x, pos.y - sp.y) < 34) {
-            sp.progress += isMove ? 8 : 26;
+          if (!sp.found && Math.hypot(pos.x - sp.x, pos.y - sp.y) < 42) {
+            fish.digTarget = sp;
+            sp.progress += isMove ? 14 : 30;
+            spawnSandBurst(sp.x, sp.y - 2, "#e2c792", isMove ? 4 : 8);
+            playTone(320 + sp.progress * 2, 0.05, "triangle");
             if (sp.progress >= 100) {
               sp.found = true;
+              fish.digTarget = null;
+              fish.digWiggleUntil = 0;
               mgScore += 18;
+              spawnSparkle(sp.x, sp.y - 16, "#fde047", "+18 🫧 Mutiara");
+              spawnSandBurst(sp.x, sp.y - 4, "#fde047", 12);
               state.codex.pearls = (state.codex.pearls || 0) + 1;
-              playTone(860, 0.14, "triangle");
+              playCuteChirp();
             }
           }
         });
       } else if (activeMinigame === "clean") {
-        dirtySpots.forEach(d => {
-          if (d.clean < 100 && Math.hypot(pos.x - d.x, pos.y - d.y) < d.r + 22) {
-            d.clean += isMove ? 14 : 35;
-            if (d.clean >= 100) {
-              mgScore += 8;
-              state.cleanliness = Math.min(100, +(state.cleanliness + 4).toFixed(1));
-              playTone(640, 0.08, "sine");
-              renderTopStats();
+        if (isMove) {
+          mossClusters.forEach(mc => {
+            if (mc.wiped < 100 && Math.hypot(pos.x - mc.x, pos.y - mc.y) < 46) {
+              mc.wiped = Math.min(100, mc.wiped + 22);
+              if (mc.wiped >= 100) {
+                mgScore += 10;
+                state.cleanliness = Math.min(100, +(state.cleanliness + 5).toFixed(1));
+                spawnSparkle(mc.x, mc.y, "#34d399", "+10 ✨");
+                playTone(660, 0.09, "sine");
+                renderTopStats();
+              }
             }
-          }
-        });
+          });
+        }
       } else if (activeMinigame === "simon" && !isMove) {
-        const hit = mgTargets.find(t => Math.hypot(pos.x - t.x, pos.y - t.y) <= t.r + 12);
+        if (simonShowing) return;
+        const hit = mgTargets.find(tObj => Math.hypot(pos.x - tObj.x, pos.y - tObj.y) <= tObj.r + 12);
         if (hit) {
           simonFlash = hit.idx;
           setTimeout(() => { simonFlash = -1; }, 180);
           if (hit.idx === simonSeq[simonStep]) {
             simonStep++;
-            playTone(360 + hit.idx * 110, 0.1, "sine");
+            playTone(hit.freq, 0.14, "sine", 0.09);
             if (simonStep >= simonSeq.length) {
               mgScore += 20;
-              toast("🌟 Urutan tepat! +20 koin ronde");
-              setTimeout(nextSimonRound, 600);
+              spawnSparkle(hit.x, hit.y - 16, "#fde047", "+20");
+              toast("🌟 Urutan nada tepat! +20 koin ronde");
+              setTimeout(nextSimonRound, 650);
             }
           } else {
-            toast("Kurang pas, coba perhatikan lagi ya!");
+            toast("Kurang pas, perhatikan ulang urutan nadanya ya!");
             simonStep = 0;
             playSimonSequence();
           }
@@ -1672,16 +2831,36 @@
     canvas.addEventListener("pointermove", e => {
       if (e.buttons > 0 || e.pointerType === "touch") handleCanvasInteract(e, true);
     });
-    canvas.addEventListener("pointerleave", () => { fish.pointerTarget = null; });
+    canvas.addEventListener("pointerup", () => {
+      fish.pointerTarget = null;
+      fish.lastPointer = null;
+    });
+    canvas.addEventListener("pointerleave", () => {
+      fish.pointerTarget = null;
+      fish.lastPointer = null;
+    });
 
     document.querySelectorAll(".tab-btn").forEach(btn => {
-      btn.onclick = () => { activeTab = btn.dataset.tab; renderTabContent(); };
+      btn.onclick = () => {
+        startBgmLoop();
+        activeTab = btn.dataset.tab;
+        renderTabContent();
+      };
     });
 
     document.getElementById("btnStopMinigame").onclick = () => stopMinigame(true);
+    document.getElementById("btnBgm").onclick = () => {
+      bgmOn = !bgmOn;
+      if (bgmOn) {
+        startBgmLoop();
+        playGentleBgmNote();
+      }
+      document.getElementById("btnBgm").textContent = bgmOn ? "🎵 Lagu: ON" : "🔇 Lagu: OFF";
+    };
     document.getElementById("btnSound").onclick = () => {
       soundOn = !soundOn;
-      document.getElementById("btnSound").textContent = soundOn ? "🔊 Suara: ON" : "🔇 Suara: OFF";
+      if (soundOn) playCuteChirp();
+      document.getElementById("btnSound").textContent = soundOn ? "🔊 Efek: ON" : "🔇 Efek: OFF";
     };
     document.getElementById("btnSync").onclick = () => syncToSheet(false);
 
@@ -1700,6 +2879,14 @@
       }
       renameModal.classList.remove("open");
     };
+
+    setInterval(() => {
+      onlineElapsedSec += 1;
+      updateOnlineTimerDisplay();
+      if (onlineElapsedSec > 0 && onlineElapsedSec % TEN_MINUTES_SEC === 0) {
+        triggerTenMinuteSurprise();
+      }
+    }, 1000);
 
     let lastFrame = performance.now();
     function frame(now) {
