@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>VirSagi Cosmic Aquarium</title>
+  <style>
+    :root {
+      --bg-dark: #070b19;
+      --panel: rgba(14, 22, 46, 0.84);
+      --panel-border: rgba(147, 197, 253, 0.22);
+      --accent: #38bdf8;
+      --accent-2: #c084fc;
+      --gold: #fbbf24;
+      --danger: #fb7185;
+      --ok: #34d399;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #111c3d, var(--bg-dark) 75%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 10px 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .pet-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pet-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .badge {
+      font-size: 0.74rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(192, 132, 252, 0.18);
+      border: 1px solid rgba(192, 132, 252, 0.4);
+      color: #e9d5ff;
+    }
+
+    .badge.gold {
+      background: rgba(251, 191, 36, 0.16);
+      border-color: rgba(251, 191, 36, 0.45);
+      color: #fde68a;
+      font-weight: 700;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: rgba(30, 41, 75, 0.9);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    button:hover {
+      background: rgba(51, 65, 110, 0.95);
+      border-color: var(--accent);
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #0284c7, #7e22ce);
+      border-color: transparent;
+    }
+
+    button.warn {
+      background: rgba(251, 113, 133, 0.2);
+      border-color: rgba(251, 113, 133, 0.55);
+      color: #fecdd3;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 8px 10px;
+    }
+
+    .stat-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .stat-val {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .bar-bg {
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.3s ease;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .stage-wrap {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(125, 211, 252, 0.28);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+      background: #081226;
+    }
+
+    canvas#tankCanvas {
+      display: block;
+      width: 100%;
+      height: 430px;
+      touch-action: none;
+    }
+
+    @media (max-width: 640px) {
+      canvas#tankCanvas {
+        height: 360px;
+      }
+    }
+
+    .hud-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+    }
+
+    .hud-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .chip {
+      pointer-events: auto;
+      background: rgba(8, 15, 34, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      backdrop-filter: blur(6px);
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      color: #e2e8f0;
+    }
+
+    .note-banner {
+      align-self: flex-start;
+      max-width: 82%;
+      background: rgba(15, 23, 42, 0.8);
+      border-left: 3px solid var(--accent-2);
+      padding: 6px 11px;
+      border-radius: 0 10px 10px 0;
+      font-size: 0.78rem;
+      color: #f1f5f9;
+      backdrop-filter: blur(6px);
+    }
+
+    .minigame-bar {
+      pointer-events: auto;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid var(--gold);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+    }
+
+    .minigame-bar.active {
+      display: flex;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #0284c7, #7e22ce);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .item-card {
+      background: rgba(15, 23, 45, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .item-title {
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+
+    .item-desc {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .item-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+    }
+
+    .toast-stack {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 99;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 320px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--accent);
+      color: #f8fafc;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+      animation: popIn 0.2s ease;
+    }
+
+    @keyframes popIn {
+      from { transform: translateY(8px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      z-index: 120;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 440px;
+      background: #0f172a;
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: #070d1f;
+      color: #fff;
+      font-size: 0.88rem;
+    }
+
+    .sub-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .pill-btn.active {
+      background: rgba(56, 189, 248, 0.22);
+      border-color: var(--accent);
+    }
+
+    .codex-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+      font-size: 0.78rem;
+    }
+
+    .codex-box {
+      background: rgba(15, 23, 45, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="pet-title-group">
+        <span class="pet-name" id="petNameDisplay">Nova</span>
+        <span class="badge" id="petTitleBadge">Penjelajah Kosmik</span>
+        <span class="badge" id="phaseBadge">Fase 1: Baby Fry • Hari 1/30</span>
+        <span class="badge gold" id="coinBadge">🪙 150</span>
+      </div>
+      <div class="top-actions">
+        <button id="btnRename">Ganti Nama</button>
+        <button id="btnSound">🔊 Suara: ON</button>
+        <button id="btnSync">☁️ Sinkron</button>
+      </div>
+    </header>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-head"><span>🍽️ Kenyang</span><span class="stat-val" id="valHunger">85%</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="barHunger" style="width:85%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-head"><span>✨ Bersih</span><span class="stat-val" id="valClean">90%</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="barClean" style="width:90%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-head"><span>💖 Mood</span><span class="stat-val" id="valMood">85%</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="barMood" style="width:85%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-head"><span>🌙 Kebiasaan</span><span class="stat-val" id="valHabit">Penasaran</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="barGrowth" style="width:3%"></div></div>
+      </div>
+    </section>
+
+    <div class="stage-wrap">
+      <canvas id="tankCanvas" width="896" height="430"></canvas>
+      <div class="hud-overlay">
+        <div class="hud-top">
+          <div class="chip" id="weatherChip">✨ Cuaca: Malam Starlight</div>
+          <div class="chip" id="statusChip">Status: Sehat</div>
+        </div>
+
+        <div class="minigame-bar" id="minigameBar">
+          <span id="minigameInfo">Mini-Game aktif!</span>
+          <button id="btnStopMinigame" class="warn">Selesai</button>
+        </div>
+
+        <div class="note-banner" id="noteBanner">💬 Selamat datang di rumah barumu!</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="care">🍽️ Makan & Rawat</button>
+      <button class="tab-btn" data-tab="games">🎮 Mini-Game Koin</button>
+      <button class="tab-btn" data-tab="decor">🏰 Rumah & Dekor</button>
+      <button class="tab-btn" data-tab="skins">🌌 Skin & Lampu</button>
+      <button class="tab-btn" data-tab="codex">📖 Jurnal & Kejutan</button>
+    </div>
+
+    <div class="panel" id="tabContent"></div>
+  </div>
+
+  <div class="toast-stack" id="toastStack"></div>
+
+  <div class="modal-backdrop" id="renameModal">
+    <div class="modal">
+      <div style="font-weight:700;font-size:1rem;">Beri Nama Ikanmu</div>
+      <input type="text" id="renameInput" maxlength="18" placeholder="Misal: Nova, Orion, Lyra..." />
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button id="cancelRename">Batal</button>
+        <button id="saveRename" class="primary">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw_jaTY7_ITivXfI5qxY8dv_okQCSji4Qol-HB3ooeF8KmiJM3rjEAejrmdznk9RqfM/exec";
+    const LOCAL_KEY = "virsagi_aquarium_state_v1";
+
+    const FOODS = [
+      { id: "pellet", name: "Pelet Dasar", cost: 15, hunger: 22, mood: 4, desc: "Makanan harian ekonomis untuk menaikkan kenyang." },
+      { id: "krill", name: "Cacing Beku / Krill", cost: 35, hunger: 36, mood: 14, desc: "Favorit! Kenyang naik lebih cepat + mood bertambah." },
+      { id: "nectar", name: "Nektar Nebula", cost: 60, hunger: 25, mood: 20, buff: "glow", desc: "Efek 45 detik: sirip berpendar kosmik & renang lebih cepat!" },
+      { id: "tonic", name: "Ramuan Pemulih", cost: 40, hunger: 55, mood: 25, clean: 20, desc: "Menyelamatkan ikan dari kondisi Kritis / Terdampar di Karang." }
+    ];
+
+    const DECORS = {
+      backdrop: [
+        { id: "reef", name: "Terumbu Karang", cost: 0, desc: "Terumbu karang klasik bernuansa lembut." },
+        { id: "ruins", name: "Reruntuhan Kuil Kosmik", cost: 140, desc: "Pilar kuno berukir rasi bintang di dasar laut." },
+        { id: "kelp", name: "Hutan Rumput Laut", cost: 160, desc: "Rumpun alga tinggi yang bergoyang mengikuti arus." },
+        { id: "nebula_bg", name: "Langit Nebula", cost: 220, desc: "Awan kosmik ungu-biru penuh debu bintang." }
+      ],
+      substrate: [
+        { id: "sand_white", name: "Pasir Putih", cost: 0, desc: "Pasir halus cerah di dasar akuarium." },
+        { id: "moon_gravel", name: "Kerikil Bulan", cost: 110, desc: "Batuan kecil keperakan yang memantulkan cahaya." },
+        { id: "violet_sand", name: "Pasir Ungu Berkilau", cost: 180, desc: "Pasir kosmik berkilau favorit Sagittarius." }
+      ],
+      shelter: [
+        { id: "none", name: "Tanpa Rumah Khusus", cost: 0, desc: "Ruang terbuka di tengah akuarium." },
+        { id: "clam", name: "Kerang Raksasa", cost: 130, desc: "Ikan bisa masuk ke kerang saat istirahat/tidur." },
+        { id: "crystal_cave", name: "Gua Kristal", cost: 210, desc: "Rumah kristal yang mempercepat pemulihan Mood." },
+        { id: "castle", name: "Kastil Mini Kosmik", cost: 260, desc: "Menara mungil tempat ikan berlindung & bermain." },
+        { id: "shipwreck", name: "Kapal Karam Mungil", cost: 240, desc: "Kapal penjelajah karam penuh nuansa petualang." }
+      ],
+      ornament: [
+        { id: "none", name: "Polos", cost: 0, desc: "Tidak ada pernak-pernik tambahan." },
+        { id: "star_bubble", name: "Gelembung Bintang", cost: 95, desc: "Sumber gelembung oksigen berbentuk bintang." },
+        { id: "glow_plant", name: "Tanaman Air Bercahaya", cost: 150, desc: "Tumbuhan neon yang memancarkan pendar lembut." },
+        { id: "coin_chest", name: "Peti Harta Koin", cost: 250, desc: "Menghasilkan bonus koin ekstra tiap beberapa menit!" }
+      ],
+      companion: [
+        { id: "none", name: "Hanya Ikan Utama", cost: 0, desc: "Fokus penuh pada satu ikan utama." },
+        { id: "neon_shoal", name: "Kawanan Ikan Neon", cost: 200, desc: "Teman kecil mungil yang berenang di sekitar ikan utama." },
+        { id: "glass_snail", name: "Siput Pembersih", cost: 175, desc: "Membantu menjaga kebersihan kaca akuarium." }
+      ]
+    };
+
+    const SKINS = [
+      { id: "classic_sagi", name: "Classic Sagi", cost: 0, primary: "#38bdf8", secondary: "#c084fc", fin: "#7dd3fc", desc: "Corak biru-ungu kosmik bawaan." },
+      { id: "koi_galaxy", name: "Koi Galaxy", cost: 180, primary: "#fb923c", secondary: "#f43f5e", fin: "#fde047", desc: "Nuansa koi hangat dengan percikan bintang." },
+      { id: "nebula_betta", name: "Cupang Nebula", cost: 220, primary: "#a855f7", secondary: "#ec4899", fin: "#67e8f9", desc: "Sirip lebar berkilau seperti nebula." },
+      { id: "aurora_angel", name: "Bidadari Aurora", cost: 260, primary: "#34d399", secondary: "#2dd4bf", fin: "#a7f3d0", desc: "Pendar hijau-toska lembut layaknya aurora." },
+      { id: "sagi_archer", name: "Rasi Sagittarius", cost: 300, primary: "#f59e0b", secondary: "#8b5cf6", fin: "#fef08a", desc: "Edisi khusus rasi bintang Sagittarius." }
+    ];
+
+    const LIGHT_MODES = [
+      { id: "day", label: "☀️ Siang" },
+      { id: "deep_space", label: "🌌 Deep Space" },
+      { id: "aurora", label: "🌿 Aurora" }
+    ];
+
+    const MYSTERY_POOL = [
+      { type: "coins", amount: 90, label: "90 Koin Bintang" },
+      { type: "food", id: "nectar", label: "1x Nektar Nebula" },
+      { type: "food", id: "krill", label: "1x Cacing Beku / Krill" },
+      { type: "skin", id: "aurora_angel", label: "Skin Bidadari Aurora" },
+      { type: "decor", slot: "ornament", id: "star_bubble", label: "Dekor Gelembung Bintang" }
+    ];
+
+    const SECRET_NOTES = [
+      "Pesan botol: 'Yang paling jauh sering kali menyimpan bintang paling terang.'",
+      "Gelembung rahasia: '+35 koin kejutan untuk jiwa petualang yang rajin mampir!'",
+      "Catatan kecil: 'Sagitarius selalu punya cara sendiri menemukan hal seru.'",
+      "Pesan botol: 'Walaupun pelan, setiap langkah kecil tetap menggerakkan cerita.'"
+    ];
+
+    function todayStr() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function createRandomTrait() {
+      const tails = ["selendang", "mahkota", "kipas"];
+      const patterns = ["dots", "lines", "starburst"];
+      const accessories = ["none", "crown", "halo"];
+      return {
+        tail: tails[Math.floor(Math.random() * tails.length)],
+        pattern: patterns[Math.floor(Math.random() * patterns.length)],
+        accessory: accessories[Math.floor(Math.random() * accessories.length)]
+      };
+    }
+
+    function defaultState() {
+      return {
+        pet_name: "Nova",
+        coins: 150,
+        hunger: 85,
+        cleanliness: 90,
+        mood: 85,
+        active_days: 1,
+        last_care_date: todayStr(),
+        last_updated: Date.now(),
+        status: "healthy",
+        critical_since: null,
+        equipped_skin: "classic_sagi",
+        unlocked_skins: ["classic_sagi"],
+        owned_items: ["reef", "sand_white"],
+        equipped_decor: {
+          backdrop: "reef",
+          substrate: "sand_white",
+          shelter: "none",
+          ornament: "none",
+          companion: "none"
+        },
+        codex: {
+          pearls: 0,
+          meteors: 0,
+          secret_bottles: 0,
+          history: ["Nova (Hari 1)"],
+          favorite_food: "Cacing Beku / Krill"
+        },
+        virgo_gift: { coins: 0, item: "", note: "Selamat datang di rumah barumu!" },
+        light_mode: "deep_space",
+        trait: createRandomTrait(),
+        stats_count: {
+          bubbles: 0,
+          krill: 0,
+          night_visits: 0
+        }
+      };
+    }
+
+    let state = defaultState();
+    let activeTab = "care";
+    let decorSlot = "backdrop";
+    let soundOn = true;
+    let audioCtx = null;
+
+    // Visual & mini-game runtime state
+    const canvas = document.getElementById("tankCanvas");
+    const ctx = canvas.getContext("2d");
+    const fish = {
+      x: 420,
+      y: 210,
+      vx: 1.4,
+      vy: 0.4,
+      angle: 0,
+      tailPhase: 0,
+      buffUntil: 0,
+      pointerTarget: null,
+      inShelter: false
+    };
+
+    const ripples = [];
+    const ambientBubbles = [];
+    const floatingCoins = [];
+    const meteors = [];
+    let weather = "Malam Starlight";
+    let activeMinigame = null; // 'bubbles' | 'rings' | 'dig' | 'clean' | 'simon'
+    let mgTimer = 0;
+    let mgScore = 0;
+    let mgTargets = [];
+    let simonSeq = [];
+    let simonStep = 0;
+    let simonFlash = -1;
+    let dirtySpots = [];
+    let sandSpots = [];
+    let lastChestCoinTime = Date.now();
+    let lastPassiveCoinTime = Date.now();
+
+    function playTone(freq = 520, duration = 0.12, type = "sine") {
+      if (!soundOn) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (_) {}
+    }
+
+    function toast(msg) {
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = msg;
+      document.getElementById("toastStack").appendChild(el);
+      setTimeout(() => el.remove(), 2800);
+    }
+
+    function setNote(msg) {
+      document.getElementById("noteBanner").textContent = "💬 " + msg;
+    }
+
+    function getGrowthPhase() {
+      const d = Number(state.active_days) || 1;
+      if (d <= 5) return { phase: 1, label: "Fase 1: Baby Fry", scale: 0.68, skinUnlocked: false };
+      if (d <= 14) return { phase: 2, label: "Fase 2: Juvenile", scale: 0.85, skinUnlocked: false };
+      if (d <= 25) return { phase: 3, label: "Fase 3: Young Adult", scale: 1.03, skinUnlocked: false };
+      return { phase: 4, label: "Fase 4: Majestic Adult", scale: 1.22, skinUnlocked: true };
+    }
+
+    function getPetTitle() {
+      const hr = new Date().getHours();
+      if (hr >= 22 || hr < 4) return "Raja/Ratu Begadang";
+      if ((state.stats_count?.krill || 0) >= 8) return "Paling Doyan Krill";
+      if ((state.stats_count?.bubbles || 0) >= 15) return "Si Pemburu Gelembung";
+      return "Penjelajah Kosmik";
+    }
+
+    function getMoodHabit() {
+      if (state.status === "critical") return "Lesu / Kritis";
+      if (state.status === "gone") return "Ke Bintang";
+      if (fish.pointerTarget) return "Penasaran";
+      if (state.mood >= 80) return "Ceria & Manja";
+      return "Petualang";
+    }
+
+    function applyElapsedDecay() {
+      const now = Date.now();
+      const prev = Number(state.last_updated) || now;
+      const elapsedHours = Math.max(0, (now - prev) / 3600000);
+
+      if (elapsedHours > 0.01 && state.status !== "gone") {
+        // Decay yang ramah agar tidak langsung stres saat sibuk
+        state.hunger = Math.max(0, +(state.hunger - elapsedHours * 1.4).toFixed(1));
+        state.cleanliness = Math.max(0, +(state.cleanliness - elapsedHours * 1.1).toFixed(1));
+        if (state.hunger < 25 || state.cleanliness < 25) {
+          state.mood = Math.max(0, +(state.mood - elapsedHours * 1.2).toFixed(1));
+        }
+      }
+
+      if (state.status !== "gone") {
+        if (state.hunger <= 0) {
+          if (state.status !== "critical") {
+            state.status = "critical";
+            state.critical_since = now;
+            toast(`${state.pet_name} masuk mode Kritis / Terdampar di Karang! Beri Ramuan Pemulih atau rawat segera.`);
+          } else if (state.critical_since && (now - state.critical_since) > 72 * 3600000) {
+            state.status = "gone";
+            toast(`${state.pet_name} telah pergi ke bintang... Kamu bisa menetas/adopsi ikan baru.`);
+          }
+        } else if (state.status === "critical" && state.hunger > 20) {
+          state.status = "healthy";
+          state.critical_since = null;
+        } else if (state.status !== "critical") {
+          state.status = state.hunger < 30 ? "hungry" : "healthy";
+        }
+      }
+
+      state.last_updated = now;
+    }
+
+    function registerCareAction(moodGain = 3) {
+      const today = todayStr();
+      if (state.last_care_date !== today && state.status !== "gone") {
+        state.last_care_date = today;
+        state.active_days = Math.min(30, (Number(state.active_days) || 1) + 1);
+        toast(`Hari aktif bertambah! Sekarang Hari ke-${state.active_days}/30.`);
+        if (state.active_days === 26) {
+          toast("✨ Fase Dewasa tercapai! Lemari Skin Kosmik kini terbuka!");
+        }
+      }
+      if (state.status !== "gone") {
+        state.mood = Math.min(100, +(state.mood + moodGain).toFixed(1));
+      }
+      const hr = new Date().getHours();
+      if (hr >= 22 || hr < 4) {
+        state.stats_count.night_visits = (state.stats_count.night_visits || 0) + 1;
+      }
+    }
+
+    function claimVirgoGiftIfAny() {
+      const g = state.virgo_gift;
+      if (!g) return;
+      const hasCoins = Number(g.coins) > 0;
+      const hasItem = Boolean(g.item);
+      if (g.note) setNote(g.note);
+
+      if (hasCoins || hasItem) {
+        if (hasCoins) {
+          state.coins += Number(g.coins);
+          toast(`🎁 Kejutan darimu: +${g.coins} koin!`);
+        }
+        if (hasItem) {
+          if (!state.owned_items.includes(g.item)) state.owned_items.push(g.item);
+          if (SKINS.some(s => s.id === g.item) && !state.unlocked_skins.includes(g.item)) {
+            state.unlocked_skins.push(g.item);
+          }
+          toast(`🎁 Kejutan item diterima: ${g.item}`);
+        }
+        state.virgo_gift = { coins: 0, item: "", note: g.note || "Semangat hari ini!" };
+        playTone(780, 0.2, "triangle");
+      }
+    }
+
+    function rollRandomWeatherAndEvent() {
+      const hr = new Date().getHours();
+      const base = hr < 11 ? "Pagi Cerah" : hr < 17 ? "Senja Hangat" : "Malam Starlight";
+      const roll = Math.random();
+      if (roll < 0.22) {
+        weather = `${base} • Hujan Meteor Kecil`;
+        for (let i = 0; i < 6; i++) {
+          meteors.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * 140,
+            vx: -4 - Math.random() * 3,
+            vy: 2.5 + Math.random() * 2,
+            life: 60
+          });
+        }
+        state.codex.meteors = (state.codex.meteors || 0) + 1;
+      } else if (roll < 0.42) {
+        weather = `${base} • Arus Aurora`;
+      } else {
+        weather = base;
+      }
+
+      if (Math.random() < 0.28 && state.status !== "gone") {
+        const msg = SECRET_NOTES[Math.floor(Math.random() * SECRET_NOTES.length)];
+        state.codex.secret_bottles = (state.codex.secret_bottles || 0) + 1;
+        state.coins += 15;
+        setNote(msg);
+        toast("🍾 Menemukan Pesan Botol Rahasia (+15 koin)!");
+      }
+    }
+
+    function parseJsonField(val, fallback) {
+      if (!val) return fallback;
+      if (typeof val === "object") return val;
+      try { return JSON.parse(val); } catch (_) { return fallback; }
+    }
+
+    function normalizeState(raw) {
+      const def = defaultState();
+      const merged = {
+        ...def,
+        ...raw,
+        coins: Number(raw.coins ?? def.coins),
+        hunger: Number(raw.hunger ?? def.hunger),
+        cleanliness: Number(raw.cleanliness ?? def.cleanliness),
+        mood: Number(raw.mood ?? def.mood),
+        active_days: Number(raw.active_days ?? def.active_days),
+        unlocked_skins: parseJsonField(raw.unlocked_skins, def.unlocked_skins),
+        owned_items: parseJsonField(raw.owned_items, def.owned_items),
+        equipped_decor: { ...def.equipped_decor, ...parseJsonField(raw.equipped_decor, {}) },
+        codex: { ...def.codex, ...parseJsonField(raw.codex, {}) },
+        virgo_gift: { ...def.virgo_gift, ...parseJsonField(raw.virgo_gift, {}) },
+        trait: { ...def.trait, ...parseJsonField(raw.trait, {}) },
+        stats_count: { ...def.stats_count, ...parseJsonField(raw.stats_count, {}) }
+      };
+      return merged;
+    }
+
+    function saveLocal() {
+      localStorage.setItem(LOCAL_KEY, JSON.stringify(state));
+    }
+
+    async function syncToSheet(silent = false) {
+      saveLocal();
+      if (!WEB_APP_URL || WEB_APP_URL.includes("PASTE_YOUR")) return;
+      try {
+        await fetch(WEB_APP_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "save_aquarium", data: state })
+        });
+        if (!silent) toast("☁️ Tersimpan ke Google Sheet");
+      } catch (err) {
+        if (!silent) toast("Disimpan lokal (cek koneksi untuk sinkron)");
+      }
+    }
+
+    async function loadFromSheet() {
+      const cached = localStorage.getItem(LOCAL_KEY);
+      if (cached) {
+        state = normalizeState(JSON.parse(cached));
+      }
+      if (WEB_APP_URL && !WEB_APP_URL.includes("PASTE_YOUR")) {
+        try {
+          const res = await fetch(`${WEB_APP_URL}?action=get_aquarium`);
+          const json = await res.json();
+          if (json && json.ok && json.data) {
+            state = normalizeState(json.data);
+          }
+        } catch (_) {}
+      }
+      applyElapsedDecay();
+      claimVirgoGiftIfAny();
+      rollRandomWeatherAndEvent();
+      saveLocal();
+      renderAll();
+      await syncToSheet(true);
+    }
+
+    function addCoins(amount, reason = "") {
+      state.coins = Math.max(0, Math.round(state.coins + amount));
+      if (reason && amount > 0) toast(`+${amount} koin (${reason})`);
+      renderTopStats();
+      saveLocal();
+    }
+
+    function feedPet(food) {
+      if (state.status === "gone") {
+        toast("Ikan sudah pergi ke bintang. Adopsi/tetaskan ikan baru dulu ya.");
+        return;
+      }
+      if (state.coins < food.cost) {
+        toast("Koin belum cukup! Main mini-game dulu untuk koin.");
+        return;
+      }
+      state.coins -= food.cost;
+      state.hunger = Math.min(100, +(state.hunger + food.hunger).toFixed(1));
+      state.mood = Math.min(100, +(state.mood + (food.mood || 0)).toFixed(1));
+      if (food.clean) state.cleanliness = Math.min(100, +(state.cleanliness + food.clean).toFixed(1));
+      if (food.buff === "glow") {
+        fish.buffUntil = Date.now() + 45000;
+        toast("✨ Sirip berpendar & renang ngebut selama 45 detik!");
+      }
+      if (food.id === "krill") {
+        state.stats_count.krill = (state.stats_count.krill || 0) + 1;
+      }
+      if (state.status === "critical" && state.hunger >= 25) {
+        state.status = "healthy";
+        state.critical_since = null;
+        toast(`💖 ${state.pet_name} pulih dari kondisi kritis!`);
+      }
+      state.codex.favorite_food = food.name;
+      registerCareAction(4);
+      playTone(620, 0.14, "sine");
+      setNote(`Menikmati ${food.name}!`);
+      renderAll();
+      syncToSheet(true);
+    }
+
+    function hatchNewPet() {
+      state.pet_name = `Star-${Math.floor(10 + Math.random() * 89)}`;
+      state.hunger = 90;
+      state.cleanliness = 95;
+      state.mood = 90;
+      state.active_days = 1;
+      state.last_care_date = todayStr();
+      state.status = "healthy";
+      state.critical_since = null;
+      state.equipped_skin = "classic_sagi";
+      state.trait = createRandomTrait();
+      state.codex.history = [...(state.codex.history || []), `${state.pet_name} (Baru menetas)`];
+      fish.x = canvas.width * 0.5;
+      fish.y = canvas.height * 0.45;
+      playTone(880, 0.22, "triangle");
+      toast(`🐣 Ikan baru menetas dengan pola unik: ${state.pet_name}!`);
+      renderAll();
+      syncToSheet(true);
+    }
+
+    // Mini-games
+    function startMinigame(mode) {
+      if (state.status === "gone") {
+        toast("Adopsi/tetaskan ikan baru dulu sebelum main.");
+        return;
+      }
+      activeMinigame = mode;
+      mgScore = 0;
+      mgTimer = 25;
+      mgTargets = [];
+      dirtySpots = [];
+      sandSpots = [];
+      simonSeq = [];
+      simonStep = 0;
+
+      document.getElementById("minigameBar").classList.add("active");
+
+      if (mode === "bubbles") {
+        setNote("Klik gelembung emas (+12 koin)! Hindari gelembung hitam.");
+        for (let i = 0; i < 9; i++) {
+          mgTargets.push({
+            x: 80 + Math.random() * (canvas.width - 160),
+            y: 70 + Math.random() * (canvas.height - 150),
+            r: 20 + Math.random() * 10,
+            vy: -0.9 - Math.random() * 1.2,
+            bad: Math.random() < 0.22
+          });
+        }
+      } else if (mode === "rings") {
+        setNote("Arahkan kursor/jari agar ikan melewati ring cahaya rasi bintang!");
+        spawnRing();
+      } else if (mode === "dig") {
+        setNote("Gosok/klik kilauan di pasir dasar untuk menggali mutiara & koin!");
+        for (let i = 0; i < 6; i++) {
+          sandSpots.push({
+            x: 90 + Math.random() * (canvas.width - 180),
+            y: canvas.height - 52 + (Math.random() * 22 - 11),
+            progress: 0,
+            found: false
+          });
+        }
+      } else if (mode === "clean") {
+        setNote("Usap atau klik bercak lumut di kaca sampai bersih mengilap!");
+        for (let i = 0; i < 12; i++) {
+          dirtySpots.push({
+            x: 70 + Math.random() * (canvas.width - 140),
+            y: 60 + Math.random() * (canvas.height - 130),
+            r: 28,
+            clean: 0
+          });
+        }
+      } else if (mode === "simon") {
+        setNote("Perhatikan urutan cahaya rasi bintang lalu klik ulang!");
+        for (let i = 0; i < 4; i++) {
+          mgTargets.push({
+            x: canvas.width * (0.22 + i * 0.18),
+            y: canvas.height * 0.36,
+            r: 26,
+            idx: i
+          });
+        }
+        nextSimonRound();
+      }
+      updateMinigameHud();
+    }
+
+    function spawnRing() {
+      mgTargets = [{
+        x: 140 + Math.random() * (canvas.width - 280),
+        y: 100 + Math.random() * (canvas.height - 200),
+        r: 34
+      }];
+    }
+
+    function nextSimonRound() {
+      simonSeq.push(Math.floor(Math.random() * 4));
+      simonStep = 0;
+      playSimonSequence();
+    }
+
+    function playSimonSequence() {
+      let i = 0;
+      const iv = setInterval(() => {
+        simonFlash = simonSeq[i];
+        playTone(360 + simonFlash * 110, 0.14, "sine");
+        setTimeout(() => { simonFlash = -1; }, 260);
+        i++;
+        if (i >= simonSeq.length) clearInterval(iv);
+      }, 480);
+    }
+
+    function stopMinigame(finished = true) {
+      if (!activeMinigame) return;
+      const earned = Math.max(finished ? 10 : 0, mgScore);
+      activeMinigame = null;
+      document.getElementById("minigameBar").classList.remove("active");
+      if (earned > 0) {
+        addCoins(earned, "Mini-Game");
+        registerCareAction(3);
+        syncToSheet(true);
+      }
+      setNote("Sesi mini-game selesai!");
+    }
+
+    function updateMinigameHud() {
+      if (!activeMinigame) return;
+      document.getElementById("minigameInfo").textContent =
+        `🎮 ${activeMinigame.toUpperCase()} • Waktu: ${Math.ceil(mgTimer)}d • Koin Ronde: +${mgScore}`;
+    }
+
+    // Tabs & UI rendering
+    function renderTopStats() {
+      const phase = getGrowthPhase();
+      document.getElementById("petNameDisplay").textContent = state.pet_name;
+      document.getElementById("petTitleBadge").textContent = `🏅 ${getPetTitle()}`;
+      document.getElementById("phaseBadge").textContent = `${phase.label} • Hari ${state.active_days}/30`;
+      document.getElementById("coinBadge").textContent = `🪙 ${state.coins}`;
+
+      const h = Math.round(state.hunger);
+      const c = Math.round(state.cleanliness);
+      const m = Math.round(state.mood);
+      document.getElementById("valHunger").textContent = `${h}%`;
+      document.getElementById("barHunger").style.width = `${h}%`;
+      document.getElementById("valClean").textContent = `${c}%`;
+      document.getElementById("barClean").style.width = `${c}%`;
+      document.getElementById("valMood").textContent = `${m}%`;
+      document.getElementById("barMood").style.width = `${m}%`;
+      document.getElementById("valHabit").textContent = getMoodHabit();
+      document.getElementById("barGrowth").style.width = `${Math.min(100, Math.round((state.active_days / 30) * 100))}%`;
+
+      document.getElementById("weatherChip").textContent = `✨ Cuaca: ${weather}`;
+      const statusMap = {
+        healthy: "Status: Sehat",
+        hungry: "Status: Lapar",
+        critical: "Status: Kritis / Terdampar",
+        gone: "Status: Pergi ke Bintang"
+      };
+      document.getElementById("statusChip").textContent = statusMap[state.status] || "Status: Sehat";
+    }
+
+    function renderTabContent() {
+      const box = document.getElementById("tabContent");
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === activeTab));
+
+      if (activeTab === "care") {
+        box.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div style="font-weight:700;">Varian Makanan & Perawatan</div>
+            ${state.status === "gone" ? `<button class="primary" id="btnHatch">🐣 Tetaskan / Adopsi Ikan Baru</button>` : ""}
+          </div>
+          <div class="shop-grid" id="foodGrid"></div>
+        `;
+        const grid = document.getElementById("foodGrid");
+        FOODS.forEach(f => {
+          const card = document.createElement("div");
+          card.className = "item-card";
+          card.innerHTML = `
+            <div>
+              <div class="item-title">${f.name}</div>
+              <div class="item-desc">${f.desc}</div>
+            </div>
+            <div class="item-foot">
+              <span>🪙 ${f.cost}</span>
+              <button class="primary" ${state.coins < f.cost || state.status === "gone" ? "disabled" : ""}>Beri</button>
+            </div>
+          `;
+          card.querySelector("button").onclick = () => feedPet(f);
+          grid.appendChild(card);
+        });
+        const hatchBtn = document.getElementById("btnHatch");
+        if (hatchBtn) hatchBtn.onclick = hatchNewPet;
+      } else if (activeTab === "games") {
+        const games = [
+          { id: "bubbles", name: "🫧 Tangkap Gelembung", desc: "Klik gelembung emas sebelum menghilang (25 detik)." },
+          { id: "rings", name: "✨ Tuntun Lewat Ring Rasi", desc: "Arahkan ikan menembus cincin cahaya rasi bintang." },
+          { id: "dig", name: "⛏️ Gali Harta Pasir", desc: "Gosok/klik pasir dasar untuk menemukan mutiara & koin." },
+          { id: "clean", name: "🧽 Bersihkan Lumut Kaca", desc: "Usap noda lumut di kaca sampai jernih & dapat koin." },
+          { id: "simon", name: "🌟 Ikuti Irama Cahaya", desc: "Tirukan urutan nyala titik bintang untuk panen koin." }
+        ];
+        box.innerHTML = `<div style="font-weight:700;">Mini-Game Solo Pencari Koin (20–25 Detik)</div><div class="shop-grid" id="gameGrid"></div>`;
+        const grid = document.getElementById("gameGrid");
+        games.forEach(g => {
+          const card = document.createElement("div");
+          card.className = "item-card";
+          card.innerHTML = `
+            <div><div class="item-title">${g.name}</div><div class="item-desc">${g.desc}</div></div>
+            <div class="item-foot"><span>Solo</span><button class="primary">Main</button></div>
+          `;
+          card.querySelector("button").onclick = () => startMinigame(g.id);
+          grid.appendChild(card);
+        });
+      } else if (activeTab === "decor") {
+        const slots = [
+          ["backdrop", "Latar"],
+          ["substrate", "Dasar/Pasir"],
+          ["shelter", "Rumah Ikan"],
+          ["ornament", "Pernak-Pernik"],
+          ["companion", "Teman Kecil"]
+        ];
+        box.innerHTML = `
+          <div style="font-weight:700;margin-bottom:8px;">Bangun Rumah & Dekorasi Akuarium</div>
+          <div class="sub-row" id="slotRow"></div>
+          <div class="shop-grid" id="decorGrid"></div>
+        `;
+        const slotRow = document.getElementById("slotRow");
+        slots.forEach(([key, label]) => {
+          const b = document.createElement("button");
+          b.className = `pill-btn ${decorSlot === key ? "active" : ""}`;
+          b.textContent = label;
+          b.onclick = () => { decorSlot = key; renderTabContent(); };
+          slotRow.appendChild(b);
+        });
+        const grid = document.getElementById("decorGrid");
+        (DECORS[decorSlot] || []).forEach(item => {
+          const owned = item.cost === 0 || state.owned_items.includes(item.id);
+          const equipped = state.equipped_decor[decorSlot] === item.id;
+          const card = document.createElement("div");
+          card.className = "item-card";
+          card.innerHTML = `
+            <div><div class="item-title">${item.name}</div><div class="item-desc">${item.desc}</div></div>
+            <div class="item-foot">
+              <span>${owned ? "Dimiliki" : "🪙 " + item.cost}</span>
+              <button class="${equipped ? "" : "primary"}">${equipped ? "Terpasang" : owned ? "Pasang" : "Beli"}</button>
+            </div>
+          `;
+          card.querySelector("button").onclick = () => {
+            if (!owned) {
+              if (state.coins < item.cost) return toast("Koin belum cukup!");
+              state.coins -= item.cost;
+              state.owned_items.push(item.id);
+              toast(`Membeli ${item.name}!`);
+            }
+            state.equipped_decor[decorSlot] = item.id;
+            playTone(580, 0.12, "sine");
+            renderAll();
+            syncToSheet(true);
+          };
+          grid.appendChild(card);
+        });
+      } else if (activeTab === "skins") {
+        const phase = getGrowthPhase();
+        box.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div style="font-weight:700;">Lampu Ambient & Lemari Skin Kosmik</div>
+              <div class="item-desc">${phase.skinUnlocked ? "Fase Dewasa tercapai! Semua skin bisa dipakai/dibeli." : `Terbuka penuh di Hari Aktif ke-26 (sekarang Hari ${state.active_days}/30).`}</div>
+            </div>
+            <div class="sub-row" id="lightRow" style="margin:0;"></div>
+          </div>
+          <div class="shop-grid" id="skinGrid"></div>
+        `;
+        const lightRow = document.getElementById("lightRow");
+        LIGHT_MODES.forEach(lm => {
+          const btn = document.createElement("button");
+          btn.className = `pill-btn ${state.light_mode === lm.id ? "active" : ""}`;
+          btn.textContent = lm.label;
+          btn.onclick = () => { state.light_mode = lm.id; renderTabContent(); saveLocal(); };
+          lightRow.appendChild(btn);
+        });
+        const grid = document.getElementById("skinGrid");
+        SKINS.forEach(sk => {
+          const owned = state.unlocked_skins.includes(sk.id);
+          const equipped = state.equipped_skin === sk.id;
+          const canUse = owned || phase.skinUnlocked;
+          const card = document.createElement("div");
+          card.className = "item-card";
+          card.innerHTML = `
+            <div>
+              <div class="item-title" style="color:${sk.fin}">${sk.name}</div>
+              <div class="item-desc">${sk.desc}</div>
+            </div>
+            <div class="item-foot">
+              <span>${owned ? "Terbuka" : "🪙 " + sk.cost}</span>
+              <button class="${equipped ? "" : "primary"}" ${!canUse && !owned ? "disabled" : ""}>
+                ${equipped ? "Dipakai" : owned ? "Pakai" : phase.skinUnlocked ? "Beli Skin" : "Terkunci"}
+              </button>
+            </div>
+          `;
+          card.querySelector("button").onclick = () => {
+            if (!owned) {
+              if (!phase.skinUnlocked) return toast("Capai Fase Dewasa (Hari 26+) dulu ya!");
+              if (state.coins < sk.cost) return toast("Koin belum cukup!");
+              state.coins -= sk.cost;
+              state.unlocked_skins.push(sk.id);
+            }
+            state.equipped_skin = sk.id;
+            playTone(700, 0.15, "triangle");
+            renderAll();
+            syncToSheet(true);
+          };
+          grid.appendChild(card);
+        });
+      } else if (activeTab === "codex") {
+        box.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+            <div style="font-weight:700;">Jurnal Penemuan (Codex) & Kerang Misteri</div>
+            <button class="primary" id="btnMystery">🔮 Buka Kerang Misteri (🪙 80)</button>
+          </div>
+          <div class="codex-list">
+            <div class="codex-box"><b>Mutiara Digali:</b> ${state.codex.pearls || 0}</div>
+            <div class="codex-box"><b>Hujan Meteor:</b> ${state.codex.meteors || 0}</div>
+            <div class="codex-box"><b>Botol Rahasia:</b> ${state.codex.secret_bottles || 0}</div>
+            <div class="codex-box"><b>Makanan Favorit:</b> ${state.codex.favorite_food || "-"}</div>
+            <div class="codex-box" style="grid-column:1/-1;"><b>Riwayat Ikan:</b> ${(state.codex.history || []).join(" • ")}</div>
+          </div>
+        `;
+        document.getElementById("btnMystery").onclick = () => {
+          if (state.coins < 80) return toast("Butuh 80 koin untuk membuka Kerang Misteri!");
+          state.coins -= 80;
+          const pick = MYSTERY_POOL[Math.floor(Math.random() * MYSTERY_POOL.length)];
+          if (pick.type === "coins") state.coins += pick.amount;
+          if (pick.type === "skin" && !state.unlocked_skins.includes(pick.id)) state.unlocked_skins.push(pick.id);
+          if (pick.type === "decor" && !state.owned_items.includes(pick.id)) state.owned_items.push(pick.id);
+          playTone(820, 0.22, "triangle");
+          toast(`🎉 Isi Kerang Misteri: ${pick.label}!`);
+          renderAll();
+          syncToSheet(true);
+        };
+      }
+    }
+
+    function renderAll() {
+      renderTopStats();
+      renderTabContent();
+    }
+
+    // Canvas drawing
+    function drawTank() {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Lighting & Backdrop
+      const lm = state.light_mode;
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      if (lm === "day") {
+        grad.addColorStop(0, "#1d4ed8");
+        grad.addColorStop(1, "#0f172a");
+      } else if (lm === "aurora") {
+        grad.addColorStop(0, "#064e3b");
+        grad.addColorStop(0.55, "#1e1b4b");
+        grad.addColorStop(1, "#090d16");
+      } else {
+        grad.addColorStop(0, "#090d1f");
+        grad.addColorStop(0.6, "#161036");
+        grad.addColorStop(1, "#060913");
+      }
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Stars
+      for (let i = 0; i < 28; i++) {
+        const sx = ((i * 97) % w);
+        const sy = ((i * 53) % (h * 0.65));
+        ctx.fillStyle = i % 3 === 0 ? "rgba(253,224,71,0.55)" : "rgba(255,255,255,0.35)";
+        ctx.beginPath();
+        ctx.arc(sx, sy, (i % 2) + 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Backdrop detail
+      const bd = state.equipped_decor.backdrop;
+      if (bd === "ruins") {
+        ctx.fillStyle = "rgba(148, 163, 184, 0.16)";
+        ctx.fillRect(120, h - 180, 34, 140);
+        ctx.fillRect(680, h - 205, 40, 165);
+      } else if (bd === "kelp") {
+        ctx.strokeStyle = "rgba(52, 211, 153, 0.25)";
+        ctx.lineWidth = 8;
+        for (let k = 0; k < 5; k++) {
+          const kx = 100 + k * 165;
+          ctx.beginPath();
+          ctx.moveTo(kx, h - 38);
+          ctx.quadraticCurveTo(kx + Math.sin(Date.now() / 600 + k) * 18, h - 110, kx, h - 170);
+          ctx.stroke();
+        }
+      } else {
+        ctx.fillStyle = "rgba(244, 114, 182, 0.14)";
+        for (let c = 0; c < 4; c++) {
+          ctx.beginPath();
+          ctx.arc(140 + c * 190, h - 46, 26 + (c % 2) * 10, Math.PI, 0);
+          ctx.fill();
+        }
+      }
+
+      // Substrate
+      const sub = state.equipped_decor.substrate;
+      ctx.fillStyle = sub === "moon_gravel" ? "#334155" : sub === "violet_sand" ? "#3b1d6e" : "#b89f78";
+      ctx.fillRect(0, h - 38, w, 38);
+
+      // Shelter
+      const sh = state.equipped_decor.shelter;
+      if (sh && sh !== "none") {
+        ctx.save();
+        ctx.translate(w * 0.78, h - 42);
+        ctx.fillStyle = sh === "crystal_cave" ? "rgba(168, 85, 247, 0.35)" : "rgba(245, 158, 11, 0.3)";
+        ctx.beginPath();
+        ctx.arc(0, 0, 48, Math.PI, 0);
+        ctx.fill();
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(sh.replace("_", " "), 0, -54);
+        ctx.restore();
+      }
+
+      // Ornament
+      const orn = state.equipped_decor.ornament;
+      if (orn === "coin_chest") {
+        ctx.fillStyle = "#d97706";
+        ctx.fillRect(68, h - 66, 44, 28);
+        ctx.fillStyle = "#fde047";
+        ctx.fillRect(85, h - 56, 10, 10);
+      } else if (orn === "glow_plant") {
+        ctx.strokeStyle = "#22d3ee";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(95, h - 38);
+        ctx.lineTo(82, h - 95);
+        ctx.moveTo(95, h - 38);
+        ctx.lineTo(112, h - 88);
+        ctx.stroke();
+      }
+
+      // Companion
+      if (state.equipped_decor.companion === "neon_shoal") {
+        for (let i = 0; i < 3; i++) {
+          const nx = ((fish.x - 60 - i * 24 + w) % w);
+          const ny = Math.max(50, Math.min(h - 70, fish.y + (i - 1) * 20 + Math.sin(Date.now() / 400 + i) * 8));
+          ctx.fillStyle = "#38bdf8";
+          ctx.beginPath();
+          ctx.ellipse(nx, ny, 9, 4, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Sand dig spots
+      sandSpots.forEach(sp => {
+        if (sp.found) return;
+        ctx.fillStyle = "rgba(253, 224, 71, 0.85)";
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, 10 + Math.sin(Date.now() / 150) * 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Minigame targets
+      if (activeMinigame === "bubbles") {
+        mgTargets.forEach(t => {
+          ctx.fillStyle = t.bad ? "rgba(30, 41, 59, 0.9)" : "rgba(251, 191, 36, 0.45)";
+          ctx.strokeStyle = t.bad ? "#fb7185" : "#fde047";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        });
+      } else if (activeMinigame === "rings") {
+        mgTargets.forEach(t => {
+          ctx.strokeStyle = "#f472b6";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+      } else if (activeMinigame === "simon") {
+        mgTargets.forEach(t => {
+          const lit = simonFlash === t.idx;
+          ctx.fillStyle = lit ? "#fde047" : "rgba(56, 189, 248, 0.25)";
+          ctx.strokeStyle = "#7dd3fc";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        });
+      }
+
+      // Main Pet Fish
+      if (state.status !== "gone") {
+        const skin = SKINS.find(s => s.id === state.equipped_skin) || SKINS[0];
+        const phase = getGrowthPhase();
+        const glowing = Date.now() < fish.buffUntil || state.equipped_skin === "aurora_angel";
+        const critical = state.status === "critical";
+
+        ctx.save();
+        ctx.translate(fish.x, fish.y);
+        if (!critical) {
+          ctx.rotate(Math.atan2(fish.vy, fish.vx) * 0.35);
+          if (fish.vx < 0) ctx.scale(1, -1);
+        } else {
+          ctx.rotate(0.45);
+        }
+        ctx.scale(phase.scale, phase.scale);
+
+        if (glowing) {
+          ctx.shadowColor = skin.fin;
+          ctx.shadowBlur = 18;
+        }
+
+        // Tail
+        const wag = critical ? 0.1 : Math.sin(fish.tailPhase) * 0.35;
+        ctx.fillStyle = skin.fin;
+        ctx.beginPath();
+        ctx.moveTo(-24, 0);
+        ctx.quadraticCurveTo(-42, -18 + wag * 30, -48, -6 + wag * 20);
+        ctx.quadraticCurveTo(-40, 0, -48, 6 + wag * 20);
+        ctx.quadraticCurveTo(-42, 18 + wag * 30, -24, 0);
+        ctx.fill();
+
+        // Body
+        ctx.fillStyle = skin.primary;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 28, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Secondary stripe/pattern
+        ctx.fillStyle = skin.secondary;
+        ctx.beginPath();
+        ctx.ellipse(-4, 2, 14, 8, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Accessory
+        if (state.trait?.accessory === "crown") {
+          ctx.fillStyle = "#fde047";
+          ctx.beginPath();
+          ctx.moveTo(4, -15);
+          ctx.lineTo(10, -24);
+          ctx.lineTo(15, -15);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Eye
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(14, -4, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#0f172a";
+        ctx.beginPath();
+        ctx.arc(15.5, -4, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // Dirty spots overlay
+      dirtySpots.forEach(d => {
+        ctx.fillStyle = `rgba(74, 222, 128, ${0.42 * (1 - d.clean / 100)})`;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Ripples & meteors
+      ripples.forEach(r => {
+        ctx.strokeStyle = `rgba(125, 211, 252, ${r.alpha})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      meteors.forEach(m => {
+        ctx.strokeStyle = "rgba(253, 224, 71, 0.85)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(m.x, m.y);
+        ctx.lineTo(m.x - m.vx * 3, m.y - m.vy * 3);
+        ctx.stroke();
+      });
+    }
+
+    function updateLoop(dt) {
+      const now = Date.now();
+      const speedMult = (now < fish.buffUntil ? 1.85 : 1) * (state.status === "critical" ? 0.15 : 1);
+
+      if (state.status !== "gone") {
+        fish.tailPhase += dt * 11 * speedMult;
+        if (fish.pointerTarget && state.status !== "critical") {
+          const dx = fish.pointerTarget.x - fish.x;
+          const dy = fish.pointerTarget.y - fish.y;
+          fish.vx = dx * 0.03 * speedMult;
+          fish.vy = dy * 0.03 * speedMult;
+        } else if (state.status !== "critical") {
+          fish.vx += (Math.random() - 0.5) * 0.14 * speedMult;
+          fish.vy += (Math.random() - 0.5) * 0.1 * speedMult;
+          fish.vx = Math.max(-2.2 * speedMult, Math.min(2.2 * speedMult, fish.vx));
+          fish.vy = Math.max(-1.3 * speedMult, Math.min(1.3 * speedMult, fish.vy));
+        } else {
+          fish.vx *= 0.9;
+          fish.vy = 0.25;
+        }
+
+        fish.x += fish.vx * dt * 55;
+        fish.y += fish.vy * dt * 55;
+
+        if (fish.x < 42) { fish.x = 42; fish.vx = Math.abs(fish.vx); }
+        if (fish.x > canvas.width - 42) { fish.x = canvas.width - 42; fish.vx = -Math.abs(fish.vx); }
+        if (fish.y < 46) { fish.y = 46; fish.vy = Math.abs(fish.vy); }
+        if (fish.y > canvas.height - 62) { fish.y = canvas.height - 62; fish.vy = -Math.abs(fish.vy); }
+      }
+
+      // Passive coin from well-cared pet & coin chest
+      if (state.hunger > 70 && state.cleanliness > 70 && state.status !== "gone" && (now - lastPassiveCoinTime) > 45000) {
+        lastPassiveCoinTime = now;
+        addCoins(5, "Gelembung Ceria");
+      }
+      if (state.equipped_decor.ornament === "coin_chest" && (now - lastChestCoinTime) > 120000) {
+        lastChestCoinTime = now;
+        addCoins(15, "Peti Harta");
+      }
+
+      // Minigame timer & motion
+      if (activeMinigame) {
+        mgTimer -= dt;
+        updateMinigameHud();
+        if (activeMinigame === "bubbles") {
+          mgTargets.forEach(t => {
+            t.y += t.vy * dt * 45;
+            if (t.y < 30) t.y = canvas.height - 50;
+          });
+        } else if (activeMinigame === "rings") {
+          const ring = mgTargets[0];
+          if (ring && Math.hypot(fish.x - ring.x, fish.y - ring.y) < ring.r + 16) {
+            mgScore += 14;
+            playTone(680, 0.12, "triangle");
+            spawnRing();
+          }
+        }
+        if (mgTimer <= 0) stopMinigame(true);
+      }
+
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        ripples[i].radius += dt * 55;
+        ripples[i].alpha -= dt * 1.1;
+        if (ripples[i].alpha <= 0) ripples.splice(i, 1);
+      }
+
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        meteors[i].x += meteors[i].vx * dt * 55;
+        meteors[i].y += meteors[i].vy * dt * 55;
+        meteors[i].life -= 1;
+        if (meteors[i].life <= 0) meteors.splice(i, 1);
+      }
+    }
+
+    function getCanvasPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: ((clientX - rect.left) / rect.width) * canvas.width,
+        y: ((clientY - rect.top) / rect.height) * canvas.height
+      };
+    }
+
+    function handleCanvasInteract(e, isMove = false) {
+      const pos = getCanvasPos(e);
+      if (!isMove) {
+        ripples.push({ x: pos.x, y: pos.y, radius: 4, alpha: 0.85 });
+        playTone(440, 0.06, "sine");
+      }
+      fish.pointerTarget = pos;
+
+      if (activeMinigame === "bubbles" && !isMove) {
+        for (let i = mgTargets.length - 1; i >= 0; i--) {
+          const t = mgTargets[i];
+          if (Math.hypot(pos.x - t.x, pos.y - t.y) <= t.r + 12) {
+            if (t.bad) {
+              mgScore = Math.max(0, mgScore - 6);
+              playTone(210, 0.14, "sawtooth");
+            } else {
+              mgScore += 12;
+              state.stats_count.bubbles = (state.stats_count.bubbles || 0) + 1;
+              playTone(740, 0.1, "sine");
+            }
+            mgTargets.splice(i, 1);
+            mgTargets.push({
+              x: 80 + Math.random() * (canvas.width - 160),
+              y: canvas.height - 55,
+              r: 20 + Math.random() * 10,
+              vy: -0.9 - Math.random() * 1.2,
+              bad: Math.random() < 0.22
+            });
+          }
+        }
+      } else if (activeMinigame === "dig") {
+        sandSpots.forEach(sp => {
+          if (!sp.found && Math.hypot(pos.x - sp.x, pos.y - sp.y) < 34) {
+            sp.progress += isMove ? 8 : 26;
+            if (sp.progress >= 100) {
+              sp.found = true;
+              mgScore += 18;
+              state.codex.pearls = (state.codex.pearls || 0) + 1;
+              playTone(860, 0.14, "triangle");
+            }
+          }
+        });
+      } else if (activeMinigame === "clean") {
+        dirtySpots.forEach(d => {
+          if (d.clean < 100 && Math.hypot(pos.x - d.x, pos.y - d.y) < d.r + 22) {
+            d.clean += isMove ? 14 : 35;
+            if (d.clean >= 100) {
+              mgScore += 8;
+              state.cleanliness = Math.min(100, +(state.cleanliness + 4).toFixed(1));
+              playTone(640, 0.08, "sine");
+              renderTopStats();
+            }
+          }
+        });
+      } else if (activeMinigame === "simon" && !isMove) {
+        const hit = mgTargets.find(t => Math.hypot(pos.x - t.x, pos.y - t.y) <= t.r + 12);
+        if (hit) {
+          simonFlash = hit.idx;
+          setTimeout(() => { simonFlash = -1; }, 180);
+          if (hit.idx === simonSeq[simonStep]) {
+            simonStep++;
+            playTone(360 + hit.idx * 110, 0.1, "sine");
+            if (simonStep >= simonSeq.length) {
+              mgScore += 20;
+              toast("🌟 Urutan tepat! +20 koin ronde");
+              setTimeout(nextSimonRound, 600);
+            }
+          } else {
+            toast("Kurang pas, coba perhatikan lagi ya!");
+            simonStep = 0;
+            playSimonSequence();
+          }
+        }
+      }
+    }
+
+    canvas.addEventListener("pointerdown", e => handleCanvasInteract(e, false));
+    canvas.addEventListener("pointermove", e => {
+      if (e.buttons > 0 || e.pointerType === "touch") handleCanvasInteract(e, true);
+    });
+    canvas.addEventListener("pointerleave", () => { fish.pointerTarget = null; });
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.onclick = () => { activeTab = btn.dataset.tab; renderTabContent(); };
+    });
+
+    document.getElementById("btnStopMinigame").onclick = () => stopMinigame(true);
+    document.getElementById("btnSound").onclick = () => {
+      soundOn = !soundOn;
+      document.getElementById("btnSound").textContent = soundOn ? "🔊 Suara: ON" : "🔇 Suara: OFF";
+    };
+    document.getElementById("btnSync").onclick = () => syncToSheet(false);
+
+    const renameModal = document.getElementById("renameModal");
+    document.getElementById("btnRename").onclick = () => {
+      document.getElementById("renameInput").value = state.pet_name;
+      renameModal.classList.add("open");
+    };
+    document.getElementById("cancelRename").onclick = () => renameModal.classList.remove("open");
+    document.getElementById("saveRename").onclick = () => {
+      const val = document.getElementById("renameInput").value.trim();
+      if (val) {
+        state.pet_name = val;
+        renderTopStats();
+        syncToSheet(true);
+      }
+      renameModal.classList.remove("open");
+    };
+
+    let lastFrame = performance.now();
+    function frame(now) {
+      const dt = Math.min(0.05, (now - lastFrame) / 1000);
+      lastFrame = now;
+      updateLoop(dt);
+      drawTank();
+      requestAnimationFrame(frame);
+    }
+
+    loadFromSheet().then(() => {
+      requestAnimationFrame(frame);
+    });
+  </script>
+</body>
+</html>
